@@ -1,0 +1,4943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HS Music — Monthly Profit Bridge (Student-Wise, Calendar &amp; PDF)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
+  <style id="dynamic-page-orientation">
+    @page { size: A4 portrait; margin: 10mm; }
+  </style>
+  <style>
+    /* =========================================================
+       DESIGN TOKENS & DARK THEME BASE
+       ========================================================= */
+    :root {
+      --bg: #0b0d12;
+      --bg-subtle: #11141c;
+      --card: #161a24;
+      --card-hover: #1d2230;
+      --border: #262c3d;
+      --border-strong: #374059;
+      --text: #f3f5fa;
+      --muted: #94a0b8;
+      --accent: #fa2d48;
+      --accent-hover: #e01e38;
+      --emerald: #10b981;
+      --emerald-bg: rgba(16, 185, 129, 0.12);
+      --emerald-border: rgba(16, 185, 129, 0.34);
+      --rose: #f43f5e;
+      --rose-bg: rgba(244, 63, 94, 0.12);
+      --rose-border: rgba(244, 63, 94, 0.34);
+      --amber: #f59e0b;
+      --amber-bg: rgba(245, 158, 11, 0.12);
+      --amber-border: rgba(245, 158, 11, 0.34);
+      --sky: #38bdf8;
+      --sky-bg: rgba(56, 189, 248, 0.12);
+      --sky-border: rgba(56, 189, 248, 0.34);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* =========================================================
+       TOAST NOTIFICATIONS
+       ========================================================= */
+    .toast-container {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 120;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast.success { border-color: var(--emerald-border); color: var(--emerald); }
+    .toast.warning { border-color: var(--amber-border); color: var(--amber); }
+    .toast.info { border-color: var(--sky-border); color: var(--sky); }
+
+    /* =========================================================
+       HEADER & CALENDAR PICKER
+       ========================================================= */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(11, 13, 18, 0.9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0;
+    }
+
+    .header-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #fa2d48 0%, #c8102e 100%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 18px rgba(250, 45, 72, 0.32);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-title span {
+      color: var(--accent);
+    }
+
+    .brand-subtitle {
+      margin: 2px 0 0;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .header-right {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cal-wrapper {
+      position: relative;
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cal-bar {
+      display: inline-flex;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .cal-nav-btn {
+      width: 30px;
+      height: 30px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .cal-nav-btn:hover {
+      background: var(--card-hover);
+      color: var(--text);
+    }
+
+    .cal-trigger-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 700;
+      padding: 6px 11px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .cal-trigger-btn:hover {
+      background: var(--card-hover);
+    }
+
+    .cal-range-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 10px;
+      white-space: nowrap;
+    }
+
+    .cal-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 296px;
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      border-radius: 15px;
+      padding: 14px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+      z-index: 80;
+      display: none;
+    }
+
+    .cal-popover.open {
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      .cal-popover {
+        left: 0;
+        right: auto;
+      }
+    }
+
+    .cal-pop-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cal-year-select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.86rem;
+      font-weight: 800;
+      padding: 5px 10px;
+      border-radius: 8px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .cal-year-select:focus {
+      border-color: var(--accent);
+    }
+
+    .cal-month-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .cal-month-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 9px 6px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--bg-subtle);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.79rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.14s ease;
+    }
+
+    .cal-month-btn:hover {
+      background: var(--card-hover);
+      border-color: var(--border-strong);
+    }
+
+    .cal-month-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(250, 45, 72, 0.35);
+    }
+
+    .cal-saved-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--emerald);
+    }
+
+    .cal-month-btn.active .cal-saved-tag {
+      color: #d1fae5;
+    }
+
+    .cal-saved-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--emerald);
+      display: inline-block;
+    }
+
+    .cal-month-btn.active .cal-saved-dot {
+      background: #ffffff;
+    }
+
+    .cal-pop-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* =========================================================
+       MAIN LAYOUT & HERO BRIDGE
+       ========================================================= */
+    main {
+      padding: 18px 0 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hero-card {
+      background: linear-gradient(180deg, #181d29 0%, #141822 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hero-top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .mode-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .segmented {
+      display: inline-flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .seg-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .seg-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 3px 10px rgba(250, 45, 72, 0.3);
+    }
+
+    .tax-reminder-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--amber);
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-border);
+      border-radius: 999px;
+      padding: 4px 10px;
+    }
+
+    .tax-reminder-pill.hidden {
+      display: none;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bridge-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 820px) {
+      .bridge-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .bridge-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 15px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .bridge-box.gain { border-color: var(--emerald-border); }
+    .bridge-box.loss { border-color: var(--rose-border); }
+
+    .bridge-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .bridge-label {
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+
+    .profit-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 8px 12px;
+    }
+
+    .profit-input-wrap:focus-within {
+      border-color: var(--accent);
+    }
+
+    .profit-input-wrap span {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    .profit-input-wrap input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1.55rem;
+      font-weight: 800;
+      outline: none;
+    }
+
+    .big-currency {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .bridge-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 6px 8px;
+    }
+
+    .arrow-svg {
+      color: var(--muted);
+    }
+
+    @media (max-width: 820px) {
+      .arrow-svg {
+        transform: rotate(90deg);
+      }
+    }
+
+    .delta-pill {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 14px;
+      min-width: 140px;
+    }
+
+    .delta-pill.gain {
+      background: var(--emerald-bg);
+      border-color: var(--emerald-border);
+      color: var(--emerald);
+    }
+
+    .delta-pill.loss {
+      background: var(--rose-bg);
+      border-color: var(--rose-border);
+      color: var(--rose);
+    }
+
+    .delta-amount {
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+
+    .delta-pct {
+      font-size: 0.72rem;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    /* =========================================================
+       SETTINGS PANEL
+       ========================================================= */
+    .settings-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .settings-toggle {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 700;
+      padding: 13px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .settings-toggle:hover {
+      background: var(--card-hover);
+    }
+
+    .settings-body {
+      display: none;
+      padding: 0 16px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .settings-body.open {
+      display: block;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 1024px) {
+      .settings-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 560px) {
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .setting-course-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .setting-course-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .setting-course-title {
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    .setting-inputs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .setting-field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .setting-field label {
+      font-size: 0.67rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .setting-field input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 6px 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .setting-field input:focus {
+      border-color: var(--accent);
+    }
+
+    /* =========================================================
+       SECTION CARDS & EXPANDABLE STUDENT-WISE COURSES
+       ========================================================= */
+    .section-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .section-header.gain {
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, transparent 65%);
+    }
+
+    .section-header.loss {
+      background: linear-gradient(90deg, rgba(244, 63, 94, 0.1) 0%, transparent 65%);
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 0.98rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-sub {
+      margin: 2px 0 0;
+      font-size: 0.74rem;
+      color: var(--muted);
+    }
+
+    .courses-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .course-block {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .course-block:last-child {
+      border-bottom: none;
+    }
+
+    .course-row-head {
+      padding: 12px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--card);
+      transition: background 0.15s ease;
+    }
+
+    .course-row-head:hover {
+      background: var(--card-hover);
+    }
+
+    .course-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      min-width: 220px;
+    }
+
+    .chevron-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--bg-subtle);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s ease, color 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .chevron-btn.open {
+      transform: rotate(90deg);
+      color: var(--text);
+      border-color: var(--border-strong);
+    }
+
+    .course-name {
+      font-size: 0.92rem;
+      font-weight: 800;
+    }
+
+    .course-meta-pill {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+
+    .course-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stepper {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 3px;
+      gap: 4px;
+    }
+
+    .step-btn {
+      border: none;
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .step-btn:hover {
+      background: var(--card-hover);
+    }
+
+    .step-btn.add-btn {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .step-btn.add-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .step-count {
+      min-width: 28px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+
+    .course-total-box {
+      min-width: 130px;
+      text-align: right;
+    }
+
+    .course-total-val {
+      font-size: 0.98rem;
+      font-weight: 800;
+    }
+
+    .course-total-sub {
+      font-size: 0.69rem;
+      color: var(--muted);
+    }
+
+    /* Student Drawer */
+    .student-drawer {
+      display: none;
+      background: var(--bg-subtle);
+      border-top: 1px solid var(--border);
+      padding: 12px 18px 16px;
+    }
+
+    .student-drawer.open {
+      display: block;
+    }
+
+    .drawer-empty {
+      font-size: 0.78rem;
+      color: var(--muted);
+      padding: 10px 12px;
+      border: 1px dashed var(--border);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table.student-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 820px;
+    }
+
+    table.student-table th {
+      text-align: left;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    table.student-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(38, 44, 61, 0.65);
+      vertical-align: top;
+    }
+
+    table.student-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .stu-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 175px;
+    }
+
+    .text-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 9px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .text-input:focus {
+      border-color: var(--accent);
+    }
+
+    .text-input.note {
+      font-size: 0.73rem;
+      font-weight: 500;
+      color: var(--muted);
+      padding: 5px 9px;
+    }
+
+    .text-input.note:focus {
+      color: var(--text);
+    }
+
+    .stu-phone-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 8px;
+    }
+
+    .stu-phone-wrap:focus-within {
+      border-color: var(--accent);
+    }
+
+    .stu-phone-wrap input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.76rem;
+      font-weight: 600;
+      outline: none;
+      letter-spacing: 0.03em;
+    }
+
+    .phone-count-pill {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 1px 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .phone-count-pill.valid {
+      color: var(--emerald);
+      border-color: var(--emerald-border);
+      background: var(--emerald-bg);
+    }
+
+    .row-total-cell {
+      text-align: right;
+      min-width: 120px;
+    }
+
+    .row-total-val {
+      font-size: 0.96rem;
+      font-weight: 800;
+    }
+
+    .remove-row-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.14s ease;
+    }
+
+    .remove-row-btn:hover {
+      background: var(--rose-bg);
+      border-color: var(--rose-border);
+      color: var(--rose);
+    }
+
+    .section-footer-bar {
+      padding: 12px 18px;
+      background: var(--bg-subtle);
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    /* =========================================================
+       CONTROLS, BADGES, BUTTONS & SUMMARY STRIP
+       ========================================================= */
+    .ctrl-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .ctrl-inline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .select-input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 9px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .select-input:focus {
+      border-color: var(--accent);
+    }
+
+    .emp-select.salaried {
+      border-color: var(--sky-border);
+      color: var(--sky);
+      background: var(--sky-bg);
+    }
+
+    .custom-pct-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: var(--bg);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 4px 7px;
+    }
+
+    .custom-pct-wrap input {
+      width: 44px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-align: right;
+      outline: none;
+    }
+
+    .custom-pct-wrap span {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .sync-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-border);
+      color: var(--amber);
+      white-space: nowrap;
+    }
+
+    .salaried-pill {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: var(--sky-bg);
+      border: 1px solid var(--sky-border);
+      color: var(--sky);
+      white-space: nowrap;
+    }
+
+    .math-sub {
+      font-size: 0.71rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .math-sub strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .kpi-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .kpi-badge.gain {
+      background: var(--emerald-bg);
+      border-color: var(--emerald-border);
+      color: var(--emerald);
+    }
+
+    .kpi-badge.loss {
+      background: var(--rose-bg);
+      border-color: var(--rose-border);
+      color: var(--rose);
+    }
+
+    .kpi-badge.warn {
+      background: var(--amber-bg);
+      border-color: var(--amber-border);
+      color: var(--amber);
+    }
+
+    .text-gain { color: var(--emerald) !important; }
+    .text-loss { color: var(--rose) !important; }
+    .text-amber { color: var(--amber) !important; }
+
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 1120px) {
+      .summary-strip {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .summary-strip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 460px) {
+      .summary-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Recording Studio Income Card */
+    .studio-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .studio-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .studio-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--emerald-bg);
+      border: 1px solid var(--emerald-border);
+      color: var(--emerald);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .studio-right {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .studio-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 8px 12px;
+      min-width: 200px;
+    }
+
+    .studio-input-wrap:focus-within {
+      border-color: var(--emerald);
+    }
+
+    .studio-input-wrap span {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--emerald);
+    }
+
+    .studio-input-wrap input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1.2rem;
+      font-weight: 800;
+      outline: none;
+    }
+
+    /* Teacher Payouts (% Basis) Panel */
+    .payout-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 16px 18px;
+    }
+
+    @media (max-width: 780px) {
+      .payout-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .payout-teacher-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .payout-card-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .payout-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .teacher-name-input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 9px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      outline: none;
+      width: 100%;
+      max-width: 200px;
+    }
+
+    .teacher-name-input:focus {
+      border-color: var(--accent);
+    }
+
+    .payout-stats {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .existing-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+    }
+
+    .existing-drawer {
+      display: none;
+      margin-top: 4px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .existing-drawer.open {
+      display: flex;
+    }
+
+    .existing-stu-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .existing-stu-top {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr auto;
+      gap: 7px;
+      align-items: center;
+    }
+
+    @media (max-width: 640px) {
+      .existing-stu-top {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .existing-stu-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(38, 44, 61, 0.65);
+    }
+
+    .modal-report-select {
+      background: var(--bg);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 6px 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .modal-report-select:focus {
+      border-color: var(--accent);
+    }
+
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .metric-label {
+      font-size: 0.69rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+
+    .metric-value {
+      font-size: 1.24rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .metric-sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 13px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--bg-subtle);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: var(--card-hover);
+      border-color: var(--border-strong);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 0.73rem;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    .btn-emerald {
+      background: var(--emerald-bg);
+      border-color: var(--emerald-border);
+      color: var(--emerald);
+    }
+
+    .btn-emerald:hover {
+      background: rgba(16, 185, 129, 0.22);
+    }
+
+    .btn-sky {
+      background: var(--sky-bg);
+      border-color: var(--sky-border);
+      color: var(--sky);
+    }
+
+    .btn-sky:hover {
+      background: rgba(56, 189, 248, 0.22);
+    }
+
+    .btn-danger-outline {
+      background: transparent;
+      border-color: var(--rose-border);
+      color: var(--rose);
+    }
+
+    .btn-danger-outline:hover {
+      background: var(--rose-bg);
+    }
+
+    .btn-pdf {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
+
+    .btn-pdf:hover {
+      background: #ffffff;
+      border-color: #ffffff;
+      box-shadow: 0 4px 14px rgba(255, 255, 255, 0.16);
+    }
+
+    /* =========================================================
+       SAVED HISTORY TABLE
+       ========================================================= */
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+    }
+
+    .history-table th {
+      text-align: left;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-subtle);
+    }
+
+    .history-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid rgba(38, 44, 61, 0.65);
+      font-size: 0.82rem;
+    }
+
+    .history-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.73rem;
+      color: var(--muted);
+      padding: 8px 16px 28px;
+    }
+
+    /* =========================================================
+       PRINT PREVIEW MODAL & A4 WHITE-PAPER PDF REPORT
+       ========================================================= */
+    .print-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(6, 7, 10, 0.84);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 18px;
+      overflow-y: auto;
+    }
+
+    .print-modal.open {
+      display: flex;
+    }
+
+    .print-modal-toolbar {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      border-radius: 13px;
+      padding: 11px 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      transition: max-width 0.2s ease;
+    }
+
+    .print-modal-toolbar.landscape {
+      max-width: 1120px;
+    }
+
+    .print-modal-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .print-modal-sub {
+      font-size: 0.73rem;
+      color: var(--muted);
+    }
+
+    .print-paper-wrap {
+      width: 100%;
+      max-width: 820px;
+      background: #ffffff;
+      color: #0f172a;
+      border-radius: 10px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+      overflow: hidden;
+      transition: max-width 0.2s ease;
+    }
+
+    .print-paper-wrap.landscape {
+      max-width: 1120px;
+    }
+
+    .print-paper-wrap.portrait .pr-bridge-grid,
+    .print-paper-wrap.portrait .pr-metrics-bar {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .print-paper-wrap.portrait #print-report {
+      padding: 20px 22px;
+    }
+
+    .print-paper-wrap.portrait .pr-table {
+      font-size: 9.5px;
+    }
+
+    .print-paper-wrap.portrait .pr-table th,
+    .print-paper-wrap.portrait .pr-table td {
+      padding: 4.5px 5px;
+    }
+
+    .pr-student-col {
+      min-width: 110px;
+      word-break: break-word;
+    }
+
+    #print-report {
+      background: #ffffff;
+      color: #0f172a;
+      padding: 28px 32px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .pr-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      padding-bottom: 14px;
+      border-bottom: 2.5px solid #0f172a;
+      margin-bottom: 16px;
+    }
+
+    .pr-brand {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #0f172a;
+    }
+
+    .pr-brand span {
+      color: #e11d48;
+    }
+
+    .pr-sub {
+      font-size: 11px;
+      color: #475569;
+      margin-top: 2px;
+    }
+
+    .pr-meta {
+      text-align: right;
+      font-size: 11px;
+      color: #334155;
+    }
+
+    .pr-period {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .pr-mode-badge {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #0f172a;
+    }
+
+    .pr-section-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #334155;
+      margin: 16px 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .pr-bridge-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+
+    .pr-bridge-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      padding: 8px 9px;
+      background: #f8fafc;
+    }
+
+    .pr-bridge-card.highlight {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+    }
+
+    .pr-card-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #64748b;
+    }
+
+    .pr-bridge-card.highlight .pr-card-label {
+      color: #cbd5e1;
+    }
+
+    .pr-card-val {
+      font-size: 13px;
+      font-weight: 800;
+      margin-top: 3px;
+    }
+
+    .pr-card-sub {
+      font-size: 9px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .pr-bridge-card.highlight .pr-card-sub {
+      color: #94a3b8;
+    }
+
+    .pr-metrics-bar {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .pr-dual-sign {
+      display: flex;
+      gap: 24px;
+      align-items: flex-end;
+    }
+
+    .pr-metric-box {
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 7px 9px;
+      background: #ffffff;
+    }
+
+    .pr-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 0;
+      margin-bottom: 10px;
+      font-size: 10.5px;
+    }
+
+    .pr-table th {
+      background: #f1f5f9;
+      color: #1e293b;
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 6px 7px;
+      border: 1px solid #cbd5e1;
+      text-align: left;
+    }
+
+    .pr-table td {
+      padding: 6px 7px;
+      border: 1px solid #e2e8f0;
+      color: #0f172a;
+      vertical-align: top;
+    }
+
+    .pr-table tr {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .pr-table tfoot td {
+      background: #f8fafc;
+      font-weight: 800;
+      border-top: 1.5px solid #94a3b8;
+    }
+
+    .pr-num {
+      text-align: right !important;
+      white-space: nowrap;
+    }
+
+    .pr-gain { color: #047857 !important; }
+    .pr-loss { color: #be123c !important; }
+    .pr-amber { color: #b45309 !important; }
+
+    .pr-empty {
+      padding: 10px 12px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 6px;
+      color: #64748b;
+      font-style: italic;
+      font-size: 11px;
+      margin-bottom: 10px;
+    }
+
+    .pr-footer {
+      margin-top: 20px;
+      padding-top: 12px;
+      border-top: 1.5px solid #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .pr-note {
+      font-size: 10px;
+      color: #475569;
+      max-width: 66%;
+    }
+
+    .pr-sign {
+      text-align: center;
+      min-width: 180px;
+    }
+
+    .pr-sign-line {
+      border-top: 1px solid #0f172a;
+      margin-top: 34px;
+      padding-top: 5px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    @media print {
+      html, body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      body > *:not(#print-modal) {
+        display: none !important;
+      }
+
+      #print-modal {
+        display: block !important;
+        position: static !important;
+        inset: auto !important;
+        background: #ffffff !important;
+        backdrop-filter: none !important;
+        padding: 0 !important;
+        overflow: visible !important;
+      }
+
+      .print-modal-toolbar {
+        display: none !important;
+      }
+
+      .print-paper-wrap {
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        overflow: visible !important;
+      }
+
+      #print-report {
+        padding: 0 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- =========================================================
+       HEADER
+       ========================================================= -->
+  <header class="app-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">HS Music <span>— Monthly Profit Bridge</span></h1>
+          <p class="brand-subtitle">Preetam Nagar, Prayagraj · Student-Wise Discounts, Calendar &amp; A4 PDF Reports</p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- Interactive Month & Year Calendar Picker -->
+        <div class="cal-wrapper" id="cal-wrapper">
+          <div class="cal-bar">
+            <button id="btn-cal-prev" type="button" class="cal-nav-btn" title="Previous Month" aria-label="Previous Month">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button id="btn-cal-trigger" type="button" class="cal-trigger-btn" aria-haspopup="dialog" aria-expanded="false">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fa2d48" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span id="cal-trigger-label">November 2026</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <button id="btn-cal-next" type="button" class="cal-nav-btn" title="Next Month" aria-label="Next Month">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </div>
+
+          <span id="cal-range-badge" class="cal-range-badge tabular-nums">1 Nov 2026 – 30 Nov 2026</span>
+
+          <!-- Calendar Popover -->
+          <div id="cal-popover" class="cal-popover" role="dialog" aria-label="Select Month and Year">
+            <div class="cal-pop-header">
+              <button id="btn-pop-year-prev" type="button" class="cal-nav-btn" title="Previous Year" aria-label="Previous Year">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              <select id="cal-year-select" class="cal-year-select tabular-nums" aria-label="Select Year"></select>
+              <button id="btn-pop-year-next" type="button" class="cal-nav-btn" title="Next Year" aria-label="Next Year">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </div>
+            <div id="cal-month-grid" class="cal-month-grid"></div>
+            <div class="cal-pop-footer">
+              <span style="font-size:0.68rem; color:var(--muted); display:inline-flex; align-items:center; gap:5px;">
+                <span class="cal-saved-dot"></span> Saved snapshot
+              </span>
+              <button id="btn-jump-today" type="button" class="btn btn-sm btn-sky">Jump to Current Month</button>
+            </div>
+          </div>
+        </div>
+
+        <button id="btn-header-pdf" type="button" class="btn btn-pdf">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+          Export PDF / Print Report
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- =========================================================
+         TOP PROFIT BRIDGE HERO CARD
+         ========================================================= -->
+    <section class="hero-card" aria-label="Monthly Profit Bridge">
+      <div class="hero-top-bar">
+        <div class="mode-wrap">
+          <div class="segmented" role="radiogroup" aria-label="Calculation Mode">
+            <button type="button" class="seg-btn mode-btn" data-mode="cash">Cash Left (Incl. Tax)</button>
+            <button type="button" class="seg-btn mode-btn" data-mode="real">Real Net (Ex-Tax)</button>
+          </div>
+          <span id="tax-reminder-pill" class="tax-reminder-pill">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            Includes Tax (pass-through) — switch to Real Net for Ex-Tax profit
+          </span>
+        </div>
+
+        <div class="action-bar">
+          <button id="btn-load-demo" type="button" class="btn btn-sky">Load Demo</button>
+          <button id="btn-carry-forward" type="button" class="btn btn-primary">Carry Forward → Next Month</button>
+          <button id="btn-save-snapshot" type="button" class="btn btn-emerald">Save Snapshot</button>
+          <button id="btn-action-pdf" type="button" class="btn btn-pdf">Export P&amp;L PDF</button>
+          <button id="btn-action-teacher-pdf" type="button" class="btn btn-sky">Teacher Payout PDF</button>
+          <button id="btn-export-csv" type="button" class="btn">Export CSV</button>
+          <button id="btn-reset-all" type="button" class="btn btn-danger-outline">Reset All</button>
+        </div>
+      </div>
+
+      <div class="bridge-grid">
+        <!-- Left: Last Month Overall Profit -->
+        <div class="bridge-box">
+          <div class="bridge-label-row">
+            <label id="last-profit-label" for="last-profit-input" class="bridge-label">Oct 2026 Profit (Base ₹)</label>
+            <span class="kpi-badge">Previous Month</span>
+          </div>
+          <div class="profit-input-wrap">
+            <span>₹</span>
+            <input id="last-profit-input" type="number" step="100" value="100000" class="tabular-nums" aria-label="Last Month Overall Profit" />
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:var(--muted);">
+            <span>Formatted: <strong id="last-profit-fmt" class="tabular-nums" style="color:var(--text);">₹1,00,000</strong></span>
+            <span>Editable</span>
+          </div>
+        </div>
+
+        <!-- Center: Arrow & Net Delta Badge -->
+        <div class="bridge-center">
+          <svg class="arrow-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+          <div id="net-delta-pill" class="delta-pill tabular-nums">
+            <span id="net-delta-amount" class="delta-amount">₹0</span>
+            <span id="net-delta-pct" class="delta-pct">0.0% change</span>
+          </div>
+        </div>
+
+        <!-- Right: Current Month Overall Profit -->
+        <div id="curr-profit-box" class="bridge-box">
+          <div class="bridge-label-row">
+            <span id="curr-profit-label" class="bridge-label">Nov 2026 Profit (₹)</span>
+            <span id="curr-status-badge" class="kpi-badge">Unchanged</span>
+          </div>
+          <div id="curr-profit-val" class="big-currency tabular-nums">₹1,00,000</div>
+          <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:var(--muted);" class="tabular-nums">
+            <span id="curr-mode-label">Cash Left (Incl. Tax)</span>
+            <span id="curr-net-students">Net Students: 0</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         COLLAPSIBLE COURSE FEE BASE SETTINGS
+         ========================================================= -->
+    <section class="settings-card" aria-label="Course Fee Base Settings">
+      <button id="btn-settings-toggle" type="button" class="settings-toggle" aria-expanded="false">
+        <span>Course Fee Base Settings (Guitar/Piano/Singing: ₹1,950 · Dance: ₹1,400)</span>
+        <span id="settings-chevron" style="color:var(--muted); font-size:0.78rem;">+ Expand</span>
+      </button>
+      <div id="settings-body" class="settings-body">
+        <div id="settings-grid" class="settings-grid"></div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 1: NEW ADMISSIONS (+ PROFIT)
+         ========================================================= -->
+    <section class="section-card" aria-label="New Admissions">
+      <div class="section-header gain">
+        <div>
+          <h2 class="section-title text-gain">+ New Admissions (Profit Added)</h2>
+          <p class="section-sub">Click "+ Add Student" on any course to enter individual name, teacher type, teacher % &amp; single proportional discount %</p>
+        </div>
+        <span id="admissions-head-badge" class="kpi-badge gain tabular-nums">0 students · +₹0</span>
+      </div>
+
+      <div id="admissions-list" class="courses-list"></div>
+
+      <div class="section-footer-bar tabular-nums">
+        <span style="font-size:0.82rem; font-weight:700; color:var(--muted);">TOTAL NEW ADMISSIONS (STRICTLY HS MUSIC PART)</span>
+        <span id="admissions-footer-total" class="text-gain" style="font-size:1.05rem; font-weight:800;">+₹0</span>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 2: CANCELED ENROLLMENTS (- LOSS)
+         ========================================================= -->
+    <section class="section-card" aria-label="Canceled Enrollments">
+      <div class="section-header loss">
+        <div>
+          <h2 class="section-title text-loss">− Canceled Enrollments (Loss Deducted)</h2>
+          <p class="section-sub">Track students who left this month — only HS Music's part is deducted from your monthly profit</p>
+        </div>
+        <span id="cancellations-head-badge" class="kpi-badge loss tabular-nums">0 students · ₹0</span>
+      </div>
+
+      <div id="cancellations-list" class="courses-list"></div>
+
+      <div class="section-footer-bar tabular-nums">
+        <span style="font-size:0.82rem; font-weight:700; color:var(--muted);">TOTAL CANCELED LOSS (STRICTLY HS MUSIC PART)</span>
+        <span id="cancellations-footer-total" class="text-loss" style="font-size:1.05rem; font-weight:800;">₹0</span>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 3: OTHER INCOME — RECORDING STUDIO
+         ========================================================= -->
+    <section class="studio-card" aria-label="Recording Studio Income">
+      <div class="studio-left">
+        <div class="studio-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+        </div>
+        <div>
+          <h2 class="section-title" style="margin:0;">Recording Studio</h2>
+          <p class="section-sub" style="margin:2px 0 0;">Other income source — amount entered here is added directly to monthly profit</p>
+        </div>
+      </div>
+
+      <div class="studio-right">
+        <div class="studio-input-wrap">
+          <span>₹</span>
+          <input id="recording-studio-input" type="number" min="0" step="100" value="0" placeholder="0" class="tabular-nums" aria-label="Recording Studio Income Amount" />
+        </div>
+        <span id="studio-added-badge" class="kpi-badge gain tabular-nums">+₹0 added to profit</span>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         6-METRIC FINANCIAL SUMMARY STRIP
+         ========================================================= -->
+    <section class="summary-strip tabular-nums" aria-label="6-Metric Financial Summary">
+      <div class="metric-card">
+        <span class="metric-label">New Admission Gain</span>
+        <span id="m-new-gain" class="metric-value text-gain">+₹0</span>
+        <span id="m-new-sub" class="metric-sub">0 students added</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Recording Studio</span>
+        <span id="m-studio-income" class="metric-value text-gain">+₹0</span>
+        <span class="metric-sub">Other income added</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Canceled Loss</span>
+        <span id="m-cancel-loss" class="metric-value text-loss">₹0</span>
+        <span id="m-cancel-sub" class="metric-sub">0 students canceled</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Net Teacher Payout Change</span>
+        <span id="m-teacher-change" class="metric-value">₹0</span>
+        <span class="metric-sub">% Basis courses only</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Total Discount Given (New)</span>
+        <span id="m-disc-total" class="metric-value text-amber">₹0</span>
+        <span id="m-disc-split" class="metric-sub">Teacher ₹0 + HS ₹0</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Scaled Tax Liability Change</span>
+        <span id="m-tax-change" class="metric-value text-amber">₹0</span>
+        <span class="metric-sub">Pass-through tax reserve</span>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         TEACHER PAYOUTS (% BASIS) — SEPARATE PDF SLIPS
+         ========================================================= -->
+    <section class="section-card" aria-label="Teacher Payouts Percent Basis">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Teacher Payouts (% Basis) — Separate PDF Slips</h2>
+          <p class="section-sub">Add continuing <strong>Existing Students</strong> for each % Basis teacher (included in Teacher Payout &amp; PDF only — <strong>excluded from P&amp;L</strong>)</p>
+        </div>
+        <button id="btn-all-teachers-pdf" type="button" class="btn btn-sm btn-pdf">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+          All % Teachers Combined PDF
+        </button>
+      </div>
+      <div id="teacher-payouts-grid" class="payout-grid"></div>
+    </section>
+
+    <!-- =========================================================
+         SAVED MONTH HISTORY
+         ========================================================= -->
+    <section class="section-card" aria-label="Saved Month History">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Saved Month History</h2>
+          <p class="section-sub">Snapshots are saved locally in your browser and linked with the calendar picker</p>
+        </div>
+        <span id="history-count-badge" class="kpi-badge tabular-nums">0 saved</span>
+      </div>
+      <div class="table-scroll">
+        <table class="history-table tabular-nums">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Mode</th>
+              <th>Students (+ / −)</th>
+              <th style="text-align:right;">Base Profit</th>
+              <th style="text-align:right;">Net Change</th>
+              <th style="text-align:right;">Final Profit</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================
+       PRINT PREVIEW MODAL (WHITE-PAPER A4 PDF REPORT)
+       ========================================================= -->
+  <div id="print-modal" class="print-modal" role="dialog" aria-modal="true" aria-label="PDF Report Print Preview">
+    <div id="print-modal-toolbar" class="print-modal-toolbar">
+      <div>
+        <div id="print-modal-title" class="print-modal-title">Complete A4 PDF Report — Print Preview</div>
+        <div class="print-modal-sub">Choose report &amp; orientation (Vertical / Horizontal), then click Download PDF or Print</div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+        <select id="modal-report-select" class="modal-report-select" aria-label="Select Report to Preview"></select>
+        <div class="segmented" role="radiogroup" aria-label="PDF Orientation">
+          <button type="button" class="seg-btn orient-btn active" data-orient="portrait" title="A4 Vertical (Portrait)">Vertical</button>
+          <button type="button" class="seg-btn orient-btn" data-orient="landscape" title="A4 Horizontal (Landscape)">Horizontal</button>
+        </div>
+        <button id="btn-modal-download-pdf" type="button" class="btn btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Save / Download PDF
+        </button>
+        <button id="btn-modal-print" type="button" class="btn btn-sky">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+          Print
+        </button>
+        <button id="btn-modal-close" type="button" class="btn">Close</button>
+      </div>
+    </div>
+
+    <div id="print-paper-wrap" class="print-paper-wrap">
+      <div id="print-report" class="tabular-nums"></div>
+    </div>
+  </div>
+
+  <footer>
+    HS Music — Monthly Profit Bridge (Student-Wise) · Preetam Nagar, Prayagraj · Indian Rupees (en-IN) · Zero External Dependencies
+  </footer>
+
+  <!-- =========================================================
+       VANILLA JAVASCRIPT APPLICATION LOGIC
+       ========================================================= -->
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_STATE_KEY = 'hs_music_studentwise_v6_state';
+      const STORAGE_HISTORY_KEY = 'hs_music_studentwise_v6_history';
+
+      const MONTHS_FULL = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+      const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      const DEFAULT_COURSES = [
+        { id: 'guitar',  name: 'Guitar',  fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'percent',  defaultTeacherPct: 50 },
+        { id: 'piano',   name: 'Piano',   fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'salaried', defaultTeacherPct: 0 },
+        { id: 'singing', name: 'Singing', fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'salaried', defaultTeacherPct: 0 },
+        { id: 'dance',   name: 'Dance',   fullFee: 1400, basicFee: 1000, maintFee: 200, taxFee: 200, defaultEmp: 'percent',  defaultTeacherPct: 50 }
+      ];
+
+      const TEACHER_PCT_PRESETS = [0, 20, 30, 40, 50, 60];
+      const DISCOUNT_PCT_PRESETS = [0, 5, 10, 15, 20, 25, 30];
+
+      const inrFmt = new Intl.NumberFormat('en-IN', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      });
+
+      function round2(n) {
+        return Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+      }
+
+      function clamp(val, min, max) {
+        const num = Number(val);
+        if (isNaN(num)) return min;
+        return Math.min(max, Math.max(min, num));
+      }
+
+      function formatINR(val, withSign = false) {
+        const num = round2(val || 0);
+        const absStr = inrFmt.format(Math.abs(num));
+        if (num < 0) return `−₹${absStr}`;
+        if (withSign && num > 0) return `+₹${absStr}`;
+        return `₹${absStr}`;
+      }
+
+      // ASCII-safe INR formatter for vector jsPDF (standard PDF fonts don't support Unicode ₹ or −)
+      function formatPdfINR(val, withSign = false) {
+        const num = round2(val || 0);
+        const absStr = inrFmt.format(Math.abs(num));
+        if (num < 0) return `-Rs. ${absStr}`;
+        if (withSign && num > 0) return `+Rs. ${absStr}`;
+        return `Rs. ${absStr}`;
+      }
+
+      function escapeHtml(str) {
+        return String(str == null ? '' : str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function getTodayYM() {
+        const now = new Date();
+        return { year: now.getFullYear(), month: now.getMonth() + 1 };
+      }
+
+      function makeYMKey(year, month) {
+        return `${year}-${String(month).padStart(2, '0')}`;
+      }
+
+      function formatMonthFull(year, month) {
+        return `${MONTHS_FULL[month - 1]} ${year}`;
+      }
+
+      function formatMonthShort(year, month) {
+        return `${MONTHS_SHORT[month - 1]} ${year}`;
+      }
+
+      function getPrevYM(year, month) {
+        return month === 1 ? { year: year - 1, month: 12 } : { year, month: month - 1 };
+      }
+
+      function getNextYM(year, month) {
+        return month === 12 ? { year: year + 1, month: 1 } : { year, month: month + 1 };
+      }
+
+      function getMonthDateRange(year, month) {
+        const lastDay = new Date(year, month, 0).getDate();
+        const mShort = MONTHS_SHORT[month - 1];
+        return `1 ${mShort} ${year} – ${lastDay} ${mShort} ${year}`;
+      }
+
+      function makeEmptyCourseMap() {
+        const m = {};
+        DEFAULT_COURSES.forEach(c => { m[c.id] = []; });
+        return m;
+      }
+
+      function makeExpandedMap(defaultVal) {
+        const m = {};
+        DEFAULT_COURSES.forEach(c => { m[c.id] = Boolean(defaultVal); });
+        return m;
+      }
+
+      function getCourseDef(courseId) {
+        return DEFAULT_COURSES.find(c => c.id === courseId) || DEFAULT_COURSES[0];
+      }
+
+      function createStudent(courseId) {
+        const def = getCourseDef(courseId);
+        return {
+          id: `stu-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          name: '',
+          phone: '',
+          note: '',
+          empType: def.defaultEmp,
+          teacherPct: def.defaultTeacherPct,
+          discPct: 0
+        };
+      }
+
+      function createDefaultState(year, month) {
+        const today = getTodayYM();
+        const y = year || today.year;
+        const m = month || today.month;
+        const courseSettings = {};
+        DEFAULT_COURSES.forEach(c => {
+          courseSettings[c.id] = {
+            fullFee: c.fullFee,
+            basicFee: c.basicFee,
+            maintFee: c.maintFee,
+            taxFee: c.taxFee
+          };
+        });
+
+        return {
+          year: y,
+          month: m,
+          monthLabel: formatMonthFull(y, m),
+          mode: 'cash',
+          lastProfit: 100000,
+          recordingStudioIncome: 0,
+          teacherNames: {
+            guitar: 'Guitar Teacher',
+            piano: 'Piano Teacher',
+            singing: 'Singing Teacher',
+            dance: 'Dance Teacher'
+          },
+          courseSettings,
+          admissions: makeEmptyCourseMap(),
+          cancellations: makeEmptyCourseMap(),
+          existingStudents: makeEmptyCourseMap(),
+          expanded: {
+            admissions: makeExpandedMap(false),
+            cancellations: makeExpandedMap(false)
+          },
+          expandedExisting: makeExpandedMap(false)
+        };
+      }
+
+      let state = createDefaultState();
+      let historyList = [];
+      let latestSummary = null;
+      let popoverYear = state.year;
+      let currentPrintReportKey = 'pnl';
+      let printOrientation = 'portrait';
+      let resetConfirmPending = false;
+      let resetConfirmTimer = null;
+
+      function showToast(msg, type = 'info') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const el = document.createElement('div');
+        el.className = `toast ${type}`;
+        el.textContent = msg;
+        container.appendChild(el);
+        requestAnimationFrame(() => el.classList.add('show'));
+        setTimeout(() => {
+          el.classList.remove('show');
+          setTimeout(() => el.remove(), 250);
+        }, 2800);
+      }
+
+      function findHistoryByYM(ymKey) {
+        return historyList.find(item => item.ymKey === ymKey);
+      }
+
+      function saveState() {
+        try { localStorage.setItem(STORAGE_STATE_KEY, JSON.stringify(state)); } catch (e) {}
+      }
+
+      function saveHistory() {
+        try { localStorage.setItem(STORAGE_HISTORY_KEY, JSON.stringify(historyList)); } catch (e) {}
+      }
+
+      function loadPersistence() {
+        try {
+          const raw = localStorage.getItem(STORAGE_STATE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            const def = createDefaultState(parsed.year, parsed.month);
+            state = {
+              ...def,
+              ...parsed,
+              year: Number(parsed.year) || def.year,
+              month: Number(parsed.month) || def.month,
+              recordingStudioIncome: Math.max(0, Number(parsed.recordingStudioIncome) || 0),
+              teacherNames: { ...def.teacherNames, ...(parsed.teacherNames || {}) },
+              courseSettings: { ...def.courseSettings, ...(parsed.courseSettings || {}) },
+              admissions: { ...def.admissions, ...(parsed.admissions || {}) },
+              cancellations: { ...def.cancellations, ...(parsed.cancellations || {}) },
+              existingStudents: { ...def.existingStudents, ...(parsed.existingStudents || {}) },
+              expanded: {
+                admissions: { ...def.expanded.admissions, ...((parsed.expanded && parsed.expanded.admissions) || {}) },
+                cancellations: { ...def.expanded.cancellations, ...((parsed.expanded && parsed.expanded.cancellations) || {}) }
+              },
+              expandedExisting: { ...def.expandedExisting, ...(parsed.expandedExisting || {}) }
+            };
+            state.monthLabel = formatMonthFull(state.year, state.month);
+          }
+          const rawHist = localStorage.getItem(STORAGE_HISTORY_KEY);
+          if (rawHist) {
+            const parsedHist = JSON.parse(rawHist);
+            if (Array.isArray(parsedHist)) historyList = parsedHist;
+          }
+        } catch (e) {
+          state = createDefaultState();
+          historyList = [];
+        }
+        popoverYear = state.year;
+      }
+
+      // =========================================================
+      // CORE PROPORTIONAL DISCOUNT & UNIT ECONOMICS MATH
+      // =========================================================
+      function calcStudent(courseId, stu) {
+        const cfg = state.courseSettings[courseId] || getCourseDef(courseId);
+        const fullFee = Math.max(0, Number(cfg.fullFee) || 0);
+        const basicFee = Math.max(0, Number(cfg.basicFee) || 0);
+        const taxFee = Math.max(0, Number(cfg.taxFee) || 0);
+
+        const d = clamp(stu.discPct, 0, 100);
+        const factor = 1 - d / 100;
+
+        const netFull = round2(fullFee * factor);
+        const discAmtFull = round2(fullFee - netFull);
+        const netBasic = round2(basicFee * factor);
+        const discAmtBasic = round2(basicFee - netBasic);
+        const netTax = round2(taxFee * factor);
+
+        const isSalaried = stu.empType === 'salaried';
+        const teacherPct = isSalaried ? 0 : clamp(stu.teacherPct, 0, 100);
+
+        const origTeacher = isSalaried ? 0 : round2(basicFee * (teacherPct / 100));
+        const teacherPayout = isSalaried ? 0 : round2(netBasic * (teacherPct / 100));
+
+        const origHsGross = round2(fullFee - origTeacher);
+        const hsGross = round2(netFull - teacherPayout);
+        const hsReal = round2((netFull - netTax) - teacherPayout);
+        const hsActive = state.mode === 'real' ? hsReal : hsGross;
+
+        const teacherHit = round2(origTeacher - teacherPayout);
+        const hsHit = round2(origHsGross - hsGross);
+
+        return {
+          fullFee,
+          basicFee,
+          taxFee,
+          d,
+          isSalaried,
+          teacherPct,
+          netFull,
+          discAmtFull,
+          netBasic,
+          discAmtBasic,
+          netTax,
+          teacherPayout,
+          hsGross,
+          hsReal,
+          hsActive,
+          teacherHit,
+          hsHit
+        };
+      }
+
+      function computeCourseTotals(section, courseId) {
+        const list = state[section][courseId] || [];
+        let count = list.length;
+        let hsTotal = 0;
+        let teacherTotal = 0;
+        let discTotal = 0;
+        let teacherDiscTotal = 0;
+        let hsDiscTotal = 0;
+        let taxTotal = 0;
+
+        list.forEach(stu => {
+          const m = calcStudent(courseId, stu);
+          hsTotal = round2(hsTotal + m.hsActive);
+          teacherTotal = round2(teacherTotal + m.teacherPayout);
+          discTotal = round2(discTotal + m.discAmtFull);
+          teacherDiscTotal = round2(teacherDiscTotal + m.teacherHit);
+          hsDiscTotal = round2(hsDiscTotal + m.hsHit);
+          taxTotal = round2(taxTotal + m.netTax);
+        });
+
+        return { count, hsTotal, teacherTotal, discTotal, teacherDiscTotal, hsDiscTotal, taxTotal };
+      }
+
+      function computeSummary() {
+        let newStudents = 0, cancelStudents = 0;
+        let newHsTotal = 0, cancelHsTotal = 0;
+        let newTeacherTotal = 0, cancelTeacherTotal = 0;
+        let newDiscTotal = 0, newTeacherDisc = 0, newHsDisc = 0;
+        let newTaxTotal = 0, cancelTaxTotal = 0;
+
+        DEFAULT_COURSES.forEach(c => {
+          const n = computeCourseTotals('admissions', c.id);
+          const x = computeCourseTotals('cancellations', c.id);
+          newStudents += n.count;
+          cancelStudents += x.count;
+          newHsTotal = round2(newHsTotal + n.hsTotal);
+          cancelHsTotal = round2(cancelHsTotal + x.hsTotal);
+          newTeacherTotal = round2(newTeacherTotal + n.teacherTotal);
+          cancelTeacherTotal = round2(cancelTeacherTotal + x.teacherTotal);
+          newDiscTotal = round2(newDiscTotal + n.discTotal);
+          newTeacherDisc = round2(newTeacherDisc + n.teacherDiscTotal);
+          newHsDisc = round2(newHsDisc + n.hsDiscTotal);
+          newTaxTotal = round2(newTaxTotal + n.taxTotal);
+          cancelTaxTotal = round2(cancelTaxTotal + x.taxTotal);
+        });
+
+        const lastProfit = round2(Number(state.lastProfit) || 0);
+        const studioIncome = round2(Math.max(0, Number(state.recordingStudioIncome) || 0));
+        const netDelta = round2(newHsTotal - cancelHsTotal + studioIncome);
+        const currentProfit = round2(lastProfit + netDelta);
+        const pctChange = lastProfit !== 0 ? (netDelta / Math.abs(lastProfit)) * 100 : null;
+        const netStudents = newStudents - cancelStudents;
+        const netTeacherChange = round2(newTeacherTotal - cancelTeacherTotal);
+        const netTaxChange = round2(newTaxTotal - cancelTaxTotal);
+
+        return {
+          lastProfit,
+          studioIncome,
+          newStudents,
+          cancelStudents,
+          netStudents,
+          newHsTotal,
+          cancelHsTotal,
+          netDelta,
+          currentProfit,
+          pctChange,
+          netTeacherChange,
+          newDiscTotal,
+          newTeacherDisc,
+          newHsDisc,
+          netTaxChange
+        };
+      }
+
+      // =========================================================
+      // CALENDAR PICKER RENDERING & NAVIGATION
+      // =========================================================
+      function renderCalendarUI() {
+        state.monthLabel = formatMonthFull(state.year, state.month);
+        document.getElementById('cal-trigger-label').textContent = state.monthLabel;
+        document.getElementById('cal-range-badge').textContent = getMonthDateRange(state.year, state.month);
+
+        const prev = getPrevYM(state.year, state.month);
+        document.getElementById('last-profit-label').textContent = `${formatMonthShort(prev.year, prev.month)} Profit (Base ₹)`;
+        document.getElementById('curr-profit-label').textContent = `${formatMonthShort(state.year, state.month)} Profit (₹)`;
+
+        renderCalendarPopover();
+      }
+
+      function renderCalendarPopover() {
+        const yearSel = document.getElementById('cal-year-select');
+        const minY = Math.min(2024, popoverYear - 1);
+        const maxY = Math.max(2032, popoverYear + 1);
+        let opts = '';
+        for (let y = minY; y <= maxY; y++) {
+          opts += `<option value="${y}" ${y === popoverYear ? 'selected' : ''}>${y}</option>`;
+        }
+        yearSel.innerHTML = opts;
+
+        const grid = document.getElementById('cal-month-grid');
+        grid.innerHTML = MONTHS_SHORT.map((mName, idx) => {
+          const mNum = idx + 1;
+          const key = makeYMKey(popoverYear, mNum);
+          const isSelected = popoverYear === state.year && mNum === state.month;
+          const hasSaved = Boolean(findHistoryByYM(key));
+          return `
+            <button type="button" class="cal-month-btn ${isSelected ? 'active' : ''}" data-pick-month="${mNum}">
+              <span>${mName}</span>
+              ${hasSaved ? '<span class="cal-saved-tag"><span class="cal-saved-dot"></span>Saved</span>' : ''}
+            </button>
+          `;
+        }).join('');
+      }
+
+      function switchToMonth(targetYear, targetMonth, closePop = true) {
+        const ymKey = makeYMKey(targetYear, targetMonth);
+        const saved = findHistoryByYM(ymKey);
+
+        if (saved && saved.snapshotState) {
+          state = JSON.parse(JSON.stringify(saved.snapshotState));
+          state.year = targetYear;
+          state.month = targetMonth;
+          state.monthLabel = formatMonthFull(targetYear, targetMonth);
+          state.recordingStudioIncome = Math.max(0, Number(state.recordingStudioIncome) || 0);
+          state.teacherNames = {
+            guitar: 'Guitar Teacher',
+            piano: 'Piano Teacher',
+            singing: 'Singing Teacher',
+            dance: 'Dance Teacher',
+            ...(state.teacherNames || {})
+          };
+          state.existingStudents = { ...makeEmptyCourseMap(), ...(state.existingStudents || {}) };
+          state.expandedExisting = { ...makeExpandedMap(false), ...(state.expandedExisting || {}) };
+          document.getElementById('last-profit-input').value = state.lastProfit;
+          document.getElementById('recording-studio-input').value = state.recordingStudioIncome;
+          popoverYear = targetYear;
+          fullRender(true);
+          showToast(`Loaded saved report for ${formatMonthShort(targetYear, targetMonth)}`, 'success');
+        } else {
+          const prev = getPrevYM(targetYear, targetMonth);
+          const prevSaved = findHistoryByYM(makeYMKey(prev.year, prev.month));
+          const preservedSettings = JSON.parse(JSON.stringify(state.courseSettings));
+          const preservedTeachers = JSON.parse(JSON.stringify(state.teacherNames || {}));
+          const preservedExisting = JSON.parse(JSON.stringify(state.existingStudents || makeEmptyCourseMap()));
+          const preservedMode = state.mode;
+          const baseProfit = prevSaved ? prevSaved.currentProfit : state.lastProfit;
+
+          state = createDefaultState(targetYear, targetMonth);
+          state.courseSettings = preservedSettings;
+          state.teacherNames = { ...state.teacherNames, ...preservedTeachers };
+          state.existingStudents = { ...makeEmptyCourseMap(), ...preservedExisting };
+          state.mode = preservedMode;
+          state.lastProfit = baseProfit;
+          document.getElementById('last-profit-input').value = state.lastProfit;
+          document.getElementById('recording-studio-input').value = state.recordingStudioIncome;
+          popoverYear = targetYear;
+          fullRender(true);
+          showToast(`Switched to ${formatMonthFull(targetYear, targetMonth)}`, 'info');
+        }
+
+        if (closePop) {
+          document.getElementById('cal-popover').classList.remove('open');
+          document.getElementById('btn-cal-trigger').setAttribute('aria-expanded', 'false');
+        }
+      }
+
+      // =========================================================
+      // RENDER SETTINGS, SECTIONS, DASHBOARD & HISTORY
+      // =========================================================
+      function renderSettingsPanel() {
+        const grid = document.getElementById('settings-grid');
+        grid.innerHTML = DEFAULT_COURSES.map(c => {
+          const cfg = state.courseSettings[c.id];
+          const sum = round2((Number(cfg.basicFee) || 0) + (Number(cfg.maintFee) || 0) + (Number(cfg.taxFee) || 0));
+          const full = round2(Number(cfg.fullFee) || 0);
+          const ok = Math.abs(sum - full) < 0.01;
+          return `
+            <div class="setting-course-box">
+              <div class="setting-course-head">
+                <span class="setting-course-title">${c.name}</span>
+                <span class="kpi-badge ${ok ? 'gain' : 'warn'} tabular-nums">${ok ? 'Valid' : `Sum ₹${sum}`}</span>
+              </div>
+              <div class="setting-inputs">
+                <div class="setting-field">
+                  <label>Full Fee (₹)</label>
+                  <input type="number" min="0" step="50" data-set-course="${c.id}" data-set-field="fullFee" value="${cfg.fullFee}" class="tabular-nums" />
+                </div>
+                <div class="setting-field">
+                  <label>Basic Fee (₹)</label>
+                  <input type="number" min="0" step="50" data-set-course="${c.id}" data-set-field="basicFee" value="${cfg.basicFee}" class="tabular-nums" />
+                </div>
+                <div class="setting-field">
+                  <label>Maint (₹)</label>
+                  <input type="number" min="0" step="50" data-set-course="${c.id}" data-set-field="maintFee" value="${cfg.maintFee}" class="tabular-nums" />
+                </div>
+                <div class="setting-field">
+                  <label>Tax (₹)</label>
+                  <input type="number" min="0" step="50" data-set-course="${c.id}" data-set-field="taxFee" value="${cfg.taxFee}" class="tabular-nums" />
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function buildTeacherPctOptions(selectedVal) {
+        const isPreset = TEACHER_PCT_PRESETS.includes(Number(selectedVal));
+        const opts = TEACHER_PCT_PRESETS.map(p => `<option value="${p}" ${isPreset && Number(selectedVal) === p ? 'selected' : ''}>${p}%</option>`).join('');
+        return `${opts}<option value="custom" ${!isPreset ? 'selected' : ''}>Custom %</option>`;
+      }
+
+      function buildDiscPctOptions(selectedVal) {
+        const isPreset = DISCOUNT_PCT_PRESETS.includes(Number(selectedVal));
+        const opts = DISCOUNT_PCT_PRESETS.map(p => `<option value="${p}" ${isPreset && Number(selectedVal) === p ? 'selected' : ''}>${p}%</option>`).join('');
+        return `${opts}<option value="custom" ${!isPreset ? 'selected' : ''}>Custom %</option>`;
+      }
+
+      function renderSection(section) {
+        const isGain = section === 'admissions';
+        const container = document.getElementById(`${section}-list`);
+
+        container.innerHTML = DEFAULT_COURSES.map(c => {
+          const cfg = state.courseSettings[c.id];
+          const students = state[section][c.id] || [];
+          const totals = computeCourseTotals(section, c.id);
+          const isOpen = Boolean(state.expanded[section][c.id]);
+
+          const totalStr = totals.hsTotal === 0
+            ? '₹0'
+            : (isGain ? formatINR(totals.hsTotal, true) : `−${formatINR(totals.hsTotal)}`);
+          const totalCls = totals.hsTotal === 0 ? '' : (isGain ? 'text-gain' : 'text-loss');
+
+          let drawerInner = '';
+          if (students.length === 0) {
+            drawerInner = `
+              <div class="drawer-empty">
+                <span>No ${c.name} students added yet.</span>
+                <button type="button" class="btn btn-sm btn-primary" data-add-stu="${section}:${c.id}">+ Add First ${c.name} Student</button>
+              </div>
+            `;
+          } else {
+            const rowsHtml = students.map((stu, idx) => {
+              const m = calcStudent(c.id, stu);
+              const isCustomT = !TEACHER_PCT_PRESETS.includes(Number(stu.teacherPct));
+              const isCustomD = !DISCOUNT_PCT_PRESETS.includes(Number(stu.discPct));
+              const rowVal = isGain ? formatINR(m.hsActive, true) : (m.hsActive > 0 ? `−${formatINR(m.hsActive)}` : '₹0');
+
+              const teacherCellHtml = m.isSalaried
+                ? `
+                  <div class="ctrl-stack">
+                    <span class="salaried-pill">Salaried — No % Calc (₹0)</span>
+                    <span class="math-sub">Fixed salary course · ₹0 variable payout</span>
+                  </div>
+                `
+                : `
+                  <div class="ctrl-stack">
+                    <div class="ctrl-inline">
+                      <select class="select-input tabular-nums" data-stu-field="teacherPct" data-section="${section}" data-course="${c.id}" data-stu-id="${stu.id}">
+                        ${buildTeacherPctOptions(stu.teacherPct)}
+                      </select>
+                      ${isCustomT ? `<span class="custom-pct-wrap"><input type="number" min="0" max="100" step="1" value="${stu.teacherPct}" data-stu-custom="teacherPct" data-section="${section}" data-course="${c.id}" data-stu-id="${stu.id}" class="tabular-nums" /><span>%</span></span>` : ''}
+                      ${m.d > 0 ? `<span class="sync-badge tabular-nums">Auto −${m.d}% disc</span>` : ''}
+                    </div>
+                    <div class="math-sub tabular-nums">
+                      Basic ${formatINR(m.netBasic)} × ${m.teacherPct}% = <strong>${formatINR(m.teacherPayout)}</strong>
+                      ${m.d > 0 ? `<br/>Teacher disc: −${formatINR(m.teacherHit)}` : ''}
+                    </div>
+                  </div>
+                `;
+
+              return `
+                <tr>
+                  <td>
+                    <div class="stu-inputs">
+                      <input type="text" class="text-input" placeholder="Student #${idx + 1} Name" value="${escapeHtml(stu.name)}" data-stu-text="name" data-section="${section}" data-course="${c.id}" data-stu-id="${stu.id}" />
+                      <div class="stu-phone-wrap">
+                        <input type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit Mobile No." value="${escapeHtml(stu.phone || '')}" data-stu-phone="phone" data-section="${section}" data-course="${c.id}" data-stu-id="${stu.id}" class="tabular-nums" />
+                        <span class="phone-count-pill tabular-nums ${(stu.phone || '').length === 10 ? 'valid' : ''}">${(stu.phone || '').length}/10</span>
+                      </div>
+                      <input type="text" class="text-input note" placeholder="Batch / Note / Reason" value="${escapeHtml(stu.note)}" data-stu-text="note" data-section="${section}" data-course="${c.id}" data-stu-id="${stu.id}" />
+                    </div>
+                  </td>
+                  <td>
+                    <select class="select-input emp-select ${m.isSalaried ? 'salaried' : ''}" data-stu-field="empType" data-section="${section}" data-course="${c.id}" data-stu-id="${stu.id}">
+                      <option value="percent" ${!m.isSalaried ? 'selected' : ''}>% Basis</option>
+                      <option value="salaried" ${m.isSalaried ? 'selected' : ''}>Salaried</option>
+                    </select>
+                  </td>
+                  <td>${teacherCellHtml}</td>
+                  <td>
+                    <div class="ctrl-stack">
+                      <div class="ctrl-inline">
+                        <select class="select-input tabular-nums" data-stu-field="discPct" data-section="${section}" data-course="${c.id}" data-stu-id="${stu.id}">
+                          ${buildDiscPctOptions(stu.discPct)}
+                        </select>
+                        ${isCustomD ? `<span class="custom-pct-wrap"><input type="number" min="0" max="100" step="1" value="${stu.discPct}" data-stu-custom="discPct" data-section="${section}" data-course="${c.id}" data-stu-id="${stu.id}" class="tabular-nums" /><span>%</span></span>` : ''}
+                      </div>
+                      <div class="math-sub tabular-nums">
+                        Fee ${formatINR(m.netFull)} − Teacher ${formatINR(m.teacherPayout)} = <strong>${formatINR(m.hsGross)}</strong>
+                        ${state.mode === 'real' ? `<br/>Ex-Tax (Tax ${formatINR(m.netTax)}): <strong>${formatINR(m.hsReal)}</strong>` : `<br/>Tax reserve: ${formatINR(m.netTax)}`}
+                        ${m.d > 0 ? `<br/>Total Disc ${formatINR(m.discAmtFull)} (${m.d}% = ${formatINR(m.teacherHit)} T + ${formatINR(m.hsHit)} HS)` : ''}
+                      </div>
+                    </div>
+                  </td>
+                  <td class="row-total-cell tabular-nums">
+                    <div class="row-total-val ${isGain ? 'text-gain' : 'text-loss'}">${rowVal}</div>
+                    <div class="math-sub">HS Part</div>
+                  </td>
+                  <td style="text-align:right;">
+                    <button type="button" class="remove-row-btn" title="Remove student" aria-label="Remove student" data-del-stu="${section}:${c.id}:${stu.id}">&times;</button>
+                  </td>
+                </tr>
+              `;
+            }).join('');
+
+            drawerInner = `
+              <div class="table-scroll">
+                <table class="student-table">
+                  <thead>
+                    <tr>
+                      <th>Student Name &amp; Details</th>
+                      <th>Teacher Type</th>
+                      <th>Teacher % (on Basic ₹${cfg.basicFee})</th>
+                      <th>HS Music Part (Discount % on Full ₹${cfg.fullFee})</th>
+                      <th style="text-align:right;">Total (HS Part)</th>
+                      <th style="width:36px;"></th>
+                    </tr>
+                  </thead>
+                  <tbody>${rowsHtml}</tbody>
+                </table>
+              </div>
+            `;
+          }
+
+          return `
+            <div class="course-block">
+              <div class="course-row-head">
+                <div class="course-left" data-toggle-course="${section}:${c.id}">
+                  <span class="chevron-btn ${isOpen ? 'open' : ''}" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </span>
+                  <span class="course-name">${c.name}</span>
+                  <span class="course-meta-pill tabular-nums">Full ₹${cfg.fullFee} · Basic ₹${cfg.basicFee}</span>
+                </div>
+
+                <div class="course-controls">
+                  <div class="stepper tabular-nums">
+                    <button type="button" class="step-btn" data-pop-stu="${section}:${c.id}" title="Remove last student" aria-label="Remove last ${c.name} student">−</button>
+                    <span class="step-count">${totals.count}</span>
+                    <button type="button" class="step-btn add-btn" data-add-stu="${section}:${c.id}">+ Add Student</button>
+                  </div>
+
+                  <div class="course-total-box tabular-nums">
+                    <div class="course-total-val ${totalCls}">${totalStr}</div>
+                    <div class="course-total-sub">Course Total (HS Part)</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="student-drawer ${isOpen ? 'open' : ''}">
+                ${drawerInner}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // =========================================================
+      // TEACHER PAYOUTS (% BASIS) DATA & UI PANEL
+      // =========================================================
+      function getPercentTeacherData(courseId) {
+        const courseDef = getCourseDef(courseId);
+        const teacherName = (state.teacherNames && state.teacherNames[courseId]) || `${courseDef.name} Teacher`;
+
+        const existingList = (state.existingStudents && state.existingStudents[courseId] ? state.existingStudents[courseId] : [])
+          .map(stu => ({ stu, m: calcStudent(courseId, { ...stu, empType: 'percent' }) }));
+
+        const newList = (state.admissions[courseId] || [])
+          .filter(stu => stu.empType !== 'salaried')
+          .map(stu => ({ stu, m: calcStudent(courseId, stu) }));
+
+        const cancelList = (state.cancellations[courseId] || [])
+          .filter(stu => stu.empType !== 'salaried')
+          .map(stu => ({ stu, m: calcStudent(courseId, stu) }));
+
+        const existingPayout = round2(existingList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
+        const newPayout = round2(newList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
+        const cancelPayout = round2(cancelList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
+        const netPayout = round2(existingPayout + newPayout - cancelPayout);
+        const existingDiscHit = round2(existingList.reduce((acc, x) => acc + x.m.teacherHit, 0));
+        const newDiscHit = round2(newList.reduce((acc, x) => acc + x.m.teacherHit, 0));
+        const totalDiscHit = round2(existingDiscHit + newDiscHit);
+        const grossBasic = round2(newList.reduce((acc, x) => acc + x.m.basicFee, 0) + existingList.reduce((acc, x) => acc + x.m.basicFee, 0));
+        const netBasic = round2(newList.reduce((acc, x) => acc + x.m.netBasic, 0) + existingList.reduce((acc, x) => acc + x.m.netBasic, 0));
+
+        return {
+          courseId,
+          courseName: courseDef.name,
+          teacherName,
+          existingList,
+          newList,
+          cancelList,
+          existingPayout,
+          newPayout,
+          cancelPayout,
+          netPayout,
+          existingDiscHit,
+          newDiscHit,
+          totalDiscHit,
+          grossBasic,
+          netBasic
+        };
+      }
+
+      function getActivePercentCourses() {
+        return DEFAULT_COURSES.filter(c => {
+          const data = getPercentTeacherData(c.id);
+          return c.defaultEmp === 'percent' || data.existingList.length > 0 || data.newList.length > 0 || data.cancelList.length > 0;
+        });
+      }
+
+      function renderTeacherPayoutsSection() {
+        const grid = document.getElementById('teacher-payouts-grid');
+        if (!grid) return;
+        const courses = getActivePercentCourses();
+
+        grid.innerHTML = courses.map(c => {
+          const d = getPercentTeacherData(c.id);
+          const cfg = state.courseSettings[c.id] || getCourseDef(c.id);
+          const isOpen = Boolean(state.expandedExisting && state.expandedExisting[c.id]);
+          const netCls = d.netPayout > 0 ? 'text-gain' : d.netPayout < 0 ? 'text-loss' : '';
+
+          const existingRowsHtml = d.existingList.length === 0
+            ? `<div style="font-size:0.74rem; color:var(--muted); padding:6px 4px;">No existing continuing students added for ${c.name} yet. Click <strong>+ Add Existing</strong> above.</div>`
+            : d.existingList.map(({ stu, m }, idx) => {
+                const isCustomT = !TEACHER_PCT_PRESETS.includes(Number(stu.teacherPct));
+                const isCustomD = !DISCOUNT_PCT_PRESETS.includes(Number(stu.discPct));
+                return `
+                  <div class="existing-stu-card">
+                    <div class="existing-stu-top">
+                      <input type="text" class="text-input" placeholder="Existing Student #${idx + 1} Name" value="${escapeHtml(stu.name)}" data-ex-text="name" data-ex-course="${c.id}" data-ex-id="${stu.id}" />
+                      <div class="stu-phone-wrap">
+                        <input type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit Mobile" value="${escapeHtml(stu.phone || '')}" data-ex-phone="phone" data-ex-course="${c.id}" data-ex-id="${stu.id}" class="tabular-nums" />
+                        <span class="phone-count-pill tabular-nums ${(stu.phone || '').length === 10 ? 'valid' : ''}">${(stu.phone || '').length}/10</span>
+                      </div>
+                      <input type="text" class="text-input note" placeholder="Batch / Old Fee Note" value="${escapeHtml(stu.note)}" data-ex-text="note" data-ex-course="${c.id}" data-ex-id="${stu.id}" />
+                      <button type="button" class="remove-row-btn" title="Remove existing student" aria-label="Remove existing student" data-del-ex="${c.id}:${stu.id}">&times;</button>
+                    </div>
+                    <div class="existing-stu-bottom tabular-nums">
+                      <div class="ctrl-inline">
+                        <span style="font-size:0.7rem; color:var(--muted); font-weight:700;">Teacher %:</span>
+                        <select class="select-input tabular-nums" data-ex-field="teacherPct" data-ex-course="${c.id}" data-ex-id="${stu.id}">
+                          ${buildTeacherPctOptions(stu.teacherPct)}
+                        </select>
+                        ${isCustomT ? `<span class="custom-pct-wrap"><input type="number" min="0" max="100" step="1" value="${stu.teacherPct}" data-ex-custom="teacherPct" data-ex-course="${c.id}" data-ex-id="${stu.id}" class="tabular-nums" /><span>%</span></span>` : ''}
+                        <span style="font-size:0.7rem; color:var(--muted); font-weight:700; margin-left:4px;">Disc %:</span>
+                        <select class="select-input tabular-nums" data-ex-field="discPct" data-ex-course="${c.id}" data-ex-id="${stu.id}">
+                          ${buildDiscPctOptions(stu.discPct)}
+                        </select>
+                        ${isCustomD ? `<span class="custom-pct-wrap"><input type="number" min="0" max="100" step="1" value="${stu.discPct}" data-ex-custom="discPct" data-ex-course="${c.id}" data-ex-id="${stu.id}" class="tabular-nums" /><span>%</span></span>` : ''}
+                      </div>
+                      <div style="text-align:right;">
+                        <span style="font-size:0.71rem; color:var(--muted);">Basic ${formatINR(m.netBasic)} × ${m.teacherPct}% = </span>
+                        <strong class="text-gain" style="font-size:0.88rem;">${formatINR(m.teacherPayout, true)}</strong>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('');
+
+          return `
+            <div class="payout-teacher-card">
+              <div class="payout-card-top">
+                <div class="payout-name-row">
+                  <span class="kpi-badge" style="color:var(--text); font-weight:800;">${c.name}</span>
+                  <input type="text" class="teacher-name-input" data-teacher-name="${c.id}" value="${escapeHtml(d.teacherName)}" placeholder="Teacher Name" aria-label="${c.name} Teacher Name" />
+                </div>
+                <button type="button" class="btn btn-sm btn-pdf" data-open-teacher-pdf="${c.id}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                  </svg>
+                  Print / PDF Slip
+                </button>
+              </div>
+
+              <!-- Existing Students Bar (Not Added to P&L) -->
+              <div class="existing-bar tabular-nums">
+                <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" data-toggle-ex="${c.id}">
+                  <span class="chevron-btn ${isOpen ? 'open' : ''}" style="width:22px; height:22px;">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </span>
+                  <div>
+                    <div style="font-size:0.78rem; font-weight:800; color:var(--text);">Existing Students (${d.existingList.length}) · <span class="text-gain">${formatINR(d.existingPayout, true)}</span></div>
+                    <div style="font-size:0.66rem; color:var(--muted);">Continuing from prev months · Basic ₹${cfg.basicFee} · Not in P&amp;L</div>
+                  </div>
+                </div>
+                <div class="stepper">
+                  <button type="button" class="step-btn" data-pop-ex="${c.id}" title="Remove last existing student">−</button>
+                  <span class="step-count">${d.existingList.length}</span>
+                  <button type="button" class="step-btn add-btn" data-add-ex="${c.id}">+ Add Existing</button>
+                </div>
+              </div>
+
+              <div class="existing-drawer ${isOpen ? 'open' : ''}">
+                ${existingRowsHtml}
+              </div>
+
+              <div class="payout-stats tabular-nums">
+                <div style="font-size:0.74rem; color:var(--muted); line-height:1.5;">
+                  Existing: <strong class="text-gain">${d.existingList.length} (${formatINR(d.existingPayout, true)})</strong> ·
+                  New: <strong class="text-gain">+${d.newList.length} (${formatINR(d.newPayout, true)})</strong> ·
+                  Canceled: <strong class="text-loss">−${d.cancelList.length} (${d.cancelPayout > 0 ? `−${formatINR(d.cancelPayout)}` : '₹0'})</strong>
+                  ${d.totalDiscHit > 0 ? `<br/>Teacher Disc Share: <strong class="text-amber">−${formatINR(d.totalDiscHit)}</strong>` : ''}
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:0.68rem; color:var(--muted); text-transform:uppercase; font-weight:700;">Total Payable Payout</div>
+                  <div class="${netCls}" style="font-size:1.08rem; font-weight:800;">${formatINR(d.netPayout, true)}</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderDashboard() {
+        const s = computeSummary();
+        latestSummary = s;
+
+        // Mode segmented buttons & tax reminder
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.mode === state.mode);
+        });
+        document.getElementById('tax-reminder-pill').classList.toggle('hidden', state.mode === 'real');
+
+        // Hero Bridge
+        document.getElementById('last-profit-fmt').textContent = formatINR(s.lastProfit);
+        document.getElementById('curr-profit-val').textContent = formatINR(s.currentProfit);
+        document.getElementById('curr-mode-label').textContent = state.mode === 'cash' ? 'Cash Left (Incl. Tax)' : 'Real Net (Ex-Tax)';
+        document.getElementById('curr-net-students').textContent = `Net Students: ${s.netStudents > 0 ? `+${s.netStudents}` : s.netStudents}`;
+
+        const deltaPill = document.getElementById('net-delta-pill');
+        const currBox = document.getElementById('curr-profit-box');
+        const statusBadge = document.getElementById('curr-status-badge');
+
+        deltaPill.classList.remove('gain', 'loss');
+        currBox.classList.remove('gain', 'loss');
+        statusBadge.classList.remove('gain', 'loss');
+
+        if (s.netDelta > 0) {
+          deltaPill.classList.add('gain');
+          currBox.classList.add('gain');
+          statusBadge.classList.add('gain');
+          statusBadge.textContent = 'Profit Up';
+        } else if (s.netDelta < 0) {
+          deltaPill.classList.add('loss');
+          currBox.classList.add('loss');
+          statusBadge.classList.add('loss');
+          statusBadge.textContent = 'Profit Down';
+        } else {
+          statusBadge.textContent = 'Unchanged';
+        }
+
+        document.getElementById('net-delta-amount').textContent = formatINR(s.netDelta, true);
+        const pctText = s.pctChange === null
+          ? '0.0% change'
+          : `${s.pctChange > 0 ? '+' : s.pctChange < 0 ? '−' : ''}${Math.abs(s.pctChange).toFixed(2)}% change`;
+        document.getElementById('net-delta-pct').textContent = pctText;
+
+        // Section Header & Footer Totals
+        document.getElementById('admissions-head-badge').textContent = `${s.newStudents} student${s.newStudents === 1 ? '' : 's'} · ${formatINR(s.newHsTotal, true)}`;
+        document.getElementById('admissions-footer-total').textContent = formatINR(s.newHsTotal, true);
+
+        const cancelDisplay = s.cancelHsTotal > 0 ? `−${formatINR(s.cancelHsTotal)}` : '₹0';
+        document.getElementById('cancellations-head-badge').textContent = `${s.cancelStudents} student${s.cancelStudents === 1 ? '' : 's'} · ${cancelDisplay}`;
+        document.getElementById('cancellations-footer-total').textContent = cancelDisplay;
+
+        // 6-Metric Summary Strip & Studio Badge
+        document.getElementById('studio-added-badge').textContent = `${formatINR(s.studioIncome, true)} added to profit`;
+        document.getElementById('m-new-gain').textContent = formatINR(s.newHsTotal, true);
+        document.getElementById('m-new-sub').textContent = `${s.newStudents} student${s.newStudents === 1 ? '' : 's'} added`;
+
+        document.getElementById('m-studio-income').textContent = formatINR(s.studioIncome, true);
+
+        document.getElementById('m-cancel-loss').textContent = cancelDisplay;
+        document.getElementById('m-cancel-sub').textContent = `${s.cancelStudents} student${s.cancelStudents === 1 ? '' : 's'} canceled`;
+
+        document.getElementById('m-teacher-change').textContent = formatINR(s.netTeacherChange, true);
+        document.getElementById('m-disc-total').textContent = formatINR(s.newDiscTotal);
+        document.getElementById('m-disc-split').textContent = `Teacher ${formatINR(s.newTeacherDisc)} + HS ${formatINR(s.newHsDisc)}`;
+        document.getElementById('m-tax-change').textContent = formatINR(s.netTaxChange, true);
+
+        renderTeacherPayoutsSection();
+      }
+
+      function renderHistory() {
+        const tbody = document.getElementById('history-tbody');
+        document.getElementById('history-count-badge').textContent = `${historyList.length} saved`;
+
+        if (historyList.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align:center; color:var(--muted); padding:22px;">
+                No saved month snapshots yet. Click <strong>Save Snapshot</strong> above to archive a month.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = historyList.map((item, idx) => {
+          const deltaCls = item.netDelta > 0 ? 'text-gain' : item.netDelta < 0 ? 'text-loss' : '';
+          return `
+            <tr>
+              <td style="font-weight:700;">${escapeHtml(item.monthLabel)}</td>
+              <td><span class="kpi-badge">${item.mode === 'real' ? 'Real Net' : 'Cash Left'}</span></td>
+              <td><span class="text-gain">+${item.newStudents}</span> / <span class="text-loss">−${item.cancelStudents}</span></td>
+              <td style="text-align:right;">${formatINR(item.lastProfit)}</td>
+              <td style="text-align:right; font-weight:700;" class="${deltaCls}">${formatINR(item.netDelta, true)}</td>
+              <td style="text-align:right; font-weight:800;">${formatINR(item.currentProfit)}</td>
+              <td style="text-align:right;">
+                <div style="display:inline-flex; gap:6px;">
+                  <button type="button" class="btn btn-sm btn-sky" data-load-hist="${idx}">Load</button>
+                  <button type="button" class="btn btn-sm btn-danger-outline" data-delete-hist="${idx}">Delete</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function fullRender(shouldSave = true) {
+        if (shouldSave) saveState();
+        renderCalendarUI();
+        renderSettingsPanel();
+        renderSection('admissions');
+        renderSection('cancellations');
+        renderDashboard();
+      }
+
+      // =========================================================
+      // COMPLETE PRINT-READY A4 PDF REPORT BUILDER
+      // =========================================================
+      function buildPrintReportHTML() {
+        const s = computeSummary();
+        const prev = getPrevYM(state.year, state.month);
+        const modeText = state.mode === 'cash' ? 'Cash Left — Incl. Tax' : 'Real Net — Ex-Tax';
+        const nowStr = new Date().toLocaleString('en-IN', {
+          day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        const pctText = s.pctChange === null
+          ? '—'
+          : `${s.pctChange > 0 ? '+' : s.pctChange < 0 ? '−' : ''}${Math.abs(s.pctChange).toFixed(2)}%`;
+
+        let cGrandNew = 0, cGrandCancel = 0, cGrandTeacher = 0, cGrandDisc = 0, cGrandHs = 0;
+        const courseSummaryRows = DEFAULT_COURSES.map(c => {
+          const n = computeCourseTotals('admissions', c.id);
+          const x = computeCourseTotals('cancellations', c.id);
+          const netStu = n.count - x.count;
+          const netTeacher = round2(n.teacherTotal - x.teacherTotal);
+          const netHs = round2(n.hsTotal - x.hsTotal);
+
+          cGrandNew += n.count;
+          cGrandCancel += x.count;
+          cGrandTeacher = round2(cGrandTeacher + netTeacher);
+          cGrandDisc = round2(cGrandDisc + n.discTotal);
+          cGrandHs = round2(cGrandHs + netHs);
+
+          const hsCls = netHs > 0 ? 'pr-gain' : netHs < 0 ? 'pr-loss' : '';
+          return `
+            <tr>
+              <td style="font-weight:700;">${c.name}</td>
+              <td class="pr-num pr-gain">+${n.count}</td>
+              <td class="pr-num pr-loss">−${x.count}</td>
+              <td class="pr-num" style="font-weight:700;">${netStu > 0 ? `+${netStu}` : netStu < 0 ? `−${Math.abs(netStu)}` : '0'}</td>
+              <td class="pr-num">${formatINR(netTeacher, true)}</td>
+              <td class="pr-num pr-amber">${formatINR(n.discTotal)}</td>
+              <td class="pr-num ${hsCls}" style="font-weight:800;">${formatINR(netHs, true)}</td>
+            </tr>
+          `;
+        }).join('');
+
+        function buildDetailedTable(section) {
+          const isGain = section === 'admissions';
+          const flat = [];
+          DEFAULT_COURSES.forEach(c => {
+            (state[section][c.id] || []).forEach(stu => {
+              flat.push({ courseName: c.name, stu, m: calcStudent(c.id, stu) });
+            });
+          });
+
+          if (flat.length === 0) {
+            return '<div class="pr-empty">No entries recorded for this period.</div>';
+          }
+
+          let totNetFee = 0, totTeacher = 0, totHs = 0;
+          const rowsHtml = flat.map((item, idx) => {
+            const { courseName, stu, m } = item;
+            totNetFee = round2(totNetFee + m.netFull);
+            totTeacher = round2(totTeacher + m.teacherPayout);
+            totHs = round2(totHs + m.hsActive);
+
+            const nameLine = escapeHtml(stu.name || '(Unnamed Student)');
+            const phoneLine = stu.phone ? `<div style="font-size:9.5px; color:#334155; font-weight:600;">Mob: ${escapeHtml(stu.phone)}</div>` : '';
+            const noteLine = stu.note ? `<div style="font-size:9.5px; color:#64748b;">${escapeHtml(stu.note)}</div>` : '';
+            const empLabel = m.isSalaried ? 'Salaried' : `% Basis (${m.teacherPct}%)`;
+            const hsVal = isGain ? formatINR(m.hsActive, true) : (m.hsActive > 0 ? `−${formatINR(m.hsActive)}` : '₹0');
+
+            return `
+              <tr>
+                <td class="pr-num">${idx + 1}</td>
+                <td style="font-weight:700;">${courseName}</td>
+                <td class="pr-student-col"><div style="font-weight:700;">${nameLine}</div>${phoneLine}${noteLine}</td>
+                <td>${empLabel}</td>
+                <td class="pr-num">${formatINR(m.fullFee)}</td>
+                <td class="pr-num">${m.d}%</td>
+                <td class="pr-num">${formatINR(m.netFull)}</td>
+                <td class="pr-num">${formatINR(m.teacherPayout)}</td>
+                <td class="pr-num ${isGain ? 'pr-gain' : 'pr-loss'}" style="font-weight:800;">${hsVal}</td>
+              </tr>
+            `;
+          }).join('');
+
+          const totHsFormatted = isGain ? formatINR(totHs, true) : (totHs > 0 ? `−${formatINR(totHs)}` : '₹0');
+
+          return `
+            <table class="pr-table">
+              <thead>
+                <tr>
+                  <th class="pr-num" style="width:32px;">S.No</th>
+                  <th>Course</th>
+                  <th>Student Name &amp; Details</th>
+                  <th>Teacher Type</th>
+                  <th class="pr-num">Full Fee</th>
+                  <th class="pr-num">Disc %</th>
+                  <th class="pr-num">Net Fee</th>
+                  <th class="pr-num">Teacher Share</th>
+                  <th class="pr-num">${isGain ? 'HS Music Part (+₹)' : 'HS Music Loss (−₹)'}</th>
+                </tr>
+              </thead>
+              <tbody>${rowsHtml}</tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="6">TOTAL (${flat.length} student${flat.length === 1 ? '' : 's'})</td>
+                  <td class="pr-num">${formatINR(totNetFee)}</td>
+                  <td class="pr-num">${formatINR(totTeacher)}</td>
+                  <td class="pr-num ${isGain ? 'pr-gain' : 'pr-loss'}">${totHsFormatted}</td>
+                </tr>
+              </tfoot>
+            </table>
+          `;
+        }
+
+        return `
+          <div class="pr-header">
+            <div>
+              <div class="pr-brand">HS MUSIC <span>— Monthly Profit &amp; Enrollment Report</span></div>
+              <div class="pr-sub">Preetam Nagar, Prayagraj · Complete Student-Wise Financial Breakdown</div>
+            </div>
+            <div class="pr-meta">
+              <div class="pr-period">${escapeHtml(state.monthLabel)}</div>
+              <div>${escapeHtml(getMonthDateRange(state.year, state.month))}</div>
+              <div class="pr-mode-badge">Mode: ${modeText}</div>
+              <div style="margin-top:3px; font-size:9.5px; color:#64748b;">Generated: ${escapeHtml(nowStr)}</div>
+            </div>
+          </div>
+
+          <div class="pr-section-title">1. Executive Profit Bridge Summary</div>
+          <div class="pr-bridge-grid">
+            <div class="pr-bridge-card">
+              <div class="pr-card-label">${formatMonthShort(prev.year, prev.month)} Profit</div>
+              <div class="pr-card-val">${formatINR(s.lastProfit)}</div>
+              <div class="pr-card-sub">Opening Base</div>
+            </div>
+            <div class="pr-bridge-card">
+              <div class="pr-card-label">+ New Admissions</div>
+              <div class="pr-card-val pr-gain">${formatINR(s.newHsTotal, true)}</div>
+              <div class="pr-card-sub">${s.newStudents} student${s.newStudents === 1 ? '' : 's'} (HS Part)</div>
+            </div>
+            <div class="pr-bridge-card">
+              <div class="pr-card-label">+ Recording Studio</div>
+              <div class="pr-card-val pr-gain">${formatINR(s.studioIncome, true)}</div>
+              <div class="pr-card-sub">Other Income</div>
+            </div>
+            <div class="pr-bridge-card">
+              <div class="pr-card-label">− Canceled Enrollments</div>
+              <div class="pr-card-val pr-loss">${s.cancelHsTotal > 0 ? `−${formatINR(s.cancelHsTotal)}` : '₹0'}</div>
+              <div class="pr-card-sub">${s.cancelStudents} student${s.cancelStudents === 1 ? '' : 's'} (HS Part)</div>
+            </div>
+            <div class="pr-bridge-card">
+              <div class="pr-card-label">Net Profit Change</div>
+              <div class="pr-card-val ${s.netDelta > 0 ? 'pr-gain' : s.netDelta < 0 ? 'pr-loss' : ''}">${formatINR(s.netDelta, true)}</div>
+              <div class="pr-card-sub">${pctText} vs prev month</div>
+            </div>
+            <div class="pr-bridge-card highlight">
+              <div class="pr-card-label">${formatMonthShort(state.year, state.month)} Profit</div>
+              <div class="pr-card-val">${formatINR(s.currentProfit)}</div>
+              <div class="pr-card-sub">Final Closing Profit</div>
+            </div>
+          </div>
+
+          <div class="pr-section-title">2. 6-Metric Financial Breakdown</div>
+          <div class="pr-metrics-bar">
+            <div class="pr-metric-box">
+              <div class="pr-card-label">New Admission Gain</div>
+              <div class="pr-card-val pr-gain" style="font-size:12px;">${formatINR(s.newHsTotal, true)}</div>
+              <div class="pr-card-sub">${s.newStudents} added</div>
+            </div>
+            <div class="pr-metric-box">
+              <div class="pr-card-label">Recording Studio</div>
+              <div class="pr-card-val pr-gain" style="font-size:12px;">${formatINR(s.studioIncome, true)}</div>
+              <div class="pr-card-sub">Studio income</div>
+            </div>
+            <div class="pr-metric-box">
+              <div class="pr-card-label">Canceled Loss</div>
+              <div class="pr-card-val pr-loss" style="font-size:12px;">${s.cancelHsTotal > 0 ? `−${formatINR(s.cancelHsTotal)}` : '₹0'}</div>
+              <div class="pr-card-sub">${s.cancelStudents} canceled</div>
+            </div>
+            <div class="pr-metric-box">
+              <div class="pr-card-label">Net Teacher Payout</div>
+              <div class="pr-card-val" style="font-size:12px;">${formatINR(s.netTeacherChange, true)}</div>
+              <div class="pr-card-sub">% Basis courses</div>
+            </div>
+            <div class="pr-metric-box">
+              <div class="pr-card-label">Total Discount Given</div>
+              <div class="pr-card-val pr-amber" style="font-size:12px;">${formatINR(s.newDiscTotal)}</div>
+              <div class="pr-card-sub">T ${formatINR(s.newTeacherDisc)} + HS ${formatINR(s.newHsDisc)}</div>
+            </div>
+            <div class="pr-metric-box">
+              <div class="pr-card-label">Scaled Tax Change</div>
+              <div class="pr-card-val pr-amber" style="font-size:12px;">${formatINR(s.netTaxChange, true)}</div>
+              <div class="pr-card-sub">Pass-through tax</div>
+            </div>
+          </div>
+
+          <div class="pr-section-title">3. Course-Wise Summary</div>
+          <table class="pr-table">
+            <thead>
+              <tr>
+                <th>Course</th>
+                <th class="pr-num">New Students</th>
+                <th class="pr-num">Canceled Students</th>
+                <th class="pr-num">Net Students</th>
+                <th class="pr-num">Teacher Payout Impact</th>
+                <th class="pr-num">Discount Given (New)</th>
+                <th class="pr-num">Net HS Music Impact</th>
+              </tr>
+            </thead>
+            <tbody>${courseSummaryRows}</tbody>
+            <tfoot>
+              <tr>
+                <td>GRAND TOTAL</td>
+                <td class="pr-num pr-gain">+${cGrandNew}</td>
+                <td class="pr-num pr-loss">−${cGrandCancel}</td>
+                <td class="pr-num">${s.netStudents > 0 ? `+${s.netStudents}` : s.netStudents < 0 ? `−${Math.abs(s.netStudents)}` : '0'}</td>
+                <td class="pr-num">${formatINR(cGrandTeacher, true)}</td>
+                <td class="pr-num pr-amber">${formatINR(cGrandDisc)}</td>
+                <td class="pr-num ${cGrandHs > 0 ? 'pr-gain' : cGrandHs < 0 ? 'pr-loss' : ''}">${formatINR(cGrandHs, true)}</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <div class="pr-section-title">4A. Detailed Student-Wise — New Admissions (+ Profit)</div>
+          ${buildDetailedTable('admissions')}
+
+          <div class="pr-section-title">4B. Detailed Student-Wise — Canceled Enrollments (− Loss)</div>
+          ${buildDetailedTable('cancellations')}
+
+          <div class="pr-footer">
+            <div class="pr-note">
+              <strong>Accounting Note:</strong> All discounts apply proportionally across Basic Fee, Maintenance, and Tax with zero double-counting.
+              Salaried courses incur ₹0 variable teacher payout. Scaled Tax Liability Change (<strong>${formatINR(s.netTaxChange, true)}</strong>) represents pass-through tax reserve and should be accounted separately from net owner profit when operating in <em>Cash Left (Incl. Tax)</em> mode.
+            </div>
+            <div class="pr-sign">
+              <div class="pr-sign-line">Authorized Signatory — HS Music</div>
+            </div>
+          </div>
+        `;
+      }
+
+      // =========================================================
+      // INDIVIDUAL & COMBINED % BASIS TEACHER PAYOUT PDF BUILDER
+      // =========================================================
+      function buildSingleTeacherBlockHTML(d, isMulti = false) {
+        const cfg = state.courseSettings[d.courseId] || getCourseDef(d.courseId);
+
+        function buildTeacherStudentTable(list, isGain, emptyLabel) {
+          if (list.length === 0) {
+            return `<div class="pr-empty">No % Basis ${emptyLabel} recorded for ${escapeHtml(d.courseName)} in this period.</div>`;
+          }
+
+          let totFull = 0, totBasic = 0, totNetBasic = 0, totPayout = 0;
+          const rows = list.map((item, idx) => {
+            const { stu, m } = item;
+            totFull = round2(totFull + m.fullFee);
+            totBasic = round2(totBasic + m.basicFee);
+            totNetBasic = round2(totNetBasic + m.netBasic);
+            totPayout = round2(totPayout + m.teacherPayout);
+
+            const nameLine = escapeHtml(stu.name || '(Unnamed Student)');
+            const noteLine = stu.note ? `<div style="font-size:9.5px; color:#64748b;">${escapeHtml(stu.note)}</div>` : '';
+            const payStr = isGain ? formatINR(m.teacherPayout, true) : (m.teacherPayout > 0 ? `−${formatINR(m.teacherPayout)}` : '₹0');
+
+            return `
+              <tr>
+                <td class="pr-num">${idx + 1}</td>
+                <td class="pr-student-col"><div style="font-weight:700;">${nameLine}</div>${noteLine}</td>
+                <td>% Basis</td>
+                <td class="pr-num">${formatINR(m.fullFee)}</td>
+                <td class="pr-num">${formatINR(m.basicFee)}</td>
+                <td class="pr-num">${m.d}%</td>
+                <td class="pr-num">${formatINR(m.netBasic)}</td>
+                <td class="pr-num">${m.teacherPct}%</td>
+                <td class="pr-num ${isGain ? 'pr-gain' : 'pr-loss'}" style="font-weight:800;">${payStr}</td>
+              </tr>
+            `;
+          }).join('');
+
+          const totPayFormatted = isGain ? formatINR(totPayout, true) : (totPayout > 0 ? `−${formatINR(totPayout)}` : '₹0');
+
+          return `
+            <table class="pr-table">
+              <thead>
+                <tr>
+                  <th class="pr-num" style="width:32px;">S.No</th>
+                  <th>Student Name &amp; Details</th>
+                  <th>Teacher Type</th>
+                  <th class="pr-num">Full Fee</th>
+                  <th class="pr-num">Basic Fee</th>
+                  <th class="pr-num">Disc %</th>
+                  <th class="pr-num">Disc. Basic</th>
+                  <th class="pr-num">Teacher %</th>
+                  <th class="pr-num">${isGain ? 'Payout (+₹)' : 'Deduct (−₹)'}</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3">TOTAL (${list.length} student${list.length === 1 ? '' : 's'})</td>
+                  <td class="pr-num">${formatINR(totFull)}</td>
+                  <td class="pr-num">${formatINR(totBasic)}</td>
+                  <td class="pr-num">—</td>
+                  <td class="pr-num">${formatINR(totNetBasic)}</td>
+                  <td class="pr-num">—</td>
+                  <td class="pr-num ${isGain ? 'pr-gain' : 'pr-loss'}">${totPayFormatted}</td>
+                </tr>
+              </tfoot>
+            </table>
+          `;
+        }
+
+        const nowStr = new Date().toLocaleString('en-IN', {
+          day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        return `
+          <div style="${isMulti ? 'page-break-after: always; break-after: page; margin-bottom: 24px;' : ''}">
+            <div class="pr-header">
+              <div>
+                <div class="pr-brand">HS MUSIC <span>— Teacher Payout Slip (% Basis)</span></div>
+                <div class="pr-sub">Preetam Nagar, Prayagraj · Student-Wise Commission Statement</div>
+              </div>
+              <div class="pr-meta">
+                <div class="pr-period">${escapeHtml(d.teacherName)} (${escapeHtml(d.courseName)})</div>
+                <div>${escapeHtml(state.monthLabel)} · ${escapeHtml(getMonthDateRange(state.year, state.month))}</div>
+                <div class="pr-mode-badge">Base Basic Fee: ${formatINR(cfg.basicFee)} / Full: ${formatINR(cfg.fullFee)}</div>
+                <div style="margin-top:3px; font-size:9.5px; color:#64748b;">Generated: ${escapeHtml(nowStr)}</div>
+              </div>
+            </div>
+
+            <div class="pr-section-title">1. Payout Summary — ${escapeHtml(d.teacherName)}</div>
+            <div class="pr-bridge-grid" style="grid-template-columns: repeat(4, 1fr);">
+              <div class="pr-bridge-card">
+                <div class="pr-card-label">Existing Students</div>
+                <div class="pr-card-val pr-gain">${formatINR(d.existingPayout, true)}</div>
+                <div class="pr-card-sub">${d.existingList.length} continuing student${d.existingList.length === 1 ? '' : 's'}</div>
+              </div>
+              <div class="pr-bridge-card">
+                <div class="pr-card-label">New Admissions</div>
+                <div class="pr-card-val pr-gain">${formatINR(d.newPayout, true)}</div>
+                <div class="pr-card-sub">${d.newList.length} new % Basis student${d.newList.length === 1 ? '' : 's'}</div>
+              </div>
+              <div class="pr-bridge-card">
+                <div class="pr-card-label">Canceled Deductions</div>
+                <div class="pr-card-val pr-loss">${d.cancelPayout > 0 ? `−${formatINR(d.cancelPayout)}` : '₹0'}</div>
+                <div class="pr-card-sub">${d.cancelList.length} canceled student${d.cancelList.length === 1 ? '' : 's'}</div>
+              </div>
+              <div class="pr-bridge-card highlight">
+                <div class="pr-card-label">Total Payable Payout</div>
+                <div class="pr-card-val">${formatINR(d.netPayout, true)}</div>
+                <div class="pr-card-sub">Payable for ${formatMonthShort(state.year, state.month)}</div>
+              </div>
+            </div>
+
+            <div class="pr-section-title">2A. Existing Students (Continuing) — Student-Wise Payout Breakdown</div>
+            ${buildTeacherStudentTable(d.existingList, true, 'existing continuing students')}
+
+            <div class="pr-section-title">2B. New Admissions — Student-Wise Payout Breakdown</div>
+            ${buildTeacherStudentTable(d.newList, true, 'new admissions')}
+
+            <div class="pr-section-title">2C. Canceled Enrollments — Student-Wise Payout Deduction</div>
+            ${buildTeacherStudentTable(d.cancelList, false, 'canceled enrollments')}
+
+            <div class="pr-footer">
+              <div class="pr-note">
+                <strong>Payout Formula:</strong> Teacher share is computed strictly on the discounted <strong>Basic Fee</strong> (excluding Maintenance &amp; Tax). Proportional student discounts automatically sync to Basic Fee with zero double-counting. Existing continuing students are included in this Teacher Payout Slip only and are excluded from the Monthly Profit Bridge (P&amp;L).
+              </div>
+              <div class="pr-dual-sign">
+                <div class="pr-sign">
+                  <div class="pr-sign-line">${escapeHtml(d.teacherName)} (Receiver)</div>
+                </div>
+                <div class="pr-sign">
+                  <div class="pr-sign-line">Authorized Signatory — HS Music</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function buildTeacherPayoutPDFHTML(courseIdOrAll) {
+        if (courseIdOrAll === 'all-teachers') {
+          const activeCourses = getActivePercentCourses();
+          if (activeCourses.length === 0) {
+            return '<div class="pr-empty">No % Basis courses found.</div>';
+          }
+          return activeCourses
+            .map((c, idx) => buildSingleTeacherBlockHTML(getPercentTeacherData(c.id), idx < activeCourses.length - 1))
+            .join('');
+        }
+        return buildSingleTeacherBlockHTML(getPercentTeacherData(courseIdOrAll), false);
+      }
+
+      function populateModalReportSelect(selectedKey) {
+        const sel = document.getElementById('modal-report-select');
+        if (!sel) return;
+        const activeCourses = getActivePercentCourses();
+        let html = `
+          <option value="pnl">Complete Monthly P&amp;L Report</option>
+          <option value="all-teachers">All % Basis Teachers (Combined Payout PDF)</option>
+        `;
+        activeCourses.forEach(c => {
+          const d = getPercentTeacherData(c.id);
+          html += `<option value="teacher:${c.id}">${escapeHtml(d.teacherName)} (${c.name}) — Payout Slip</option>`;
+        });
+        sel.innerHTML = html;
+        sel.value = selectedKey;
+      }
+
+      function renderSelectedPrintReport(reportKey) {
+        currentPrintReportKey = reportKey || 'pnl';
+        const reportEl = document.getElementById('print-report');
+        const titleEl = document.getElementById('print-modal-title');
+        if (!reportEl) return;
+
+        if (currentPrintReportKey === 'pnl') {
+          if (titleEl) titleEl.textContent = `Complete A4 P&L Report — ${state.monthLabel}`;
+          reportEl.innerHTML = buildPrintReportHTML();
+        } else if (currentPrintReportKey === 'all-teachers') {
+          if (titleEl) titleEl.textContent = `All % Basis Teachers Payout Slips — ${state.monthLabel}`;
+          reportEl.innerHTML = buildTeacherPayoutPDFHTML('all-teachers');
+        } else if (currentPrintReportKey.startsWith('teacher:')) {
+          const courseId = currentPrintReportKey.split(':')[1];
+          const d = getPercentTeacherData(courseId);
+          if (titleEl) titleEl.textContent = `${d.teacherName} (${d.courseName}) Payout Slip — ${state.monthLabel}`;
+          reportEl.innerHTML = buildTeacherPayoutPDFHTML(courseId);
+        }
+      }
+
+      function setPrintOrientation(orient) {
+        printOrientation = orient === 'landscape' ? 'landscape' : 'portrait';
+        const isLand = printOrientation === 'landscape';
+
+        document.querySelectorAll('.orient-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.orient === printOrientation);
+        });
+
+        const toolbar = document.getElementById('print-modal-toolbar');
+        const paperWrap = document.getElementById('print-paper-wrap');
+        if (toolbar) toolbar.classList.toggle('landscape', isLand);
+        if (paperWrap) {
+          paperWrap.classList.toggle('landscape', isLand);
+          paperWrap.classList.toggle('portrait', !isLand);
+        }
+
+        const styleTag = document.getElementById('dynamic-page-orientation');
+        if (styleTag) {
+          styleTag.textContent = isLand
+            ? '@page { size: A4 landscape; margin: 9mm; }'
+            : '@page { size: A4 portrait; margin: 10mm; }';
+        }
+      }
+
+      function getReportFilename() {
+        const mTag = `${MONTHS_SHORT[state.month - 1]}-${state.year}`;
+        const orientTag = printOrientation === 'landscape' ? 'Horizontal' : 'Vertical';
+        if (currentPrintReportKey === 'pnl') {
+          return `HS-Music-PnL-${mTag}-${orientTag}.pdf`;
+        }
+        if (currentPrintReportKey === 'all-teachers') {
+          return `HS-Music-All-Teachers-Payout-${mTag}-${orientTag}.pdf`;
+        }
+        const cId = currentPrintReportKey.split(':')[1] || 'teacher';
+        const cName = getCourseDef(cId).name;
+        return `HS-Music-${cName}-Teacher-Payout-${mTag}-${orientTag}.pdf`;
+      }
+
+      // =========================================================
+      // VECTOR PDF GENERATOR (jsPDF + AutoTable) — ZERO CUTOFF
+      // =========================================================
+      function drawPdfHeader(doc, titleRight, periodLine, subLine, badgeLine) {
+        const pageW = doc.internal.pageSize.getWidth();
+        const margin = 10;
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.setTextColor(15, 23, 42);
+        doc.text('HS MUSIC', margin, 14);
+
+        doc.setTextColor(225, 29, 72);
+        doc.setFontSize(12);
+        doc.text(`- ${titleRight}`, margin + 27, 14);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.setTextColor(71, 85, 105);
+        doc.text(subLine, margin, 19);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.setTextColor(15, 23, 42);
+        doc.text(periodLine, pageW - margin, 13.5, { align: 'right' });
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(71, 85, 105);
+        doc.text(badgeLine, pageW - margin, 18.5, { align: 'right' });
+
+        doc.setDrawColor(15, 23, 42);
+        doc.setLineWidth(0.6);
+        doc.line(margin, 22, pageW - margin, 22);
+        return 27;
+      }
+
+      function drawPdfSectionTitle(doc, y, text) {
+        const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight();
+        const margin = 10;
+        if (y > pageH - 28) {
+          doc.addPage();
+          y = 14;
+        }
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9.5);
+        doc.setTextColor(30, 41, 59);
+        doc.text(text.toUpperCase(), margin, y);
+        doc.setDrawColor(203, 213, 225);
+        doc.setLineWidth(0.3);
+        doc.line(margin, y + 1.5, pageW - margin, y + 1.5);
+        return y + 5;
+      }
+
+      function drawPdfCardGrid(doc, startY, cards, colsPerRow) {
+        const pageW = doc.internal.pageSize.getWidth();
+        const margin = 10;
+        const gap = 3;
+        const usableW = pageW - margin * 2;
+        const cardW = (usableW - gap * (colsPerRow - 1)) / colsPerRow;
+        const cardH = 15.5;
+        let y = startY;
+
+        cards.forEach((card, idx) => {
+          const col = idx % colsPerRow;
+          const row = Math.floor(idx / colsPerRow);
+          const x = margin + col * (cardW + gap);
+          const cy = startY + row * (cardH + gap);
+
+          if (card.highlight) {
+            doc.setFillColor(15, 23, 42);
+            doc.setDrawColor(15, 23, 42);
+          } else {
+            doc.setFillColor(248, 250, 252);
+            doc.setDrawColor(203, 213, 225);
+          }
+          doc.setLineWidth(0.25);
+          doc.roundedRect(x, cy, cardW, cardH, 1.8, 1.8, 'FD');
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(6.8);
+          doc.setTextColor(card.highlight ? 203 : 100, card.highlight ? 213 : 116, card.highlight ? 225 : 139);
+          doc.text(card.label.toUpperCase(), x + 2.5, cy + 4.5);
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10);
+          if (card.highlight) {
+            doc.setTextColor(255, 255, 255);
+          } else if (card.tone === 'gain') {
+            doc.setTextColor(4, 120, 87);
+          } else if (card.tone === 'loss') {
+            doc.setTextColor(190, 18, 60);
+          } else if (card.tone === 'amber') {
+            doc.setTextColor(180, 83, 9);
+          } else {
+            doc.setTextColor(15, 23, 42);
+          }
+          doc.text(card.value, x + 2.5, cy + 10);
+
+          if (card.sub) {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(6.8);
+            doc.setTextColor(card.highlight ? 148 : 100, card.highlight ? 163 : 116, card.highlight ? 184 : 139);
+            doc.text(card.sub, x + 2.5, cy + 13.8);
+          }
+          y = cy + cardH;
+        });
+
+        return y + 5;
+      }
+
+      function generatePnLVectorPDF(doc) {
+        const s = computeSummary();
+        const prev = getPrevYM(state.year, state.month);
+        const isLand = printOrientation === 'landscape';
+        const margin = 10;
+        const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight();
+        const modeText = state.mode === 'cash' ? 'Cash Left (Incl. Tax)' : 'Real Net (Ex-Tax)';
+        const nowStr = new Date().toLocaleString('en-IN', {
+          day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+        const pctText = s.pctChange === null
+          ? '0.0% vs prev'
+          : `${s.pctChange > 0 ? '+' : s.pctChange < 0 ? '-' : ''}${Math.abs(s.pctChange).toFixed(2)}% vs prev`;
+
+        let y = drawPdfHeader(
+          doc,
+          'Monthly Profit & Enrollment Report',
+          `${state.monthLabel} (${getMonthDateRange(state.year, state.month)})`,
+          'Preetam Nagar, Prayagraj | Complete Student-Wise Financial Breakdown',
+          `Mode: ${modeText} | Generated: ${nowStr}`
+        );
+
+        // 1. Executive Profit Bridge
+        y = drawPdfSectionTitle(doc, y, '1. Executive Profit Bridge Summary');
+        y = drawPdfCardGrid(doc, y, [
+          { label: `${formatMonthShort(prev.year, prev.month)} Profit`, value: formatPdfINR(s.lastProfit), sub: 'Opening Base' },
+          { label: '+ New Admissions', value: formatPdfINR(s.newHsTotal, true), sub: `${s.newStudents} students (HS Part)`, tone: 'gain' },
+          { label: '+ Recording Studio', value: formatPdfINR(s.studioIncome, true), sub: 'Other Income', tone: 'gain' },
+          { label: '- Canceled Loss', value: s.cancelHsTotal > 0 ? `-${formatPdfINR(s.cancelHsTotal)}` : 'Rs. 0', sub: `${s.cancelStudents} students (HS Part)`, tone: 'loss' },
+          { label: 'Net Profit Change', value: formatPdfINR(s.netDelta, true), sub: pctText, tone: s.netDelta > 0 ? 'gain' : s.netDelta < 0 ? 'loss' : '' },
+          { label: `${formatMonthShort(state.year, state.month)} Profit`, value: formatPdfINR(s.currentProfit), sub: 'Final Closing Profit', highlight: true }
+        ], isLand ? 6 : 3);
+
+        // 2. 6-Metric Breakdown
+        y = drawPdfSectionTitle(doc, y, '2. 6-Metric Financial Breakdown');
+        y = drawPdfCardGrid(doc, y, [
+          { label: 'New Admission Gain', value: formatPdfINR(s.newHsTotal, true), sub: `${s.newStudents} added`, tone: 'gain' },
+          { label: 'Recording Studio', value: formatPdfINR(s.studioIncome, true), sub: 'Studio income', tone: 'gain' },
+          { label: 'Canceled Loss', value: s.cancelHsTotal > 0 ? `-${formatPdfINR(s.cancelHsTotal)}` : 'Rs. 0', sub: `${s.cancelStudents} canceled`, tone: 'loss' },
+          { label: 'Net Teacher Payout', value: formatPdfINR(s.netTeacherChange, true), sub: '% Basis courses' },
+          { label: 'Total Discount (New)', value: formatPdfINR(s.newDiscTotal), sub: `T ${formatPdfINR(s.newTeacherDisc)} + HS ${formatPdfINR(s.newHsDisc)}`, tone: 'amber' },
+          { label: 'Scaled Tax Change', value: formatPdfINR(s.netTaxChange, true), sub: 'Pass-through tax', tone: 'amber' }
+        ], isLand ? 6 : 3);
+
+        // 3. Course-Wise Summary
+        y = drawPdfSectionTitle(doc, y, '3. Course-Wise Summary');
+        let cGrandNew = 0, cGrandCancel = 0, cGrandTeacher = 0, cGrandDisc = 0, cGrandHs = 0;
+        const courseBody = DEFAULT_COURSES.map(c => {
+          const n = computeCourseTotals('admissions', c.id);
+          const x = computeCourseTotals('cancellations', c.id);
+          const netStu = n.count - x.count;
+          const netTeacher = round2(n.teacherTotal - x.teacherTotal);
+          const netHs = round2(n.hsTotal - x.hsTotal);
+          cGrandNew += n.count;
+          cGrandCancel += x.count;
+          cGrandTeacher = round2(cGrandTeacher + netTeacher);
+          cGrandDisc = round2(cGrandDisc + n.discTotal);
+          cGrandHs = round2(cGrandHs + netHs);
+          return [
+            c.name,
+            `+${n.count}`,
+            `-${x.count}`,
+            netStu > 0 ? `+${netStu}` : `${netStu}`,
+            formatPdfINR(netTeacher, true),
+            formatPdfINR(n.discTotal),
+            formatPdfINR(netHs, true)
+          ];
+        });
+
+        doc.autoTable({
+          startY: y,
+          margin: { left: margin, right: margin },
+          theme: 'grid',
+          styles: { fontSize: isLand ? 8.5 : 7.8, cellPadding: 2.2, textColor: [15, 23, 42], lineColor: [203, 213, 225], lineWidth: 0.2 },
+          headStyles: { fillColor: [241, 245, 249], textColor: [30, 41, 59], fontStyle: 'bold' },
+          footStyles: { fillColor: [248, 250, 252], textColor: [15, 23, 42], fontStyle: 'bold' },
+          columnStyles: {
+            1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' },
+            4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right', fontStyle: 'bold' }
+          },
+          head: [['Course', 'New', 'Canceled', 'Net', 'Teacher Payout Impact', 'Discount (New)', 'Net HS Music Impact']],
+          body: courseBody,
+          foot: [['GRAND TOTAL', `+${cGrandNew}`, `-${cGrandCancel}`, s.netStudents > 0 ? `+${s.netStudents}` : `${s.netStudents}`, formatPdfINR(cGrandTeacher, true), formatPdfINR(cGrandDisc), formatPdfINR(cGrandHs, true)]]
+        });
+        y = doc.lastAutoTable.finalY + 6;
+
+        // 4A & 4B Detailed Student-Wise Tables
+        function addStudentSection(section, title) {
+          const isGain = section === 'admissions';
+          y = drawPdfSectionTitle(doc, y, title);
+          const flat = [];
+          DEFAULT_COURSES.forEach(c => {
+            (state[section][c.id] || []).forEach(stu => {
+              flat.push({ courseName: c.name, stu, m: calcStudent(c.id, stu) });
+            });
+          });
+
+          if (flat.length === 0) {
+            doc.setFont('helvetica', 'italic');
+            doc.setFontSize(8.5);
+            doc.setTextColor(100, 116, 139);
+            doc.text('No entries recorded for this period.', margin, y + 2);
+            y += 8;
+            return;
+          }
+
+          let totNetFee = 0, totTeacher = 0, totHs = 0;
+          const rows = flat.map((item, idx) => {
+            const { courseName, stu, m } = item;
+            totNetFee = round2(totNetFee + m.netFull);
+            totTeacher = round2(totTeacher + m.teacherPayout);
+            totHs = round2(totHs + m.hsActive);
+            const details = [stu.name || '(Unnamed Student)', stu.phone ? `Mob: ${stu.phone}` : '', stu.note || ''].filter(Boolean).join('\n');
+            return [
+              String(idx + 1),
+              courseName,
+              details,
+              m.isSalaried ? 'Salaried' : `% Basis (${m.teacherPct}%)`,
+              formatPdfINR(m.fullFee),
+              `${m.d}%`,
+              formatPdfINR(m.netFull),
+              formatPdfINR(m.teacherPayout),
+              isGain ? formatPdfINR(m.hsActive, true) : (m.hsActive > 0 ? `-${formatPdfINR(m.hsActive)}` : 'Rs. 0')
+            ];
+          });
+
+          const totHsText = isGain ? formatPdfINR(totHs, true) : (totHs > 0 ? `-${formatPdfINR(totHs)}` : 'Rs. 0');
+
+          doc.autoTable({
+            startY: y,
+            margin: { left: margin, right: margin },
+            theme: 'grid',
+            styles: { fontSize: isLand ? 8 : 7.2, cellPadding: 2, textColor: [15, 23, 42], lineColor: [203, 213, 225], lineWidth: 0.2, overflow: 'linebreak' },
+            headStyles: { fillColor: [241, 245, 249], textColor: [30, 41, 59], fontStyle: 'bold' },
+            footStyles: { fillColor: [248, 250, 252], textColor: [15, 23, 42], fontStyle: 'bold' },
+            columnStyles: {
+              0: { halign: 'right', cellWidth: 9 },
+              1: { fontStyle: 'bold', cellWidth: isLand ? 22 : 16 },
+              2: { cellWidth: isLand ? 68 : 42 },
+              4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right' },
+              7: { halign: 'right' }, 8: { halign: 'right', fontStyle: 'bold' }
+            },
+            head: [['#', 'Course', 'Student Name, Mobile & Details', 'Teacher Type', 'Full Fee', 'Disc %', 'Net Fee', 'Teacher Share', isGain ? 'HS Part (+)' : 'HS Loss (-)']],
+            body: rows,
+            foot: [[{ content: `TOTAL (${flat.length} students)`, colSpan: 6 }, formatPdfINR(totNetFee), formatPdfINR(totTeacher), totHsText]]
+          });
+          y = doc.lastAutoTable.finalY + 6;
+        }
+
+        addStudentSection('admissions', '4A. Detailed Student-Wise — New Admissions (+ Profit)');
+        addStudentSection('cancellations', '4B. Detailed Student-Wise — Canceled Enrollments (- Loss)');
+
+        // Footer & Signature
+        if (y > pageH - 26) {
+          doc.addPage();
+          y = 18;
+        }
+        doc.setDrawColor(203, 213, 225);
+        doc.line(margin, y, pageW - margin, y);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(71, 85, 105);
+        const noteText = `Accounting Note: All discounts apply proportionally across Basic Fee, Maintenance, and Tax with zero double-counting. Salaried courses incur Rs. 0 variable payout. Scaled Tax Liability Change (${formatPdfINR(s.netTaxChange, true)}) represents pass-through tax reserve.`;
+        doc.text(doc.splitTextToSize(noteText, pageW - margin * 2 - 60), margin, y + 5);
+
+        doc.setDrawColor(15, 23, 42);
+        doc.line(pageW - margin - 52, y + 14, pageW - margin, y + 14);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(15, 23, 42);
+        doc.text('Authorized Signatory - HS Music', pageW - margin - 26, y + 18, { align: 'center' });
+      }
+
+      function generateTeacherPayoutVectorPDF(doc, courseIdOrAll) {
+        const isLand = printOrientation === 'landscape';
+        const margin = 10;
+        const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight();
+        const nowStr = new Date().toLocaleString('en-IN', {
+          day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        const targets = courseIdOrAll === 'all-teachers'
+          ? getActivePercentCourses().map(c => getPercentTeacherData(c.id))
+          : [getPercentTeacherData(courseIdOrAll)];
+
+        if (targets.length === 0) {
+          doc.setFontSize(11);
+          doc.text('No % Basis courses found.', margin, 20);
+          return;
+        }
+
+        targets.forEach((d, tIdx) => {
+          if (tIdx > 0) doc.addPage();
+          const cfg = state.courseSettings[d.courseId] || getCourseDef(d.courseId);
+
+          let y = drawPdfHeader(
+            doc,
+            'Teacher Payout Slip (% Basis)',
+            `${d.teacherName} (${d.courseName})`,
+            `Preetam Nagar, Prayagraj | ${state.monthLabel} (${getMonthDateRange(state.year, state.month)})`,
+            `Basic: ${formatPdfINR(cfg.basicFee)} / Full: ${formatPdfINR(cfg.fullFee)} | Generated: ${nowStr}`
+          );
+
+          y = drawPdfSectionTitle(doc, y, `1. Payout Summary - ${d.teacherName}`);
+          y = drawPdfCardGrid(doc, y, [
+            { label: 'Existing Students', value: formatPdfINR(d.existingPayout, true), sub: `${d.existingList.length} continuing students`, tone: 'gain' },
+            { label: 'New Admissions', value: formatPdfINR(d.newPayout, true), sub: `${d.newList.length} new % Basis`, tone: 'gain' },
+            { label: 'Canceled Deductions', value: d.cancelPayout > 0 ? `-${formatPdfINR(d.cancelPayout)}` : 'Rs. 0', sub: `${d.cancelList.length} canceled`, tone: 'loss' },
+            { label: 'Total Payable Payout', value: formatPdfINR(d.netPayout, true), sub: `For ${formatMonthShort(state.year, state.month)}`, highlight: true }
+          ], isLand ? 4 : 2);
+
+          function addTeacherTable(list, isGain, title, emptyLabel) {
+            y = drawPdfSectionTitle(doc, y, title);
+            if (list.length === 0) {
+              doc.setFont('helvetica', 'italic');
+              doc.setFontSize(8.5);
+              doc.setTextColor(100, 116, 139);
+              doc.text(`No % Basis ${emptyLabel} recorded for ${d.courseName}.`, margin, y + 2);
+              y += 8;
+              return;
+            }
+
+            let totFull = 0, totBasic = 0, totNetBasic = 0, totPayout = 0;
+            const rows = list.map((item, idx) => {
+              const { stu, m } = item;
+              totFull = round2(totFull + m.fullFee);
+              totBasic = round2(totBasic + m.basicFee);
+              totNetBasic = round2(totNetBasic + m.netBasic);
+              totPayout = round2(totPayout + m.teacherPayout);
+              const details = [stu.name || '(Unnamed Student)', stu.note || ''].filter(Boolean).join('\n');
+              return [
+                String(idx + 1),
+                details,
+                '% Basis',
+                formatPdfINR(m.fullFee),
+                formatPdfINR(m.basicFee),
+                `${m.d}%`,
+                formatPdfINR(m.netBasic),
+                `${m.teacherPct}%`,
+                isGain ? formatPdfINR(m.teacherPayout, true) : (m.teacherPayout > 0 ? `-${formatPdfINR(m.teacherPayout)}` : 'Rs. 0')
+              ];
+            });
+
+            const totPayText = isGain ? formatPdfINR(totPayout, true) : (totPayout > 0 ? `-${formatPdfINR(totPayout)}` : 'Rs. 0');
+
+            doc.autoTable({
+              startY: y,
+              margin: { left: margin, right: margin },
+              theme: 'grid',
+              styles: { fontSize: isLand ? 8 : 7.2, cellPadding: 2, textColor: [15, 23, 42], lineColor: [203, 213, 225], lineWidth: 0.2, overflow: 'linebreak' },
+              headStyles: { fillColor: [241, 245, 249], textColor: [30, 41, 59], fontStyle: 'bold' },
+              footStyles: { fillColor: [248, 250, 252], textColor: [15, 23, 42], fontStyle: 'bold' },
+              columnStyles: {
+                0: { halign: 'right', cellWidth: 9 },
+                1: { cellWidth: isLand ? 78 : 44 },
+                3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' },
+                6: { halign: 'right' }, 7: { halign: 'right' }, 8: { halign: 'right', fontStyle: 'bold' }
+              },
+              head: [['#', 'Student Name & Details', 'Teacher Type', 'Full Fee', 'Basic Fee', 'Disc %', 'Disc. Basic', 'Teacher %', isGain ? 'Payout (+)' : 'Deduct (-)']],
+              body: rows,
+              foot: [[{ content: `TOTAL (${list.length} students)`, colSpan: 3 }, formatPdfINR(totFull), formatPdfINR(totBasic), '-', formatPdfINR(totNetBasic), '-', totPayText]]
+            });
+            y = doc.lastAutoTable.finalY + 6;
+          }
+
+          addTeacherTable(d.existingList, true, '2A. Existing Students (Continuing) — Payout Breakdown', 'existing continuing students');
+          addTeacherTable(d.newList, true, '2B. New Admissions — Student-Wise Payout Breakdown', 'new admissions');
+          addTeacherTable(d.cancelList, false, '2C. Canceled Enrollments — Student-Wise Payout Deduction', 'canceled enrollments');
+
+          if (y > pageH - 28) {
+            doc.addPage();
+            y = 18;
+          }
+          doc.setDrawColor(203, 213, 225);
+          doc.line(margin, y, pageW - margin, y);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7.5);
+          doc.setTextColor(71, 85, 105);
+          doc.text(doc.splitTextToSize('Payout Formula: Teacher share is computed strictly on discounted Basic Fee (excluding Maintenance & Tax). Existing continuing students are included in this Teacher Payout Slip only and are excluded from the Monthly Profit Bridge (P&L).', pageW - margin * 2 - 108), margin, y + 5);
+          doc.setDrawColor(15, 23, 42);
+          doc.line(pageW - margin - 102, y + 14, pageW - margin - 54, y + 14);
+          doc.line(pageW - margin - 48, y + 14, pageW - margin, y + 14);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(7.8);
+          doc.setTextColor(15, 23, 42);
+          doc.text(`${d.teacherName} (Receiver)`, pageW - margin - 78, y + 18, { align: 'center' });
+          doc.text('Authorized Signatory - HS Music', pageW - margin - 24, y + 18, { align: 'center' });
+        });
+      }
+
+      function downloadCurrentReportPDF() {
+        const btn = document.getElementById('btn-modal-download-pdf');
+        if (!window.jspdf || typeof window.jspdf.jsPDF !== 'function') {
+          showToast('PDF library still loading — please wait 2 seconds or use Print.', 'warning');
+          return;
+        }
+
+        const origHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.textContent = 'Generating PDF...';
+
+        try {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({
+            orientation: printOrientation,
+            unit: 'mm',
+            format: 'a4'
+          });
+
+          if (currentPrintReportKey === 'pnl') {
+            generatePnLVectorPDF(doc);
+          } else if (currentPrintReportKey === 'all-teachers') {
+            generateTeacherPayoutVectorPDF(doc, 'all-teachers');
+          } else if (currentPrintReportKey.startsWith('teacher:')) {
+            generateTeacherPayoutVectorPDF(doc, currentPrintReportKey.split(':')[1]);
+          }
+
+          const filename = getReportFilename();
+          const blob = doc.output('blob');
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+          showToast(`Saved ${filename} (${printOrientation === 'landscape' ? 'Horizontal' : 'Vertical'})`, 'success');
+        } catch (err) {
+          console.error('PDF generation error:', err);
+          showToast('Could not generate PDF — opening Print fallback.', 'warning');
+          printCurrentReport();
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
+        }
+      }
+
+      function printCurrentReport() {
+        const reportEl = document.getElementById('print-report');
+        if (!reportEl) return;
+
+        const isLand = printOrientation === 'landscape';
+        const pageCss = isLand
+          ? '@page { size: A4 landscape; margin: 9mm; }'
+          : '@page { size: A4 portrait; margin: 10mm; }';
+
+        const gridCols = isLand ? 'repeat(6, 1fr)' : 'repeat(3, 1fr)';
+        const tblFont = isLand ? '10px' : '9px';
+        const tblPad = isLand ? '5px 6px' : '4px 4.5px';
+
+        const htmlDoc = `<!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8" />
+            <title>${escapeHtml(getReportFilename().replace(/\.pdf$/i, ''))}</title>
+            <style>
+              ${pageCss}
+              * { box-sizing: border-box; }
+              body { margin: 0; padding: 0; background: #ffffff; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11px; line-height: 1.4; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              .tabular-nums { font-variant-numeric: tabular-nums; }
+              .pr-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; padding-bottom: 10px; border-bottom: 2px solid #0f172a; margin-bottom: 12px; }
+              .pr-brand { font-size: 17px; font-weight: 800; color: #0f172a; }
+              .pr-brand span { color: #e11d48; }
+              .pr-sub { font-size: 10px; color: #475569; margin-top: 2px; }
+              .pr-meta { text-align: right; font-size: 10px; color: #334155; }
+              .pr-period { font-size: 13px; font-weight: 800; color: #0f172a; }
+              .pr-mode-badge { display: inline-block; margin-top: 3px; padding: 2px 7px; border-radius: 999px; font-size: 9px; font-weight: 700; background: #f1f5f9; border: 1px solid #cbd5e1; color: #0f172a; }
+              .pr-section-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #334155; margin: 12px 0 6px; padding-bottom: 3px; border-bottom: 1px solid #e2e8f0; }
+              .pr-bridge-grid, .pr-metrics-bar { display: grid; grid-template-columns: ${gridCols}; gap: 6px; margin-bottom: 10px; }
+              .pr-bridge-card { border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 8px; background: #f8fafc; }
+              .pr-bridge-card.highlight { background: #0f172a; color: #ffffff; border-color: #0f172a; }
+              .pr-card-label { font-size: 8.5px; font-weight: 700; text-transform: uppercase; color: #64748b; }
+              .pr-bridge-card.highlight .pr-card-label { color: #cbd5e1; }
+              .pr-card-val { font-size: 12px; font-weight: 800; margin-top: 2px; }
+              .pr-card-sub { font-size: 8.5px; color: #64748b; margin-top: 1px; }
+              .pr-bridge-card.highlight .pr-card-sub { color: #94a3b8; }
+              .pr-metric-box { border: 1px solid #e2e8f0; border-radius: 5px; padding: 6px 8px; background: #ffffff; }
+              .pr-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: ${tblFont}; }
+              .pr-table th { background: #f1f5f9; color: #1e293b; font-size: 8.5px; font-weight: 800; text-transform: uppercase; padding: ${tblPad}; border: 1px solid #cbd5e1; text-align: left; }
+              .pr-table td { padding: ${tblPad}; border: 1px solid #e2e8f0; color: #0f172a; vertical-align: top; }
+              .pr-student-col { min-width: 95px; word-break: break-word; }
+              .pr-table tr { break-inside: avoid; page-break-inside: avoid; }
+              .pr-table tfoot td { background: #f8fafc; font-weight: 800; border-top: 1.5px solid #94a3b8; }
+              .pr-num { text-align: right !important; white-space: nowrap; }
+              .pr-gain { color: #047857 !important; }
+              .pr-loss { color: #be123c !important; }
+              .pr-amber { color: #b45309 !important; }
+              .pr-empty { padding: 8px 10px; border: 1px dashed #cbd5e1; border-radius: 5px; color: #64748b; font-style: italic; font-size: 10px; margin-bottom: 8px; }
+              .pr-footer { margin-top: 16px; padding-top: 10px; border-top: 1.5px solid #cbd5e1; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; break-inside: avoid; page-break-inside: avoid; }
+              .pr-note { font-size: 9px; color: #475569; max-width: 64%; }
+              .pr-dual-sign { display: flex; gap: 20px; align-items: flex-end; }
+              .pr-sign { text-align: center; min-width: 155px; }
+              .pr-sign-line { border-top: 1px solid #0f172a; margin-top: 28px; padding-top: 4px; font-size: 9.5px; font-weight: 700; color: #0f172a; }
+            </style>
+          </head>
+          <body class="tabular-nums">${reportEl.innerHTML}</body>
+          </html>`;
+
+        try {
+          const printWin = window.open('', '_blank', 'width=1024,height=768');
+          if (printWin) {
+            printWin.document.open();
+            printWin.document.write(htmlDoc);
+            printWin.document.close();
+            printWin.focus();
+            setTimeout(() => {
+              printWin.print();
+            }, 300);
+            return;
+          }
+        } catch (e) {}
+
+        // Fallback: hidden iframe print
+        try {
+          const iframe = document.createElement('iframe');
+          iframe.style.position = 'fixed';
+          iframe.style.right = '0';
+          iframe.style.bottom = '0';
+          iframe.style.width = '0';
+          iframe.style.height = '0';
+          iframe.style.border = '0';
+          document.body.appendChild(iframe);
+
+          const doc = iframe.contentWindow.document;
+          doc.open();
+          doc.write(htmlDoc);
+          doc.close();
+
+          setTimeout(() => {
+            try {
+              iframe.contentWindow.focus();
+              iframe.contentWindow.print();
+            } catch (err) {
+              window.print();
+            }
+            setTimeout(() => {
+              if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+            }, 1500);
+          }, 250);
+          showToast('Opening Print dialog (if blocked in Preview, use Save / Download PDF).', 'info');
+        } catch (err) {
+          window.print();
+        }
+      }
+
+      function openPrintPreview(reportKey = 'pnl') {
+        populateModalReportSelect(reportKey);
+        setPrintOrientation(printOrientation);
+        renderSelectedPrintReport(reportKey);
+        document.getElementById('print-modal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closePrintPreview() {
+        document.getElementById('print-modal').classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      // =========================================================
+      // CSV EXPORT (STUDENT-LEVEL BREAKDOWN + STUDIO INCOME)
+      // =========================================================
+      function exportCSV() {
+        const s = computeSummary();
+        const rows = [
+          ['HS Music — Monthly Profit Bridge Report', state.monthLabel],
+          ['Mode', state.mode === 'cash' ? 'Cash Left (Incl. Tax)' : 'Real Net (Ex-Tax)'],
+          ['Previous Month Profit', s.lastProfit],
+          ['Recording Studio Income', s.studioIncome],
+          ['Net Profit Change', s.netDelta],
+          ['Current Month Profit', s.currentProfit],
+          [],
+          ['Section', 'Course', 'Student Name', 'Mobile (10-digit)', 'Details/Note', 'Teacher Type', 'Teacher %', 'Full Fee', 'Discount %', 'Net Fee', 'Teacher Share', 'Tax Reserve', 'HS Music Part']
+        ];
+
+        ['admissions', 'cancellations'].forEach(section => {
+          const sign = section === 'admissions' ? 1 : -1;
+          const label = section === 'admissions' ? 'New Admission' : 'Canceled Enrollment';
+          DEFAULT_COURSES.forEach(c => {
+            (state[section][c.id] || []).forEach(stu => {
+              const m = calcStudent(c.id, stu);
+              rows.push([
+                label,
+                c.name,
+                stu.name || '(Unnamed)',
+                stu.phone || '',
+                stu.note || '',
+                m.isSalaried ? 'Salaried' : '% Basis',
+                m.teacherPct,
+                m.fullFee,
+                m.d,
+                m.netFull,
+                m.teacherPayout,
+                m.netTax,
+                round2(sign * m.hsActive)
+              ]);
+            });
+          });
+        });
+
+        const csvContent = rows
+          .map(r => r.map(v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`).join(','))
+          .join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `HS-Music-Report-${MONTHS_SHORT[state.month - 1]}-${state.year}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Exported student-level CSV successfully!', 'success');
+      }
+
+      // =========================================================
+      // EVENT LISTENERS
+      // =========================================================
+      function bindSectionEvents(section) {
+        const el = document.getElementById(`${section}-list`);
+
+        el.addEventListener('click', (e) => {
+          const addBtn = e.target.closest('[data-add-stu]');
+          if (addBtn) {
+            const [sec, courseId] = addBtn.dataset.addStu.split(':');
+            const newStu = createStudent(courseId);
+            state[sec][courseId].push(newStu);
+            state.expanded[sec][courseId] = true;
+            saveState();
+            renderSection(sec);
+            renderDashboard();
+            const nameInput = el.querySelector(`input[data-stu-text="name"][data-stu-id="${newStu.id}"]`);
+            if (nameInput) nameInput.focus();
+            return;
+          }
+
+          const popBtn = e.target.closest('[data-pop-stu]');
+          if (popBtn) {
+            const [sec, courseId] = popBtn.dataset.popStu.split(':');
+            if (state[sec][courseId].length > 0) {
+              state[sec][courseId].pop();
+              saveState();
+              renderSection(sec);
+              renderDashboard();
+            }
+            return;
+          }
+
+          const delBtn = e.target.closest('[data-del-stu]');
+          if (delBtn) {
+            const [sec, courseId, stuId] = delBtn.dataset.delStu.split(':');
+            state[sec][courseId] = state[sec][courseId].filter(s => s.id !== stuId);
+            saveState();
+            renderSection(sec);
+            renderDashboard();
+            return;
+          }
+
+          const toggleRow = e.target.closest('[data-toggle-course]');
+          if (toggleRow) {
+            const [sec, courseId] = toggleRow.dataset.toggleCourse.split(':');
+            state.expanded[sec][courseId] = !state.expanded[sec][courseId];
+            saveState();
+            renderSection(sec);
+          }
+        });
+
+        el.addEventListener('change', (e) => {
+          const sel = e.target.closest('select[data-stu-field]');
+          if (!sel) return;
+          const { section: sec, course, stuId, stuField } = sel.dataset;
+          const stu = (state[sec][course] || []).find(s => s.id === stuId);
+          if (!stu) return;
+
+          if (stuField === 'empType') {
+            stu.empType = sel.value;
+            if (stu.empType === 'percent' && stu.teacherPct === 0) {
+              stu.teacherPct = getCourseDef(course).defaultTeacherPct || 50;
+            }
+          } else if (stuField === 'teacherPct') {
+            stu.teacherPct = sel.value === 'custom' ? 35 : clamp(sel.value, 0, 100);
+          } else if (stuField === 'discPct') {
+            stu.discPct = sel.value === 'custom' ? 12 : clamp(sel.value, 0, 100);
+          }
+
+          saveState();
+          renderSection(sec);
+          renderDashboard();
+        });
+
+        el.addEventListener('input', (e) => {
+          const phoneInp = e.target.closest('input[data-stu-phone]');
+          if (phoneInp) {
+            const digitsOnly = phoneInp.value.replace(/\D/g, '').slice(0, 10);
+            if (phoneInp.value !== digitsOnly) {
+              phoneInp.value = digitsOnly;
+            }
+            const { section: sec, course, stuId } = phoneInp.dataset;
+            const stu = (state[sec][course] || []).find(s => s.id === stuId);
+            if (stu) {
+              stu.phone = digitsOnly;
+              saveState();
+            }
+            const pill = phoneInp.parentElement.querySelector('.phone-count-pill');
+            if (pill) {
+              pill.textContent = `${digitsOnly.length}/10`;
+              pill.classList.toggle('valid', digitsOnly.length === 10);
+            }
+            return;
+          }
+
+          const txt = e.target.closest('input[data-stu-text]');
+          if (txt) {
+            const { section: sec, course, stuId, stuText } = txt.dataset;
+            const stu = (state[sec][course] || []).find(s => s.id === stuId);
+            if (stu) {
+              stu[stuText] = txt.value;
+              saveState();
+            }
+            return;
+          }
+
+          const custom = e.target.closest('input[data-stu-custom]');
+          if (custom) {
+            const { section: sec, course, stuId, stuCustom } = custom.dataset;
+            const stu = (state[sec][course] || []).find(s => s.id === stuId);
+            if (stu) {
+              stu[stuCustom] = clamp(custom.value, 0, 100);
+              saveState();
+              renderSection(sec);
+              renderDashboard();
+              const refocus = el.querySelector(`input[data-stu-custom="${stuCustom}"][data-stu-id="${stuId}"]`);
+              if (refocus) {
+                refocus.focus();
+                refocus.setSelectionRange(refocus.value.length, refocus.value.length);
+              }
+            }
+          }
+        });
+      }
+
+      function bindEvents() {
+        // Calendar Picker & Navigation
+        const calWrapper = document.getElementById('cal-wrapper');
+        const calTrigger = document.getElementById('btn-cal-trigger');
+        const calPopover = document.getElementById('cal-popover');
+
+        calTrigger.addEventListener('click', () => {
+          const willOpen = !calPopover.classList.contains('open');
+          if (willOpen) {
+            popoverYear = state.year;
+            renderCalendarPopover();
+          }
+          calPopover.classList.toggle('open', willOpen);
+          calTrigger.setAttribute('aria-expanded', String(willOpen));
+        });
+
+        document.addEventListener('click', (e) => {
+          if (calPopover.classList.contains('open') && !calWrapper.contains(e.target)) {
+            calPopover.classList.remove('open');
+            calTrigger.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        document.getElementById('btn-cal-prev').addEventListener('click', () => {
+          const prev = getPrevYM(state.year, state.month);
+          switchToMonth(prev.year, prev.month, true);
+        });
+
+        document.getElementById('btn-cal-next').addEventListener('click', () => {
+          const next = getNextYM(state.year, state.month);
+          switchToMonth(next.year, next.month, true);
+        });
+
+        document.getElementById('btn-pop-year-prev').addEventListener('click', () => {
+          popoverYear -= 1;
+          renderCalendarPopover();
+        });
+
+        document.getElementById('btn-pop-year-next').addEventListener('click', () => {
+          popoverYear += 1;
+          renderCalendarPopover();
+        });
+
+        document.getElementById('cal-year-select').addEventListener('change', (e) => {
+          popoverYear = parseInt(e.target.value, 10) || state.year;
+          renderCalendarPopover();
+        });
+
+        document.getElementById('cal-month-grid').addEventListener('click', (e) => {
+          const btn = e.target.closest('button[data-pick-month]');
+          if (!btn) return;
+          const mNum = parseInt(btn.dataset.pickMonth, 10);
+          switchToMonth(popoverYear, mNum, true);
+        });
+
+        document.getElementById('btn-jump-today').addEventListener('click', () => {
+          const today = getTodayYM();
+          switchToMonth(today.year, today.month, true);
+        });
+
+        // Recording Studio Income Input
+        document.getElementById('recording-studio-input').addEventListener('input', (e) => {
+          state.recordingStudioIncome = Math.max(0, Number(e.target.value) || 0);
+          saveState();
+          renderDashboard();
+        });
+
+        // PDF & Print Preview Modal Controls
+        document.getElementById('btn-header-pdf').addEventListener('click', () => openPrintPreview('pnl'));
+        document.getElementById('btn-action-pdf').addEventListener('click', () => openPrintPreview('pnl'));
+        document.getElementById('btn-action-teacher-pdf').addEventListener('click', () => openPrintPreview('all-teachers'));
+        document.getElementById('btn-all-teachers-pdf').addEventListener('click', () => openPrintPreview('all-teachers'));
+
+        document.getElementById('modal-report-select').addEventListener('change', (e) => {
+          renderSelectedPrintReport(e.target.value);
+        });
+
+        document.querySelectorAll('.orient-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            setPrintOrientation(btn.dataset.orient);
+          });
+        });
+
+        document.getElementById('btn-modal-download-pdf').addEventListener('click', downloadCurrentReportPDF);
+        document.getElementById('btn-modal-print').addEventListener('click', printCurrentReport);
+        document.getElementById('btn-modal-close').addEventListener('click', closePrintPreview);
+
+        document.getElementById('print-modal').addEventListener('click', (e) => {
+          if (e.target.id === 'print-modal') {
+            closePrintPreview();
+          }
+        });
+
+        // Teacher Payouts Panel Events (Name edit, Existing Students & Individual PDF button)
+        const payoutGrid = document.getElementById('teacher-payouts-grid');
+        payoutGrid.addEventListener('input', (e) => {
+          const inp = e.target.closest('input[data-teacher-name]');
+          if (inp) {
+            const courseId = inp.dataset.teacherName;
+            if (!state.teacherNames) state.teacherNames = {};
+            state.teacherNames[courseId] = inp.value;
+            saveState();
+            return;
+          }
+
+          const phoneInp = e.target.closest('input[data-ex-phone]');
+          if (phoneInp) {
+            const digitsOnly = phoneInp.value.replace(/\D/g, '').slice(0, 10);
+            if (phoneInp.value !== digitsOnly) phoneInp.value = digitsOnly;
+            const courseId = phoneInp.dataset.exCourse;
+            const stuId = phoneInp.dataset.exId;
+            const stu = (state.existingStudents[courseId] || []).find(s => s.id === stuId);
+            if (stu) {
+              stu.phone = digitsOnly;
+              saveState();
+            }
+            const pill = phoneInp.parentElement.querySelector('.phone-count-pill');
+            if (pill) {
+              pill.textContent = `${digitsOnly.length}/10`;
+              pill.classList.toggle('valid', digitsOnly.length === 10);
+            }
+            return;
+          }
+
+          const txt = e.target.closest('input[data-ex-text]');
+          if (txt) {
+            const courseId = txt.dataset.exCourse;
+            const stuId = txt.dataset.exId;
+            const field = txt.dataset.exText;
+            const stu = (state.existingStudents[courseId] || []).find(s => s.id === stuId);
+            if (stu) {
+              stu[field] = txt.value;
+              saveState();
+            }
+            return;
+          }
+
+          const custom = e.target.closest('input[data-ex-custom]');
+          if (custom) {
+            const courseId = custom.dataset.exCourse;
+            const stuId = custom.dataset.exId;
+            const field = custom.dataset.exCustom;
+            const stu = (state.existingStudents[courseId] || []).find(s => s.id === stuId);
+            if (stu) {
+              stu[field] = clamp(custom.value, 0, 100);
+              saveState();
+              renderTeacherPayoutsSection();
+              const refocus = payoutGrid.querySelector(`input[data-ex-custom="${field}"][data-ex-id="${stuId}"]`);
+              if (refocus) {
+                refocus.focus();
+                refocus.setSelectionRange(refocus.value.length, refocus.value.length);
+              }
+            }
+          }
+        });
+
+        payoutGrid.addEventListener('change', (e) => {
+          const sel = e.target.closest('select[data-ex-field]');
+          if (!sel) return;
+          const courseId = sel.dataset.exCourse;
+          const stuId = sel.dataset.exId;
+          const field = sel.dataset.exField;
+          const stu = (state.existingStudents[courseId] || []).find(s => s.id === stuId);
+          if (!stu) return;
+
+          if (field === 'teacherPct') {
+            stu.teacherPct = sel.value === 'custom' ? 35 : clamp(sel.value, 0, 100);
+          } else if (field === 'discPct') {
+            stu.discPct = sel.value === 'custom' ? 12 : clamp(sel.value, 0, 100);
+          }
+          saveState();
+          renderTeacherPayoutsSection();
+        });
+
+        payoutGrid.addEventListener('click', (e) => {
+          const addEx = e.target.closest('button[data-add-ex]');
+          if (addEx) {
+            const courseId = addEx.dataset.addEx;
+            if (!state.existingStudents) state.existingStudents = makeEmptyCourseMap();
+            if (!state.expandedExisting) state.expandedExisting = makeExpandedMap(false);
+            const newStu = createStudent(courseId);
+            newStu.empType = 'percent';
+            if (!newStu.teacherPct) newStu.teacherPct = getCourseDef(courseId).defaultTeacherPct || 50;
+            state.existingStudents[courseId].push(newStu);
+            state.expandedExisting[courseId] = true;
+            saveState();
+            renderTeacherPayoutsSection();
+            const nameInput = payoutGrid.querySelector(`input[data-ex-text="name"][data-ex-id="${newStu.id}"]`);
+            if (nameInput) nameInput.focus();
+            return;
+          }
+
+          const popEx = e.target.closest('button[data-pop-ex]');
+          if (popEx) {
+            const courseId = popEx.dataset.popEx;
+            if (state.existingStudents && state.existingStudents[courseId] && state.existingStudents[courseId].length > 0) {
+              state.existingStudents[courseId].pop();
+              saveState();
+              renderTeacherPayoutsSection();
+            }
+            return;
+          }
+
+          const delEx = e.target.closest('button[data-del-ex]');
+          if (delEx) {
+            const [courseId, stuId] = delEx.dataset.delEx.split(':');
+            if (state.existingStudents && state.existingStudents[courseId]) {
+              state.existingStudents[courseId] = state.existingStudents[courseId].filter(s => s.id !== stuId);
+              saveState();
+              renderTeacherPayoutsSection();
+            }
+            return;
+          }
+
+          const toggleEx = e.target.closest('[data-toggle-ex]');
+          if (toggleEx) {
+            const courseId = toggleEx.dataset.toggleEx;
+            if (!state.expandedExisting) state.expandedExisting = makeExpandedMap(false);
+            state.expandedExisting[courseId] = !state.expandedExisting[courseId];
+            saveState();
+            renderTeacherPayoutsSection();
+            return;
+          }
+
+          const btn = e.target.closest('button[data-open-teacher-pdf]');
+          if (!btn) return;
+          openPrintPreview(`teacher:${btn.dataset.openTeacherPdf}`);
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            if (document.getElementById('print-modal').classList.contains('open')) {
+              closePrintPreview();
+            }
+            if (calPopover.classList.contains('open')) {
+              calPopover.classList.remove('open');
+              calTrigger.setAttribute('aria-expanded', 'false');
+            }
+          }
+        });
+
+        // Mode Toggle
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            state.mode = btn.dataset.mode;
+            fullRender(true);
+          });
+        });
+
+        // Last Month Overall Profit Input
+        document.getElementById('last-profit-input').addEventListener('input', (e) => {
+          state.lastProfit = Number(e.target.value) || 0;
+          saveState();
+          renderDashboard();
+        });
+
+        // Collapsible Settings Panel
+        const settingsToggle = document.getElementById('btn-settings-toggle');
+        const settingsBody = document.getElementById('settings-body');
+        const settingsChevron = document.getElementById('settings-chevron');
+        settingsToggle.addEventListener('click', () => {
+          const isOpen = settingsBody.classList.toggle('open');
+          settingsToggle.setAttribute('aria-expanded', String(isOpen));
+          settingsChevron.textContent = isOpen ? '− Collapse' : '+ Expand';
+        });
+
+        document.getElementById('settings-grid').addEventListener('input', (e) => {
+          const inp = e.target.closest('input[data-set-course]');
+          if (!inp) return;
+          const courseId = inp.dataset.setCourse;
+          const field = inp.dataset.setField;
+          state.courseSettings[courseId][field] = Math.max(0, Number(inp.value) || 0);
+          saveState();
+          renderSection('admissions');
+          renderSection('cancellations');
+          renderDashboard();
+          // Update validation badge without losing input focus
+          const box = inp.closest('.setting-course-box');
+          if (box) {
+            const cfg = state.courseSettings[courseId];
+            const sum = round2((Number(cfg.basicFee) || 0) + (Number(cfg.maintFee) || 0) + (Number(cfg.taxFee) || 0));
+            const ok = Math.abs(sum - round2(Number(cfg.fullFee) || 0)) < 0.01;
+            const badge = box.querySelector('.kpi-badge');
+            if (badge) {
+              badge.className = `kpi-badge ${ok ? 'gain' : 'warn'} tabular-nums`;
+              badge.textContent = ok ? 'Valid' : `Sum ₹${sum}`;
+            }
+          }
+        });
+
+        // Admissions & Cancellations Section Events
+        bindSectionEvents('admissions');
+        bindSectionEvents('cancellations');
+
+        // Load Demo Button
+        document.getElementById('btn-load-demo').addEventListener('click', () => {
+          state = createDefaultState(state.year, state.month);
+          state.lastProfit = 100000;
+          state.recordingStudioIncome = 15000;
+          state.mode = 'cash';
+
+          state.admissions.guitar = [
+            { id: 'demo-g1', name: 'Rahul Verma', phone: '9876543210', note: 'Evening Batch (Full Fee)', empType: 'percent', teacherPct: 50, discPct: 0 },
+            { id: 'demo-g2', name: 'Aman Singh', phone: '9123456789', note: '10% Referral Discount', empType: 'percent', teacherPct: 50, discPct: 10 }
+          ];
+          state.admissions.piano = [
+            { id: 'demo-p1', name: 'Sneha Gupta', phone: '9988776655', note: 'Morning Batch', empType: 'salaried', teacherPct: 0, discPct: 0 }
+          ];
+          state.admissions.dance = [
+            { id: 'demo-d1', name: 'Priya Sharma', phone: '9811223344', note: '10% Sibling Discount', empType: 'percent', teacherPct: 50, discPct: 10 }
+          ];
+          state.cancellations.guitar = [
+            { id: 'demo-cg1', name: 'Rohan Mehta', phone: '9765432109', note: 'Relocated', empType: 'percent', teacherPct: 50, discPct: 0 }
+          ];
+          state.existingStudents.guitar = [
+            { id: 'demo-eg1', name: 'Vikram Tiwari', phone: '9839011223', note: 'Old Batch (Continuing)', empType: 'percent', teacherPct: 50, discPct: 0 },
+            { id: 'demo-eg2', name: 'Ananya Mishra', phone: '9450112233', note: 'Old Batch (10% Disc)', empType: 'percent', teacherPct: 50, discPct: 10 }
+          ];
+          state.existingStudents.dance = [
+            { id: 'demo-ed1', name: 'Kavya Srivastava', phone: '9621009988', note: 'Evening Continuing Batch', empType: 'percent', teacherPct: 50, discPct: 0 }
+          ];
+
+          state.expanded.admissions.guitar = true;
+          state.expanded.admissions.piano = true;
+          state.expanded.admissions.dance = true;
+          state.expanded.cancellations.guitar = true;
+          state.expandedExisting.guitar = true;
+          state.expandedExisting.dance = true;
+
+          document.getElementById('last-profit-input').value = state.lastProfit;
+          document.getElementById('recording-studio-input').value = state.recordingStudioIncome;
+          fullRender(true);
+          showToast('Loaded demo data (Existing Students in Teacher Payouts + Studio ₹15,000).', 'success');
+        });
+
+        // Reset All Button (Two-click confirmation, no alert/confirm)
+        const resetBtn = document.getElementById('btn-reset-all');
+        resetBtn.addEventListener('click', () => {
+          if (!resetConfirmPending) {
+            resetConfirmPending = true;
+            resetBtn.textContent = 'Click again to Reset';
+            showToast('Click "Reset All" again within 4s to confirm.', 'warning');
+            clearTimeout(resetConfirmTimer);
+            resetConfirmTimer = setTimeout(() => {
+              resetConfirmPending = false;
+              resetBtn.textContent = 'Reset All';
+            }, 4000);
+            return;
+          }
+
+          clearTimeout(resetConfirmTimer);
+          resetConfirmPending = false;
+          resetBtn.textContent = 'Reset All';
+
+          state = createDefaultState(state.year, state.month);
+          document.getElementById('last-profit-input').value = state.lastProfit;
+          document.getElementById('recording-studio-input').value = state.recordingStudioIncome;
+          fullRender(true);
+          showToast('All student entries & settings reset.', 'warning');
+        });
+
+        // Carry Forward -> Next Month
+        document.getElementById('btn-carry-forward').addEventListener('click', () => {
+          if (!latestSummary) return;
+          const next = getNextYM(state.year, state.month);
+          state.lastProfit = round2(latestSummary.currentProfit);
+          state.recordingStudioIncome = 0;
+          state.year = next.year;
+          state.month = next.month;
+          state.monthLabel = formatMonthFull(next.year, next.month);
+          state.admissions = makeEmptyCourseMap();
+          state.cancellations = makeEmptyCourseMap();
+          state.expanded = {
+            admissions: makeExpandedMap(false),
+            cancellations: makeExpandedMap(false)
+          };
+          popoverYear = state.year;
+
+          document.getElementById('last-profit-input').value = state.lastProfit;
+          document.getElementById('recording-studio-input').value = 0;
+          fullRender(true);
+          showToast(`Carried forward ${formatINR(state.lastProfit)} to ${state.monthLabel}!`, 'success');
+        });
+
+        // Save Snapshot
+        document.getElementById('btn-save-snapshot').addEventListener('click', () => {
+          if (!latestSummary) return;
+          const s = latestSummary;
+          const ymKey = makeYMKey(state.year, state.month);
+          const entry = {
+            id: Date.now(),
+            ymKey,
+            year: state.year,
+            month: state.month,
+            monthLabel: formatMonthFull(state.year, state.month),
+            mode: state.mode,
+            lastProfit: s.lastProfit,
+            netDelta: s.netDelta,
+            currentProfit: s.currentProfit,
+            newStudents: s.newStudents,
+            cancelStudents: s.cancelStudents,
+            snapshotState: JSON.parse(JSON.stringify(state))
+          };
+
+          const existingIdx = historyList.findIndex(item => item.ymKey === ymKey);
+          if (existingIdx !== -1) {
+            historyList.splice(existingIdx, 1);
+          }
+          historyList.unshift(entry);
+          saveHistory();
+          renderHistory();
+          renderCalendarPopover();
+          showToast(`Saved snapshot for ${entry.monthLabel}.`, 'success');
+        });
+
+        // History Load & Delete
+        document.getElementById('history-tbody').addEventListener('click', (e) => {
+          const loadBtn = e.target.closest('button[data-load-hist]');
+          if (loadBtn) {
+            const idx = parseInt(loadBtn.dataset.loadHist, 10);
+            const item = historyList[idx];
+            if (item && item.snapshotState) {
+              state = JSON.parse(JSON.stringify(item.snapshotState));
+              if (item.year && item.month) {
+                state.year = item.year;
+                state.month = item.month;
+              }
+              state.recordingStudioIncome = Math.max(0, Number(state.recordingStudioIncome) || 0);
+              state.teacherNames = {
+                guitar: 'Guitar Teacher',
+                piano: 'Piano Teacher',
+                singing: 'Singing Teacher',
+                dance: 'Dance Teacher',
+                ...(state.teacherNames || {})
+              };
+              state.existingStudents = { ...makeEmptyCourseMap(), ...(state.existingStudents || {}) };
+              state.expandedExisting = { ...makeExpandedMap(false), ...(state.expandedExisting || {}) };
+              state.monthLabel = formatMonthFull(state.year, state.month);
+              popoverYear = state.year;
+              document.getElementById('last-profit-input').value = state.lastProfit;
+              document.getElementById('recording-studio-input').value = state.recordingStudioIncome;
+              fullRender(true);
+              showToast(`Loaded saved report for ${formatMonthShort(state.year, state.month)}`, 'success');
+            }
+            return;
+          }
+
+          const delBtn = e.target.closest('button[data-delete-hist]');
+          if (delBtn) {
+            const idx = parseInt(delBtn.dataset.deleteHist, 10);
+            if (!isNaN(idx) && idx >= 0 && idx < historyList.length) {
+              const removed = historyList.splice(idx, 1)[0];
+              saveHistory();
+              renderHistory();
+              renderCalendarPopover();
+              showToast(`Deleted snapshot: ${removed.monthLabel}`, 'warning');
+            }
+          }
+        });
+
+        // Export CSV
+        document.getElementById('btn-export-csv').addEventListener('click', exportCSV);
+      }
+
+      window.addEventListener('DOMContentLoaded', () => {
+        loadPersistence();
+        document.getElementById('last-profit-input').value = state.lastProfit;
+        document.getElementById('recording-studio-input').value = state.recordingStudioIncome;
+        bindEvents();
+        renderHistory();
+        fullRender(false);
+      });
+    })();
+  </script>
+</body>
+</html>
