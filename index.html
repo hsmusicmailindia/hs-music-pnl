@@ -619,12 +619,12 @@
 
     .settings-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 12px;
       margin-top: 14px;
     }
 
-    @media (max-width: 1024px) {
+    @media (max-width: 1120px) {
       .settings-grid {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -2100,7 +2100,7 @@
          ========================================================= -->
     <section class="settings-card" aria-label="Course Fee Base Settings">
       <button id="btn-settings-toggle" type="button" class="settings-toggle" aria-expanded="false">
-        <span>Course Fee Base Settings (Guitar/Piano/Singing: ₹1,950 · Dance: ₹1,400)</span>
+        <span>Course Fee Base Settings (Guitar/Piano/Singing: ₹1,950 · Electric Guitar: ₹2,550 · Dance: ₹1,400)</span>
         <span id="settings-chevron" style="color:var(--muted); font-size:0.78rem;">+ Expand</span>
       </button>
       <div id="settings-body" class="settings-body">
@@ -2325,10 +2325,11 @@
       const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
       const DEFAULT_COURSES = [
-        { id: 'guitar',  name: 'Guitar',  fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'percent',  defaultTeacherPct: 50 },
-        { id: 'piano',   name: 'Piano',   fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'salaried', defaultTeacherPct: 0 },
-        { id: 'singing', name: 'Singing', fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'salaried', defaultTeacherPct: 0 },
-        { id: 'dance',   name: 'Dance',   fullFee: 1400, basicFee: 1000, maintFee: 200, taxFee: 200, defaultEmp: 'percent',  defaultTeacherPct: 50 }
+        { id: 'guitar',          name: 'Guitar',          fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'percent',  defaultTeacherPct: 50 },
+        { id: 'electric_guitar', name: 'Electric Guitar', fullFee: 2550, basicFee: 2000, maintFee: 200, taxFee: 350, defaultEmp: 'percent',  defaultTeacherPct: 50 },
+        { id: 'piano',           name: 'Piano',           fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'salaried', defaultTeacherPct: 0 },
+        { id: 'singing',         name: 'Singing',         fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'salaried', defaultTeacherPct: 0 },
+        { id: 'dance',           name: 'Dance',           fullFee: 1400, basicFee: 1000, maintFee: 200, taxFee: 200, defaultEmp: 'percent',  defaultTeacherPct: 50 }
       ];
 
       const TEACHER_PCT_PRESETS = [0, 20, 30, 40, 50, 60];
@@ -2458,6 +2459,7 @@
           recordingStudioIncome: 0,
           teacherNames: {
             guitar: 'Guitar Teacher',
+            electric_guitar: 'Electric Guitar Teacher',
             piano: 'Piano Teacher',
             singing: 'Singing Teacher',
             dance: 'Dance Teacher'
@@ -2718,20 +2720,26 @@
         const saved = findHistoryByYM(ymKey);
 
         if (saved && saved.snapshotState) {
-          state = JSON.parse(JSON.stringify(saved.snapshotState));
-          state.year = targetYear;
-          state.month = targetMonth;
-          state.monthLabel = formatMonthFull(targetYear, targetMonth);
-          state.recordingStudioIncome = Math.max(0, Number(state.recordingStudioIncome) || 0);
-          state.teacherNames = {
-            guitar: 'Guitar Teacher',
-            piano: 'Piano Teacher',
-            singing: 'Singing Teacher',
-            dance: 'Dance Teacher',
-            ...(state.teacherNames || {})
+          const def = createDefaultState(targetYear, targetMonth);
+          const snap = JSON.parse(JSON.stringify(saved.snapshotState));
+          state = {
+            ...def,
+            ...snap,
+            year: targetYear,
+            month: targetMonth,
+            monthLabel: formatMonthFull(targetYear, targetMonth),
+            recordingStudioIncome: Math.max(0, Number(snap.recordingStudioIncome) || 0),
+            teacherNames: { ...def.teacherNames, ...(snap.teacherNames || {}) },
+            courseSettings: { ...def.courseSettings, ...(snap.courseSettings || {}) },
+            admissions: { ...def.admissions, ...(snap.admissions || {}) },
+            cancellations: { ...def.cancellations, ...(snap.cancellations || {}) },
+            existingStudents: { ...def.existingStudents, ...(snap.existingStudents || {}) },
+            expanded: {
+              admissions: { ...def.expanded.admissions, ...((snap.expanded && snap.expanded.admissions) || {}) },
+              cancellations: { ...def.expanded.cancellations, ...((snap.expanded && snap.expanded.cancellations) || {}) }
+            },
+            expandedExisting: { ...def.expandedExisting, ...(snap.expandedExisting || {}) }
           };
-          state.existingStudents = { ...makeEmptyCourseMap(), ...(state.existingStudents || {}) };
-          state.expandedExisting = { ...makeExpandedMap(false), ...(state.expandedExisting || {}) };
           document.getElementById('last-profit-input').value = state.lastProfit;
           document.getElementById('recording-studio-input').value = state.recordingStudioIncome;
           popoverYear = targetYear;
@@ -4770,6 +4778,9 @@
             { id: 'demo-g1', name: 'Rahul Verma', phone: '9876543210', note: 'Evening Batch (Full Fee)', empType: 'percent', teacherPct: 50, discPct: 0 },
             { id: 'demo-g2', name: 'Aman Singh', phone: '9123456789', note: '10% Referral Discount', empType: 'percent', teacherPct: 50, discPct: 10 }
           ];
+          state.admissions.electric_guitar = [
+            { id: 'demo-egnew1', name: 'Karan Yadav', phone: '9839556677', note: 'Lead Guitar Batch (Full Fee)', empType: 'percent', teacherPct: 50, discPct: 0 }
+          ];
           state.admissions.piano = [
             { id: 'demo-p1', name: 'Sneha Gupta', phone: '9988776655', note: 'Morning Batch', empType: 'salaried', teacherPct: 0, discPct: 0 }
           ];
@@ -4788,6 +4799,7 @@
           ];
 
           state.expanded.admissions.guitar = true;
+          state.expanded.admissions.electric_guitar = true;
           state.expanded.admissions.piano = true;
           state.expanded.admissions.dance = true;
           state.expanded.cancellations.guitar = true;
@@ -4887,22 +4899,28 @@
             const idx = parseInt(loadBtn.dataset.loadHist, 10);
             const item = historyList[idx];
             if (item && item.snapshotState) {
-              state = JSON.parse(JSON.stringify(item.snapshotState));
-              if (item.year && item.month) {
-                state.year = item.year;
-                state.month = item.month;
-              }
-              state.recordingStudioIncome = Math.max(0, Number(state.recordingStudioIncome) || 0);
-              state.teacherNames = {
-                guitar: 'Guitar Teacher',
-                piano: 'Piano Teacher',
-                singing: 'Singing Teacher',
-                dance: 'Dance Teacher',
-                ...(state.teacherNames || {})
+              const targetY = item.year || state.year;
+              const targetM = item.month || state.month;
+              const def = createDefaultState(targetY, targetM);
+              const snap = JSON.parse(JSON.stringify(item.snapshotState));
+              state = {
+                ...def,
+                ...snap,
+                year: targetY,
+                month: targetM,
+                monthLabel: formatMonthFull(targetY, targetM),
+                recordingStudioIncome: Math.max(0, Number(snap.recordingStudioIncome) || 0),
+                teacherNames: { ...def.teacherNames, ...(snap.teacherNames || {}) },
+                courseSettings: { ...def.courseSettings, ...(snap.courseSettings || {}) },
+                admissions: { ...def.admissions, ...(snap.admissions || {}) },
+                cancellations: { ...def.cancellations, ...(snap.cancellations || {}) },
+                existingStudents: { ...def.existingStudents, ...(snap.existingStudents || {}) },
+                expanded: {
+                  admissions: { ...def.expanded.admissions, ...((snap.expanded && snap.expanded.admissions) || {}) },
+                  cancellations: { ...def.expanded.cancellations, ...((snap.expanded && snap.expanded.cancellations) || {}) }
+                },
+                expandedExisting: { ...def.expandedExisting, ...(snap.expandedExisting || {}) }
               };
-              state.existingStudents = { ...makeEmptyCourseMap(), ...(state.existingStudents || {}) };
-              state.expandedExisting = { ...makeExpandedMap(false), ...(state.expandedExisting || {}) };
-              state.monthLabel = formatMonthFull(state.year, state.month);
               popoverYear = state.year;
               document.getElementById('last-profit-input').value = state.lastProfit;
               document.getElementById('recording-studio-input').value = state.recordingStudioIncome;
