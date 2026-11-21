@@ -2313,16 +2313,65 @@
       <div class="section-header">
         <div>
           <h2 class="section-title">Teacher Payouts (All Courses) — Separate PDF Slips</h2>
-          <p class="section-sub"><strong>1-Month Arrears Rule:</strong> All 5 course teachers appear here. Enter <strong>Fixed Salary (₹)</strong> for salaried teachers and/or <strong>Existing Students</strong> for % Basis teachers (excluded from P&amp;L). This month's <strong>New Admissions</strong> shift to next month automatically on Carry Forward.</p>
+          <p class="section-sub"><strong>1-Month Arrears Rule:</strong> Select payout month independently below. Enter <strong>Fixed Salary (₹)</strong> and/or <strong>Existing Students</strong> (excluded from P&amp;L). Save each month's complete Teacher Payout separately.</p>
         </div>
-        <button id="btn-all-teachers-pdf" type="button" class="btn btn-sm btn-pdf">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 6 2 18 2 18 9"></polyline>
-            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-            <rect x="6" y="14" width="12" height="8"></rect>
-          </svg>
-          All Teachers Combined PDF
-        </button>
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+          <!-- Independent Teacher Payout Month & Year Calendar -->
+          <div class="cal-wrapper" id="payout-cal-wrapper">
+            <div class="cal-bar">
+              <button id="btn-payout-cal-prev" type="button" class="cal-nav-btn" title="Previous Payout Month" aria-label="Previous Payout Month">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              <button id="btn-payout-cal-trigger" type="button" class="cal-trigger-btn" aria-haspopup="dialog" aria-expanded="false">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span id="payout-cal-trigger-label">November 2026</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <button id="btn-payout-cal-next" type="button" class="cal-nav-btn" title="Next Payout Month" aria-label="Next Payout Month">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </div>
+            <span id="payout-cal-range-badge" class="cal-range-badge tabular-nums">1 Nov 2026 – 30 Nov 2026</span>
+
+            <!-- Teacher Payout Calendar Popover -->
+            <div id="payout-cal-popover" class="cal-popover" role="dialog" aria-label="Select Teacher Payout Month and Year">
+              <div class="cal-pop-header">
+                <button id="btn-payout-pop-year-prev" type="button" class="cal-nav-btn" title="Previous Year" aria-label="Previous Year">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <select id="payout-cal-year-select" class="cal-year-select tabular-nums" aria-label="Select Payout Year"></select>
+                <button id="btn-payout-pop-year-next" type="button" class="cal-nav-btn" title="Next Year" aria-label="Next Year">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+              </div>
+              <div id="payout-cal-month-grid" class="cal-month-grid"></div>
+              <div class="cal-pop-footer">
+                <span style="font-size:0.68rem; color:var(--muted); display:inline-flex; align-items:center; gap:5px;">
+                  <span class="cal-saved-dot"></span> Saved payout
+                </span>
+                <button id="btn-payout-jump-today" type="button" class="btn btn-sm btn-sky">Jump to Current Month</button>
+              </div>
+            </div>
+          </div>
+
+          <button id="btn-save-payout-snapshot" type="button" class="btn btn-sm btn-emerald">
+            Save Payout Snapshot
+          </button>
+
+          <button id="btn-all-teachers-pdf" type="button" class="btn btn-sm btn-pdf">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            All Teachers Combined PDF
+          </button>
+        </div>
       </div>
       <div id="teacher-payouts-grid" class="payout-grid"></div>
     </section>
@@ -2334,16 +2383,20 @@
       <div class="section-header">
         <div>
           <h2 class="section-title">Saved Month History &amp; Backup</h2>
-          <p class="section-sub">Snapshots save in your browser — download a Backup (.json) file to keep previous months 100% safe across devices</p>
+          <p id="history-subtitle" class="section-sub">Choose Complete Profit &amp; Loss or Teacher Payout from the dropdown to view history and download its separate Backup (.json)</p>
         </div>
         <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+          <select id="history-view-select" class="modal-report-select" aria-label="Select Saved History &amp; Backup Type">
+            <option value="pnl">Complete Profit &amp; Loss</option>
+            <option value="payout">Teacher Payout</option>
+          </select>
           <button id="btn-backup-json" type="button" class="btn btn-sm btn-emerald">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            Download Backup (.json)
+            <span id="btn-backup-label">Download P&amp;L Backup (.json)</span>
           </button>
           <button id="btn-restore-json" type="button" class="btn btn-sm btn-sky">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -2359,7 +2412,7 @@
       </div>
       <div class="table-scroll">
         <table class="history-table tabular-nums">
-          <thead>
+          <thead id="history-thead">
             <tr>
               <th>Month</th>
               <th>Mode</th>
@@ -2430,7 +2483,7 @@
 
       const STORAGE_STATE_KEY = 'hs_music_studentwise_v6_state';
       const STORAGE_HISTORY_KEY = 'hs_music_studentwise_v6_history';
-
+      const STORAGE_PAYOUT_HISTORY_KEY = 'hs_music_studentwise_v6_payout_history';
       const MONTHS_FULL = [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
@@ -2619,6 +2672,8 @@
           year: y,
           month: m,
           monthLabel: formatMonthFull(y, m),
+          payoutYear: y,
+          payoutMonth: m,
           mode: 'cash',
           lastProfit: 0,
           recordingStudioIncome: 0,
@@ -2651,8 +2706,11 @@
 
       let state = createDefaultState();
       let historyList = [];
+      let payoutHistoryList = [];
       let latestSummary = null;
       let popoverYear = state.year;
+      let payoutPopoverYear = state.payoutYear;
+      let activeHistoryView = 'pnl';
       let currentPrintReportKey = 'pnl';
       let printOrientation = 'portrait';
       let resetConfirmPending = false;
@@ -2676,12 +2734,20 @@
         return historyList.find(item => item.ymKey === ymKey);
       }
 
+      function findPayoutHistoryByYM(ymKey) {
+        return payoutHistoryList.find(item => item.ymKey === ymKey);
+      }
+
       function saveState() {
         try { localStorage.setItem(STORAGE_STATE_KEY, JSON.stringify(state)); } catch (e) {}
       }
 
       function saveHistory() {
         try { localStorage.setItem(STORAGE_HISTORY_KEY, JSON.stringify(historyList)); } catch (e) {}
+      }
+
+      function savePayoutHistory() {
+        try { localStorage.setItem(STORAGE_PAYOUT_HISTORY_KEY, JSON.stringify(payoutHistoryList)); } catch (e) {}
       }
 
       function migrateLegacyElectricGuitar(targetState, sourceObj) {
@@ -2716,6 +2782,8 @@
               ...parsed,
               year: Number(parsed.year) || def.year,
               month: Number(parsed.month) || def.month,
+              payoutYear: Number(parsed.payoutYear) || Number(parsed.year) || def.year,
+              payoutMonth: Number(parsed.payoutMonth) || Number(parsed.month) || def.month,
               recordingStudioIncome: Math.max(0, Number(parsed.recordingStudioIncome) || 0),
               teacherNames: { ...def.teacherNames, ...(parsed.teacherNames || {}) },
               teacherSalaries: { ...def.teacherSalaries, ...(parsed.teacherSalaries || {}) },
@@ -2740,11 +2808,18 @@
             const parsedHist = JSON.parse(rawHist);
             if (Array.isArray(parsedHist)) historyList = parsedHist;
           }
+          const rawPayoutHist = localStorage.getItem(STORAGE_PAYOUT_HISTORY_KEY);
+          if (rawPayoutHist) {
+            const parsedPHist = JSON.parse(rawPayoutHist);
+            if (Array.isArray(parsedPHist)) payoutHistoryList = parsedPHist;
+          }
         } catch (e) {
           state = createDefaultState();
           historyList = [];
+          payoutHistoryList = [];
         }
         popoverYear = state.year;
+        payoutPopoverYear = state.payoutYear;
       }
 
       // =========================================================
@@ -2982,20 +3057,148 @@
       }
 
       // =========================================================
-      // TEACHER PAYOUTS (ALL COURSES) DATA & UI PANEL
+      // INDEPENDENT TEACHER PAYOUT CALENDAR PICKER
       // =========================================================
+      function renderPayoutCalendarUI() {
+        const py = state.payoutYear || state.year;
+        const pm = state.payoutMonth || state.month;
+        const lbl = document.getElementById('payout-cal-trigger-label');
+        const rng = document.getElementById('payout-cal-range-badge');
+        if (lbl) lbl.textContent = formatMonthFull(py, pm);
+        if (rng) rng.textContent = getMonthDateRange(py, pm);
+        renderPayoutCalendarPopover();
+      }
+
+      function renderPayoutCalendarPopover() {
+        const yearSel = document.getElementById('payout-cal-year-select');
+        const grid = document.getElementById('payout-cal-month-grid');
+        if (!yearSel || !grid) return;
+
+        const minY = Math.min(2024, payoutPopoverYear - 1);
+        const maxY = Math.max(2032, payoutPopoverYear + 1);
+        let opts = '';
+        for (let y = minY; y <= maxY; y++) {
+          opts += `<option value="${y}" ${y === payoutPopoverYear ? 'selected' : ''}>${y}</option>`;
+        }
+        yearSel.innerHTML = opts;
+
+        const py = state.payoutYear || state.year;
+        const pm = state.payoutMonth || state.month;
+        grid.innerHTML = MONTHS_SHORT.map((mName, idx) => {
+          const mNum = idx + 1;
+          const key = makeYMKey(payoutPopoverYear, mNum);
+          const isSelected = payoutPopoverYear === py && mNum === pm;
+          const hasSaved = Boolean(findPayoutHistoryByYM(key));
+          return `
+            <button type="button" class="cal-month-btn ${isSelected ? 'active' : ''}" data-pick-payout-month="${mNum}">
+              <span>${mName}</span>
+              ${hasSaved ? '<span class="cal-saved-tag"><span class="cal-saved-dot"></span>Saved</span>' : ''}
+            </button>
+          `;
+        }).join('');
+      }
+
+      function switchToPayoutMonth(targetYear, targetMonth, closePop = true) {
+        const ymKey = makeYMKey(targetYear, targetMonth);
+        const saved = findPayoutHistoryByYM(ymKey);
+
+        state.payoutYear = targetYear;
+        state.payoutMonth = targetMonth;
+        payoutPopoverYear = targetYear;
+
+        if (saved && saved.payoutState) {
+          const pSnap = JSON.parse(JSON.stringify(saved.payoutState));
+          const def = createDefaultState(targetYear, targetMonth);
+          state.teacherNames = { ...def.teacherNames, ...(pSnap.teacherNames || {}) };
+          state.teacherSalaries = { ...def.teacherSalaries, ...(pSnap.teacherSalaries || {}) };
+          state.existingStudents = { ...makeEmptyCourseMap(), ...(pSnap.existingStudents || {}) };
+          saveState();
+          renderCourseTeachersBlock();
+          renderPayoutCalendarUI();
+          renderTeacherPayoutsSection();
+          showToast(`Loaded saved Teacher Payout for ${formatMonthShort(targetYear, targetMonth)}`, 'success');
+        } else {
+          saveState();
+          renderPayoutCalendarUI();
+          renderTeacherPayoutsSection();
+          showToast(`Teacher Payout month set to ${formatMonthFull(targetYear, targetMonth)}`, 'info');
+        }
+
+        if (closePop) {
+          const pop = document.getElementById('payout-cal-popover');
+          const trig = document.getElementById('btn-payout-cal-trigger');
+          if (pop) pop.classList.remove('open');
+          if (trig) trig.setAttribute('aria-expanded', 'false');
+        }
+      }
+
+      function saveCurrentPayoutSnapshot() {
+        const py = state.payoutYear || state.year;
+        const pm = state.payoutMonth || state.month;
+        const ymKey = makeYMKey(py, pm);
+        const monthLabel = formatMonthFull(py, pm);
+
+        const teachersSummary = DEFAULT_COURSES.map(c => {
+          const d = getPercentTeacherData(c.id);
+          return {
+            courseId: c.id,
+            courseName: d.courseName,
+            teacherName: d.teacherName,
+            fixedSalary: d.fixedSalary,
+            existingCount: d.existingList.length,
+            existingPayout: d.existingPayout,
+            cancelCount: d.cancelList.length,
+            cancelPayout: d.cancelPayout,
+            deferredNewCount: d.newList.length,
+            deferredNewPayout: d.newPayout,
+            netPayout: d.netPayout
+          };
+        });
+
+        const totalExistingCount = teachersSummary.reduce((a, t) => a + t.existingCount, 0);
+        const totalFixedSalary = round2(teachersSummary.reduce((a, t) => a + t.fixedSalary, 0));
+        const totalPayable = round2(teachersSummary.reduce((a, t) => a + t.netPayout, 0));
+
+        const entry = {
+          id: Date.now(),
+          ymKey,
+          year: py,
+          month: pm,
+          monthLabel,
+          totalExistingCount,
+          totalFixedSalary,
+          totalPayable,
+          teachersSummary,
+          payoutState: {
+            payoutYear: py,
+            payoutMonth: pm,
+            teacherNames: JSON.parse(JSON.stringify(state.teacherNames || {})),
+            teacherSalaries: JSON.parse(JSON.stringify(state.teacherSalaries || {})),
+            existingStudents: JSON.parse(JSON.stringify(state.existingStudents || makeEmptyCourseMap()))
+          }
+        };
+
+        const existingIdx = payoutHistoryList.findIndex(item => item.ymKey === ymKey);
+        if (existingIdx !== -1) {
+          payoutHistoryList.splice(existingIdx, 1);
+        }
+        payoutHistoryList.unshift(entry);
+        savePayoutHistory();
+        renderPayoutCalendarPopover();
+        renderHistory();
+        showToast(`Saved Teacher Payout snapshot for ${monthLabel} (${formatINR(totalPayable)})`, 'success');
+      }
+
       function getPercentTeacherData(courseId) {
-        const courseDef = getCourseDef(courseId);
+        const courseName = getCourseTeacherLabel(courseId);
         const teacherName = getTeacherDisplayName(courseId);
         const fixedSalary = round2(Math.max(0, Number(state.teacherSalaries && state.teacherSalaries[courseId]) || 0));
 
         const existingList = (state.existingStudents && state.existingStudents[courseId] ? state.existingStudents[courseId] : [])
-          .map(stu => ({ stu, m: calcStudent(courseId, { ...stu, empType: 'percent' }) }));
-
+          .map(stu => ({ stu, m: calcStudent(courseId, stu) }));
         const newList = (state.admissions[courseId] || [])
           .filter(stu => stu.empType !== 'salaried')
           .map(stu => ({ stu, m: calcStudent(courseId, stu) }));
-
         const cancelList = (state.cancellations[courseId] || [])
           .filter(stu => stu.empType !== 'salaried')
           .map(stu => ({ stu, m: calcStudent(courseId, stu) }));
@@ -3003,17 +3206,12 @@
         const existingPayout = round2(existingList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
         const newPayout = round2(newList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
         const cancelPayout = round2(cancelList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
-        // 1-Month Arrears Rule: Fixed Salary + Existing Students - Canceled Deductions (New Admissions deferred to next month)
+        const totalDiscHit = round2(existingList.reduce((acc, x) => acc + x.m.teacherHit, 0));
         const netPayout = round2(fixedSalary + existingPayout - cancelPayout);
-        const existingDiscHit = round2(existingList.reduce((acc, x) => acc + x.m.teacherHit, 0));
-        const newDiscHit = round2(newList.reduce((acc, x) => acc + x.m.teacherHit, 0));
-        const totalDiscHit = round2(existingDiscHit);
-        const grossBasic = round2(existingList.reduce((acc, x) => acc + x.m.basicFee, 0));
-        const netBasic = round2(existingList.reduce((acc, x) => acc + x.m.netBasic, 0));
 
         return {
           courseId,
-          courseName: courseDef.name,
+          courseName,
           teacherName,
           fixedSalary,
           existingList,
@@ -3022,12 +3220,8 @@
           existingPayout,
           newPayout,
           cancelPayout,
-          netPayout,
-          existingDiscHit,
-          newDiscHit,
           totalDiscHit,
-          grossBasic,
-          netBasic
+          netPayout
         };
       }
 
@@ -3493,14 +3687,91 @@
       }
 
       function renderHistory() {
+        const thead = document.getElementById('history-thead');
         const tbody = document.getElementById('history-tbody');
-        document.getElementById('history-count-badge').textContent = `${historyList.length} saved`;
+        const badge = document.getElementById('history-count-badge');
+        const backupLbl = document.getElementById('btn-backup-label');
+        const sel = document.getElementById('history-view-select');
+        if (sel && sel.value !== activeHistoryView) sel.value = activeHistoryView;
+
+        if (activeHistoryView === 'payout') {
+          if (backupLbl) backupLbl.textContent = 'Download Teacher Payout Backup (.json)';
+          if (badge) badge.textContent = `${payoutHistoryList.length} payout saved`;
+          if (thead) {
+            thead.innerHTML = `
+              <tr>
+                <th>Payout Month</th>
+                <th>Teachers Included</th>
+                <th>Existing Students</th>
+                <th style="text-align:right;">Fixed Salaries</th>
+                <th style="text-align:right;">Total Payable</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            `;
+          }
+
+          if (payoutHistoryList.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="6" style="text-align:center; color:var(--muted); padding:22px;">
+                  No saved Teacher Payout snapshots yet. Select a month in the <strong>Teacher Payout</strong> calendar above and click <strong>Save Payout Snapshot</strong>.
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          tbody.innerHTML = payoutHistoryList.map((item, idx) => {
+            const teacherNamesText = Array.isArray(item.teachersSummary)
+              ? item.teachersSummary
+                  .filter(t => t.netPayout !== 0 || t.fixedSalary > 0 || t.existingCount > 0)
+                  .map(t => `${escapeHtml(t.teacherName)} (${formatINR(t.netPayout)})`)
+                  .join(' · ') || 'All 5 Teachers (₹0)'
+              : 'All Teachers';
+            const payCls = item.totalPayable > 0 ? 'text-gain' : item.totalPayable < 0 ? 'text-loss' : '';
+
+            return `
+              <tr>
+                <td style="font-weight:700;">${escapeHtml(item.monthLabel)}</td>
+                <td style="font-size:0.75rem; color:var(--muted); max-width:300px;">${teacherNamesText}</td>
+                <td><span class="kpi-badge">${item.totalExistingCount || 0} continuing</span></td>
+                <td style="text-align:right;">${formatINR(item.totalFixedSalary || 0)}</td>
+                <td style="text-align:right; font-weight:800;" class="${payCls}">${formatINR(item.totalPayable || 0)}</td>
+                <td style="text-align:right;">
+                  <div style="display:inline-flex; gap:6px;">
+                    <button type="button" class="btn btn-sm btn-sky" data-load-payout-hist="${idx}">Load</button>
+                    <button type="button" class="btn btn-sm btn-pdf" data-pdf-payout-hist="${idx}">PDF</button>
+                    <button type="button" class="btn btn-sm btn-danger-outline" data-delete-payout-hist="${idx}">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('');
+          return;
+        }
+
+        // Default: Complete Profit & Loss History View
+        if (backupLbl) backupLbl.textContent = 'Download P&L Backup (.json)';
+        if (badge) badge.textContent = `${historyList.length} P&L saved`;
+        if (thead) {
+          thead.innerHTML = `
+            <tr>
+              <th>Month</th>
+              <th>Mode</th>
+              <th>Students (+ / −)</th>
+              <th style="text-align:right;">Base Profit</th>
+              <th style="text-align:right;">Net Change</th>
+              <th style="text-align:right;">Final Profit</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          `;
+        }
 
         if (historyList.length === 0) {
           tbody.innerHTML = `
             <tr>
               <td colspan="7" style="text-align:center; color:var(--muted); padding:22px;">
-                No saved month snapshots yet. Click <strong>Save Snapshot</strong> above to archive a month.
+                No saved P&amp;L month snapshots yet. Click <strong>Save Snapshot</strong> above to archive a month.
               </td>
             </tr>
           `;
@@ -3531,6 +3802,7 @@
       function fullRender(shouldSave = true) {
         if (shouldSave) saveState();
         renderCalendarUI();
+        renderPayoutCalendarUI();
         renderSettingsPanel();
         renderCourseTeachersBlock();
         renderSection('admissions');
@@ -3785,10 +4057,15 @@
       // =========================================================
       function buildSingleTeacherBlockHTML(d, isMulti = false) {
         const cfg = state.courseSettings[d.courseId] || getCourseDef(d.courseId);
+        const py = state.payoutYear || state.year;
+        const pm = state.payoutMonth || state.month;
+        const payoutMonthFull = formatMonthFull(py, pm);
+        const payoutMonthShort = formatMonthShort(py, pm);
+        const payoutDateRange = getMonthDateRange(py, pm);
 
         function buildTeacherStudentTable(list, isGain, emptyLabel) {
           if (list.length === 0) {
-            return `<div class="pr-empty">No % Basis ${emptyLabel} recorded for ${escapeHtml(d.courseName)} in this period.</div>`;
+            return `<div class="pr-empty">No % Basis ${escapeHtml(emptyLabel)} recorded for ${escapeHtml(d.courseName)}.</div>`;
           }
 
           let totFull = 0, totBasic = 0, totNetBasic = 0, totPayout = 0;
@@ -3867,7 +4144,7 @@
               </div>
               <div class="pr-meta">
                 <div class="pr-period">${escapeHtml(d.teacherName)} (${escapeHtml(d.courseName)})</div>
-                <div>${escapeHtml(state.monthLabel)} · ${escapeHtml(getMonthDateRange(state.year, state.month))}</div>
+                <div>${escapeHtml(payoutMonthFull)} · ${escapeHtml(payoutDateRange)}</div>
                 <div class="pr-mode-badge">Base Basic Fee: ${formatINR(cfg.basicFee)} / Full: ${formatINR(cfg.fullFee)}</div>
                 <div style="margin-top:3px; font-size:9.5px; color:#64748b;">Generated: ${escapeHtml(nowStr)}</div>
               </div>
@@ -3900,7 +4177,7 @@
               <div class="pr-bridge-card highlight">
                 <div class="pr-card-label">Payable This Month</div>
                 <div class="pr-card-val">${formatINR(d.netPayout, true)}</div>
-                <div class="pr-card-sub">${d.fixedSalary > 0 ? 'Salary + Existing − Canceled' : 'Existing − Canceled'} (${formatMonthShort(state.year, state.month)})</div>
+                <div class="pr-card-sub">${d.fixedSalary > 0 ? 'Salary + Existing − Canceled' : 'Existing − Canceled'} (${payoutMonthShort})</div>
               </div>
             </div>
 
@@ -3965,16 +4242,18 @@
         const titleEl = document.getElementById('print-modal-title');
         if (!reportEl) return;
 
+        const payoutLabel = formatMonthFull(state.payoutYear || state.year, state.payoutMonth || state.month);
+
         if (currentPrintReportKey === 'pnl') {
           if (titleEl) titleEl.textContent = `Complete A4 P&L Report — ${state.monthLabel}`;
           reportEl.innerHTML = buildPrintReportHTML();
         } else if (currentPrintReportKey === 'all-teachers') {
-          if (titleEl) titleEl.textContent = `All Teachers Payout Slips — ${state.monthLabel}`;
+          if (titleEl) titleEl.textContent = `All Teachers Payout Slips — ${payoutLabel}`;
           reportEl.innerHTML = buildTeacherPayoutPDFHTML('all-teachers');
         } else if (currentPrintReportKey.startsWith('teacher:')) {
           const courseId = currentPrintReportKey.split(':')[1];
           const d = getPercentTeacherData(courseId);
-          if (titleEl) titleEl.textContent = `${d.teacherName} (${d.courseName}) Payout Slip — ${state.monthLabel}`;
+          if (titleEl) titleEl.textContent = `${d.teacherName} (${d.courseName}) Payout Slip — ${payoutLabel}`;
           reportEl.innerHTML = buildTeacherPayoutPDFHTML(courseId);
         }
       }
@@ -4005,16 +4284,19 @@
 
       function getReportFilename() {
         const mTag = `${MONTHS_SHORT[state.month - 1]}-${state.year}`;
+        const py = state.payoutYear || state.year;
+        const pm = state.payoutMonth || state.month;
+        const pTag = `${MONTHS_SHORT[pm - 1]}-${py}`;
         const orientTag = printOrientation === 'landscape' ? 'Horizontal' : 'Vertical';
         if (currentPrintReportKey === 'pnl') {
           return `HS-Music-PnL-${mTag}-${orientTag}.pdf`;
         }
         if (currentPrintReportKey === 'all-teachers') {
-          return `HS-Music-All-Teachers-Payout-${mTag}-${orientTag}.pdf`;
+          return `HS-Music-All-Teachers-Payout-${pTag}-${orientTag}.pdf`;
         }
         const cId = currentPrintReportKey.split(':')[1] || 'teacher';
         const cName = getCourseDef(cId).name;
-        return `HS-Music-${cName}-Teacher-Payout-${mTag}-${orientTag}.pdf`;
+        return `HS-Music-${cName}-Teacher-Payout-${pTag}-${orientTag}.pdf`;
       }
 
       // =========================================================
@@ -4326,12 +4608,17 @@
         targets.forEach((d, tIdx) => {
           if (tIdx > 0) doc.addPage();
           const cfg = state.courseSettings[d.courseId] || getCourseDef(d.courseId);
+          const py = state.payoutYear || state.year;
+          const pm = state.payoutMonth || state.month;
+          const pMonthFull = formatMonthFull(py, pm);
+          const pMonthShort = formatMonthShort(py, pm);
+          const pDateRange = getMonthDateRange(py, pm);
 
           let y = drawPdfHeader(
             doc,
             'Teacher Payout Slip',
             `${d.teacherName} (${d.courseName})`,
-            `Preetam Nagar, Prayagraj | ${state.monthLabel} (${getMonthDateRange(state.year, state.month)})`,
+            `Preetam Nagar, Prayagraj | ${pMonthFull} (${pDateRange})`,
             `Basic: ${formatPdfINR(cfg.basicFee)} / Full: ${formatPdfINR(cfg.fullFee)} | Generated: ${nowStr}`
           );
 
@@ -4344,7 +4631,7 @@
             { label: 'Existing (Payable)', value: formatPdfINR(d.existingPayout, true), sub: `${d.existingList.length} continuing students`, tone: 'gain' },
             { label: 'Canceled Deductions', value: d.cancelPayout > 0 ? `-${formatPdfINR(d.cancelPayout)}` : 'Rs. 0', sub: `${d.cancelList.length} canceled`, tone: 'loss' },
             { label: 'New (Next Month)', value: formatPdfINR(d.newPayout), sub: `${d.newList.length} deferred (excluded)`, tone: 'amber' },
-            { label: 'Payable This Month', value: formatPdfINR(d.netPayout, true), sub: `${d.fixedSalary > 0 ? 'Salary + Existing - Canceled' : 'Existing - Canceled'} (${formatMonthShort(state.year, state.month)})`, highlight: true }
+            { label: 'Payable This Month', value: formatPdfINR(d.netPayout, true), sub: `${d.fixedSalary > 0 ? 'Salary + Existing - Canceled' : 'Existing - Canceled'} (${pMonthShort})`, highlight: true }
           );
           y = drawPdfCardGrid(doc, y, payoutCards, isLand ? payoutCards.length : (payoutCards.length > 4 ? 3 : 2));
 
@@ -4601,87 +4888,56 @@
       }
 
       // =========================================================
-      // CSV EXPORT (STUDENT-LEVEL BREAKDOWN + STUDIO INCOME)
-      // =========================================================
-      function exportCSV() {
-        const s = computeSummary();
-        const rows = [
-          ['HS Music — Monthly Profit Bridge Report', state.monthLabel],
-          ['Mode', state.mode === 'cash' ? 'Cash Left (Incl. Tax)' : 'Real Net (Ex-Tax)'],
-          ['Previous Month Profit', s.lastProfit],
-          ['Recording Studio Income', s.studioIncome],
-          ['Net Profit Change', s.netDelta],
-          ['Current Month Profit', s.currentProfit],
-          [],
-          ['Section', 'Course', 'Teacher Name', 'Student Name', 'Mobile (10-digit)', 'Details/Note', 'Teacher Type', 'Teacher %', 'Full Fee', 'Discount %', 'Net Fee', 'Teacher Share', 'Tax Reserve', 'HS Music Part']
-        ];
-
-        ['admissions', 'cancellations'].forEach(section => {
-          const sign = section === 'admissions' ? 1 : -1;
-          const label = section === 'admissions' ? 'New Admission' : 'Canceled Enrollment';
-          DEFAULT_COURSES.forEach(c => {
-            (state[section][c.id] || []).forEach(stu => {
-              const m = calcStudent(c.id, stu);
-              rows.push([
-                label,
-                getStudentCourseLabel(c.id, stu),
-                getTeacherDisplayName(c.id),
-                stu.name || '(Unnamed)',
-                stu.phone || '',
-                stu.note || '',
-                m.isSalaried ? 'Salaried' : '% Basis',
-                m.teacherPct,
-                m.fullFee,
-                m.d,
-                m.netFull,
-                m.teacherPayout,
-                m.netTax,
-                round2(sign * m.hsActive)
-              ]);
-            });
-          });
-        });
-
-        const csvContent = rows
-          .map(r => r.map(v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`).join(','))
-          .join('\n');
-
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `HS-Music-Report-${MONTHS_SHORT[state.month - 1]}-${state.year}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showToast('Exported student-level CSV successfully!', 'success');
-      }
-
-      // =========================================================
-      // FULL BACKUP & RESTORE (.JSON) — SAFE ACROSS DEVICES
+      // SEPARATE BACKUP & RESTORE (.JSON) — P&L vs TEACHER PAYOUT
       // =========================================================
       function exportFullBackupJSON() {
         try {
-          const payload = {
-            app: 'HS-Music-Monthly-Profit-Bridge',
-            version: 6,
-            exportedAt: new Date().toISOString(),
-            state,
-            historyList
-          };
+          const todayTag = new Date().toISOString().slice(0, 10);
+          let payload;
+          let filename;
+          let toastMsg;
+
+          if (activeHistoryView === 'payout') {
+            payload = {
+              app: 'HS-Music-Monthly-Profit-Bridge',
+              backupType: 'payout',
+              version: 7,
+              exportedAt: new Date().toISOString(),
+              payoutState: {
+                payoutYear: state.payoutYear || state.year,
+                payoutMonth: state.payoutMonth || state.month,
+                teacherNames: state.teacherNames || {},
+                teacherSalaries: state.teacherSalaries || {},
+                existingStudents: state.existingStudents || makeEmptyCourseMap()
+              },
+              payoutHistoryList
+            };
+            filename = `HS-Music-Teacher-Payout-Backup-${todayTag}.json`;
+            toastMsg = `Teacher Payout Backup downloaded (${payoutHistoryList.length} saved month${payoutHistoryList.length === 1 ? '' : 's'})!`;
+          } else {
+            payload = {
+              app: 'HS-Music-Monthly-Profit-Bridge',
+              backupType: 'pnl',
+              version: 7,
+              exportedAt: new Date().toISOString(),
+              state,
+              historyList
+            };
+            filename = `HS-Music-PnL-Backup-${todayTag}.json`;
+            toastMsg = `Complete P&L Backup downloaded (${historyList.length} saved month${historyList.length === 1 ? '' : 's'})!`;
+          }
+
           const jsonStr = JSON.stringify(payload, null, 2);
           const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
           const url = URL.createObjectURL(blob);
-          const todayTag = new Date().toISOString().slice(0, 10);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `HS-Music-Full-Backup-${todayTag}.json`;
+          a.download = filename;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
           setTimeout(() => URL.revokeObjectURL(url), 4000);
-          showToast(`Backup downloaded (${historyList.length} saved month${historyList.length === 1 ? '' : 's'} included)!`, 'success');
+          showToast(toastMsg, 'success');
         } catch (err) {
           console.error('Backup export error:', err);
           showToast('Could not create backup file.', 'warning');
@@ -4694,7 +4950,37 @@
         reader.onload = (ev) => {
           try {
             const parsed = JSON.parse(String(ev.target.result || ''));
-            if (!parsed || (typeof parsed.state !== 'object' && !Array.isArray(parsed.historyList))) {
+            if (!parsed || typeof parsed !== 'object') {
+              showToast('Invalid backup file. Please choose a valid HS Music .json backup.', 'warning');
+              return;
+            }
+
+            // Case 1: Dedicated Teacher Payout Backup
+            if (parsed.backupType === 'payout') {
+              if (Array.isArray(parsed.payoutHistoryList)) {
+                payoutHistoryList = parsed.payoutHistoryList;
+                savePayoutHistory();
+              }
+              if (parsed.payoutState && typeof parsed.payoutState === 'object') {
+                const ps = parsed.payoutState;
+                const def = createDefaultState(ps.payoutYear || state.payoutYear, ps.payoutMonth || state.payoutMonth);
+                state.payoutYear = Number(ps.payoutYear) || state.payoutYear;
+                state.payoutMonth = Number(ps.payoutMonth) || state.payoutMonth;
+                state.teacherNames = { ...def.teacherNames, ...(ps.teacherNames || {}) };
+                state.teacherSalaries = { ...def.teacherSalaries, ...(ps.teacherSalaries || {}) };
+                state.existingStudents = { ...makeEmptyCourseMap(), ...(ps.existingStudents || {}) };
+                payoutPopoverYear = state.payoutYear;
+                saveState();
+              }
+              activeHistoryView = 'payout';
+              renderHistory();
+              fullRender(true);
+              showToast(`Teacher Payout Backup restored (${payoutHistoryList.length} saved month${payoutHistoryList.length === 1 ? '' : 's'})!`, 'success');
+              return;
+            }
+
+            // Case 2: P&L Backup or Legacy Full Backup
+            if (typeof parsed.state !== 'object' && !Array.isArray(parsed.historyList) && !Array.isArray(parsed.payoutHistoryList)) {
               showToast('Invalid backup file. Please choose a valid HS Music .json backup.', 'warning');
               return;
             }
@@ -4702,6 +4988,10 @@
             if (Array.isArray(parsed.historyList)) {
               historyList = parsed.historyList;
               saveHistory();
+            }
+            if (Array.isArray(parsed.payoutHistoryList)) {
+              payoutHistoryList = parsed.payoutHistoryList;
+              savePayoutHistory();
             }
 
             if (parsed.state && typeof parsed.state === 'object') {
@@ -4712,6 +5002,8 @@
                 ...sObj,
                 year: Number(sObj.year) || def.year,
                 month: Number(sObj.month) || def.month,
+                payoutYear: Number(sObj.payoutYear) || state.payoutYear || def.year,
+                payoutMonth: Number(sObj.payoutMonth) || state.payoutMonth || def.month,
                 recordingStudioIncome: Math.max(0, Number(sObj.recordingStudioIncome) || 0),
                 teacherNames: { ...def.teacherNames, ...(sObj.teacherNames || {}) },
                 teacherSalaries: { ...def.teacherSalaries, ...(sObj.teacherSalaries || {}) },
@@ -4731,19 +5023,82 @@
               migrateLegacyElectricGuitar(state, sObj);
               state.monthLabel = formatMonthFull(state.year, state.month);
               popoverYear = state.year;
+              payoutPopoverYear = state.payoutYear;
               document.getElementById('last-profit-input').value = state.lastProfit;
               document.getElementById('recording-studio-input').value = state.recordingStudioIncome;
             }
 
+            activeHistoryView = 'pnl';
             renderHistory();
             fullRender(true);
-            showToast(`Backup restored! ${historyList.length} saved month${historyList.length === 1 ? '' : 's'} loaded.`, 'success');
+            showToast(`P&L Backup restored! ${historyList.length} saved month${historyList.length === 1 ? '' : 's'} loaded.`, 'success');
           } catch (err) {
             console.error('Backup restore error:', err);
             showToast('Failed to read backup file. Make sure it is a valid .json file.', 'warning');
           }
         };
         reader.readAsText(file);
+      }
+
+      function exportCSV() {
+        const headers = [
+          'Month', 'Section', 'Course', 'Teacher Name', 'Student Name', 'Mobile No',
+          'Note', 'Teacher Type', 'Full Fee', 'Basic Fee', 'Discount %',
+          'Net Fee', 'Teacher %', 'Teacher Share', 'Tax Reserve', 'HS Music Part'
+        ];
+        const rows = [];
+
+        function csvEsc(v) {
+          const s = String(v == null ? '' : v);
+          return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+        }
+
+        ['admissions', 'cancellations'].forEach(section => {
+          const isGain = section === 'admissions';
+          DEFAULT_COURSES.forEach(c => {
+            const tName = getTeacherDisplayName(c.id);
+            (state[section][c.id] || []).forEach(stu => {
+              const m = calcStudent(c.id, stu);
+              rows.push([
+                state.monthLabel,
+                isGain ? 'New Admission' : 'Canceled Enrollment',
+                getStudentCourseLabel(c.id, stu),
+                tName,
+                stu.name || '(Unnamed)',
+                stu.phone || '',
+                stu.note || '',
+                m.isSalaried ? 'Salaried' : '% Basis',
+                m.fullFee,
+                m.basicFee,
+                m.d,
+                m.netFull,
+                m.teacherPct,
+                m.teacherPayout,
+                m.netTax,
+                isGain ? m.hsActive : -m.hsActive
+              ].map(csvEsc).join(','));
+            });
+          });
+        });
+
+        if (state.recordingStudioIncome > 0) {
+          rows.push([
+            state.monthLabel, 'Other Income', 'Recording Studio', '', '', '', '', '',
+            state.recordingStudioIncome, 0, 0, state.recordingStudioIncome, 0, 0, 0, state.recordingStudioIncome
+          ].map(csvEsc).join(','));
+        }
+
+        const csvContent = [headers.join(','), ...rows].join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `HS-Music-${MONTHS_SHORT[state.month - 1]}-${state.year}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+        showToast('Exported student-wise CSV!', 'success');
       }
 
       // =========================================================
@@ -4932,11 +5287,73 @@
           switchToMonth(today.year, today.month, true);
         });
 
-        // Recording Studio Income Input
-        document.getElementById('recording-studio-input').addEventListener('input', (e) => {
-          state.recordingStudioIncome = Math.max(0, Number(e.target.value) || 0);
-          saveState();
-          renderDashboard();
+        // Independent Teacher Payout Calendar Picker & Save Snapshot
+        const payoutCalWrapper = document.getElementById('payout-cal-wrapper');
+        const payoutCalTrigger = document.getElementById('btn-payout-cal-trigger');
+        const payoutCalPopover = document.getElementById('payout-cal-popover');
+
+        if (payoutCalTrigger && payoutCalPopover) {
+          payoutCalTrigger.addEventListener('click', () => {
+            const willOpen = !payoutCalPopover.classList.contains('open');
+            if (willOpen) {
+              payoutPopoverYear = state.payoutYear || state.year;
+              renderPayoutCalendarPopover();
+            }
+            payoutCalPopover.classList.toggle('open', willOpen);
+            payoutCalTrigger.setAttribute('aria-expanded', String(willOpen));
+          });
+
+          document.addEventListener('click', (e) => {
+            if (payoutCalPopover.classList.contains('open') && !payoutCalWrapper.contains(e.target)) {
+              payoutCalPopover.classList.remove('open');
+              payoutCalTrigger.setAttribute('aria-expanded', 'false');
+            }
+          });
+        }
+
+        document.getElementById('btn-payout-cal-prev').addEventListener('click', () => {
+          const prev = getPrevYM(state.payoutYear || state.year, state.payoutMonth || state.month);
+          switchToPayoutMonth(prev.year, prev.month, true);
+        });
+
+        document.getElementById('btn-payout-cal-next').addEventListener('click', () => {
+          const next = getNextYM(state.payoutYear || state.year, state.payoutMonth || state.month);
+          switchToPayoutMonth(next.year, next.month, true);
+        });
+
+        document.getElementById('btn-payout-pop-year-prev').addEventListener('click', () => {
+          payoutPopoverYear -= 1;
+          renderPayoutCalendarPopover();
+        });
+
+        document.getElementById('btn-payout-pop-year-next').addEventListener('click', () => {
+          payoutPopoverYear += 1;
+          renderPayoutCalendarPopover();
+        });
+
+        document.getElementById('payout-cal-year-select').addEventListener('change', (e) => {
+          payoutPopoverYear = parseInt(e.target.value, 10) || (state.payoutYear || state.year);
+          renderPayoutCalendarPopover();
+        });
+
+        document.getElementById('payout-cal-month-grid').addEventListener('click', (e) => {
+          const btn = e.target.closest('button[data-pick-payout-month]');
+          if (!btn) return;
+          const mNum = parseInt(btn.dataset.pickPayoutMonth, 10);
+          switchToPayoutMonth(payoutPopoverYear, mNum, true);
+        });
+
+        document.getElementById('btn-payout-jump-today').addEventListener('click', () => {
+          const today = getTodayYM();
+          switchToPayoutMonth(today.year, today.month, true);
+        });
+
+        document.getElementById('btn-save-payout-snapshot').addEventListener('click', saveCurrentPayoutSnapshot);
+
+        // History View Selector (Complete Profit & Loss vs Teacher Payout)
+        document.getElementById('history-view-select').addEventListener('change', (e) => {
+          activeHistoryView = e.target.value === 'payout' ? 'payout' : 'pnl';
+          renderHistory();
         });
 
         // PDF & Print Preview Modal Controls
@@ -5144,64 +5561,9 @@
               calPopover.classList.remove('open');
               calTrigger.setAttribute('aria-expanded', 'false');
             }
-          }
-        });
-
-        // Mode Toggle
-        document.querySelectorAll('.mode-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            state.mode = btn.dataset.mode;
-            fullRender(true);
-          });
-        });
-
-        // Last Month Overall Profit Input
-        document.getElementById('last-profit-input').addEventListener('input', (e) => {
-          state.lastProfit = Number(e.target.value) || 0;
-          saveState();
-          renderDashboard();
-        });
-
-        // Collapsible Settings Panel
-        const settingsToggle = document.getElementById('btn-settings-toggle');
-        const settingsBody = document.getElementById('settings-body');
-        const settingsChevron = document.getElementById('settings-chevron');
-        settingsToggle.addEventListener('click', () => {
-          const isOpen = settingsBody.classList.toggle('open');
-          settingsToggle.setAttribute('aria-expanded', String(isOpen));
-          settingsChevron.textContent = isOpen ? '− Collapse' : '+ Expand';
-        });
-
-        document.getElementById('settings-grid').addEventListener('input', (e) => {
-          const inp = e.target.closest('input[data-set-course], input[data-set-variant]');
-          if (!inp) return;
-          const field = inp.dataset.setField;
-          const val = Math.max(0, Number(inp.value) || 0);
-          let cfg = null;
-
-          if (inp.dataset.setVariant) {
-            const varId = inp.dataset.setVariant;
-            state.guitarVariantSettings[varId][field] = val;
-            cfg = state.guitarVariantSettings[varId];
-          } else {
-            const courseId = inp.dataset.setCourse;
-            state.courseSettings[courseId][field] = val;
-            cfg = state.courseSettings[courseId];
-          }
-
-          saveState();
-          renderSection('admissions');
-          renderSection('cancellations');
-          renderDashboard();
-          // Update validation badge without losing input focus
-          const box = inp.closest('.setting-course-box');
-          if (box && cfg) {
-            const sum = round2((Number(cfg.basicFee) || 0) + (Number(cfg.maintFee) || 0) + (Number(cfg.taxFee) || 0));
-            const ok = Math.abs(sum - round2(Number(cfg.fullFee) || 0)) < 0.01;
-            const badge = box.querySelector('.kpi-badge');
-            if (badge) {
-              badge.className = `kpi-badge ${ok ? 'gain' : 'warn'} tabular-nums`;
-              badge.textContent = ok ? 'Valid' : `Sum ₹${sum}`;
+            if (payoutCalPopover && payoutCalPopover.classList.contains('open')) {
+              payoutCalPopover.classList.remove('open');
+              payoutCalTrigger.setAttribute('aria-expanded', 'false');
             }
           }
         });
@@ -5312,6 +5674,8 @@
           state.recordingStudioIncome = 0;
           state.year = next.year;
           state.month = next.month;
+          state.payoutYear = next.year;
+          state.payoutMonth = next.month;
           state.monthLabel = formatMonthFull(next.year, next.month);
           state.admissions = makeEmptyCourseMap();
           state.cancellations = makeEmptyCourseMap();
@@ -5320,47 +5684,130 @@
             cancellations: makeExpandedMap(false)
           };
           popoverYear = state.year;
-
+          payoutPopoverYear = state.payoutYear;
           document.getElementById('last-profit-input').value = state.lastProfit;
-          document.getElementById('recording-studio-input').value = 0;
+          document.getElementById('recording-studio-input').value = state.recordingStudioIncome;
           fullRender(true);
           const extraMsg = movedCount > 0 ? ` · ${movedCount} new % Basis student${movedCount === 1 ? '' : 's'} shifted to Existing Payout` : '';
           showToast(`Carried forward ${formatINR(state.lastProfit)} to ${state.monthLabel}${extraMsg}!`, 'success');
         });
 
-        // Save Snapshot
+        // Mode Toggle (Cash Left vs Real Net)
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            state.mode = btn.dataset.mode === 'real' ? 'real' : 'cash';
+            fullRender(true);
+          });
+        });
+
+        // Last Profit & Recording Studio Inputs
+        document.getElementById('last-profit-input').addEventListener('input', (e) => {
+          state.lastProfit = Number(e.target.value) || 0;
+          saveState();
+          renderDashboard();
+        });
+
+        document.getElementById('recording-studio-input').addEventListener('input', (e) => {
+          state.recordingStudioIncome = Math.max(0, Number(e.target.value) || 0);
+          saveState();
+          renderDashboard();
+        });
+
+        // Course Fee Base Settings Toggle & Inputs
+        const settingsToggle = document.getElementById('btn-settings-toggle');
+        const settingsBody = document.getElementById('settings-body');
+        const settingsChevron = document.getElementById('settings-chevron');
+        settingsToggle.addEventListener('click', () => {
+          const isOpen = settingsBody.classList.toggle('open');
+          settingsToggle.setAttribute('aria-expanded', String(isOpen));
+          settingsChevron.textContent = isOpen ? '− Collapse' : '+ Expand';
+        });
+
+        document.getElementById('settings-grid').addEventListener('input', (e) => {
+          const inp = e.target.closest('input[data-set-field]');
+          if (!inp) return;
+          const field = inp.dataset.setField;
+          const val = Math.max(0, Number(inp.value) || 0);
+          if (inp.dataset.setVariant) {
+            const vId = inp.dataset.setVariant;
+            if (state.guitarVariantSettings && state.guitarVariantSettings[vId]) {
+              state.guitarVariantSettings[vId][field] = val;
+            }
+          } else if (inp.dataset.setCourse) {
+            const cId = inp.dataset.setCourse;
+            if (state.courseSettings && state.courseSettings[cId]) {
+              state.courseSettings[cId][field] = val;
+            }
+          }
+          saveState();
+          renderSection('admissions');
+          renderSection('cancellations');
+          renderDashboard();
+        });
+
+        // Save Complete P&L Snapshot
         document.getElementById('btn-save-snapshot').addEventListener('click', () => {
-          if (!latestSummary) return;
-          const s = latestSummary;
+          const s = computeSummary();
           const ymKey = makeYMKey(state.year, state.month);
           const entry = {
             id: Date.now(),
             ymKey,
             year: state.year,
             month: state.month,
-            monthLabel: formatMonthFull(state.year, state.month),
+            monthLabel: state.monthLabel,
             mode: state.mode,
+            newStudents: s.newStudents,
+            cancelStudents: s.cancelStudents,
             lastProfit: s.lastProfit,
             netDelta: s.netDelta,
             currentProfit: s.currentProfit,
-            newStudents: s.newStudents,
-            cancelStudents: s.cancelStudents,
             snapshotState: JSON.parse(JSON.stringify(state))
           };
-
-          const existingIdx = historyList.findIndex(item => item.ymKey === ymKey);
-          if (existingIdx !== -1) {
-            historyList.splice(existingIdx, 1);
-          }
+          const idx = historyList.findIndex(item => item.ymKey === ymKey);
+          if (idx !== -1) historyList.splice(idx, 1);
           historyList.unshift(entry);
           saveHistory();
-          renderHistory();
           renderCalendarPopover();
-          showToast(`Saved snapshot for ${entry.monthLabel}.`, 'success');
+          renderHistory();
+          showToast(`Saved P&L snapshot for ${state.monthLabel} (${formatINR(s.currentProfit)})`, 'success');
         });
 
-        // History Load & Delete
+        // History Load & Delete (Both P&L and Teacher Payout)
         document.getElementById('history-tbody').addEventListener('click', (e) => {
+          const loadPayoutBtn = e.target.closest('button[data-load-payout-hist]');
+          if (loadPayoutBtn) {
+            const idx = parseInt(loadPayoutBtn.dataset.loadPayoutHist, 10);
+            const item = payoutHistoryList[idx];
+            if (item && item.payoutState) {
+              switchToPayoutMonth(item.year, item.month, true);
+            }
+            return;
+          }
+
+          const pdfPayoutBtn = e.target.closest('button[data-pdf-payout-hist]');
+          if (pdfPayoutBtn) {
+            const idx = parseInt(pdfPayoutBtn.dataset.pdfPayoutHist, 10);
+            const item = payoutHistoryList[idx];
+            if (item && item.payoutState) {
+              switchToPayoutMonth(item.year, item.month, true);
+              openPrintPreview('all-teachers');
+            }
+            return;
+          }
+
+          const delPayoutBtn = e.target.closest('button[data-delete-payout-hist]');
+          if (delPayoutBtn) {
+            const idx = parseInt(delPayoutBtn.dataset.deletePayoutHist, 10);
+            if (!isNaN(idx) && idx >= 0 && idx < payoutHistoryList.length) {
+              const removed = payoutHistoryList.splice(idx, 1)[0];
+              savePayoutHistory();
+              renderHistory();
+              renderPayoutCalendarPopover();
+              showToast(`Deleted Teacher Payout snapshot: ${removed.monthLabel}`, 'warning');
+            }
+            return;
+          }
+
           const loadBtn = e.target.closest('button[data-load-hist]');
           if (loadBtn) {
             const idx = parseInt(loadBtn.dataset.loadHist, 10);
