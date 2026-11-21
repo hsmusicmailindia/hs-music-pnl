@@ -694,6 +694,86 @@
       border-color: var(--accent);
     }
 
+    /* Course Teachers Directory Block */
+    .teachers-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      padding: 14px 18px 16px;
+    }
+
+    @media (max-width: 1120px) {
+      .teachers-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 680px) {
+      .teachers-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 460px) {
+      .teachers-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .teacher-dir-item {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .teacher-dir-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .teacher-dir-sub {
+      font-size: 0.64rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .teacher-dir-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 9px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .teacher-dir-input:focus {
+      border-color: var(--accent);
+    }
+
+    .course-teacher-pill {
+      font-size: 0.69rem;
+      font-weight: 700;
+      color: var(--sky);
+      background: var(--sky-bg);
+      border: 1px solid var(--sky-border);
+      border-radius: 999px;
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+
     /* =========================================================
        SECTION CARDS & EXPANDABLE STUDENT-WISE COURSES
        ========================================================= */
@@ -2100,12 +2180,26 @@
          ========================================================= -->
     <section class="settings-card" aria-label="Course Fee Base Settings">
       <button id="btn-settings-toggle" type="button" class="settings-toggle" aria-expanded="false">
-        <span>Course Fee Base Settings (Advance Guitar: ₹1,950 · Electric Guitar: ₹2,550 · Piano/Singing: ₹1,950 · Dance: ₹1,400)</span>
+        <span>Course Fee Base Settings (Advance Guitar: ₹1,950 · Electric Guitar: ₹2,550 · Beginners Guitar: ₹1,200 · Piano/Singing: ₹1,950 · Dance: ₹1,400)</span>
         <span id="settings-chevron" style="color:var(--muted); font-size:0.78rem;">+ Expand</span>
       </button>
       <div id="settings-body" class="settings-body">
         <div id="settings-grid" class="settings-grid"></div>
       </div>
+    </section>
+
+    <!-- =========================================================
+         COURSE TEACHERS DIRECTORY (SEPARATE TEACHER NAME PER COURSE)
+         ========================================================= -->
+    <section class="section-card" aria-label="Course Teachers Directory">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Course Teachers</h2>
+          <p class="section-sub">Type each course teacher's name manually (e.g., Sumit for Advance / Electric Guitar) — auto-updates in Courses, Payout Slips &amp; PDF Reports</p>
+        </div>
+        <span class="kpi-badge">5 Courses</span>
+      </div>
+      <div id="course-teachers-grid" class="teachers-grid"></div>
     </section>
 
     <!-- =========================================================
@@ -2213,13 +2307,13 @@
     </section>
 
     <!-- =========================================================
-         TEACHER PAYOUTS (% BASIS) — SEPARATE PDF SLIPS
+         TEACHER PAYOUTS (ALL COURSES) — SEPARATE PDF SLIPS
          ========================================================= -->
-    <section class="section-card" aria-label="Teacher Payouts Percent Basis">
+    <section class="section-card" aria-label="Teacher Payouts All Courses">
       <div class="section-header">
         <div>
-          <h2 class="section-title">Teacher Payouts (% Basis) — Separate PDF Slips</h2>
-          <p class="section-sub"><strong>1-Month Arrears Rule:</strong> Only <strong>Existing Students</strong> (minus cancellations) are payable this month (excluded from P&amp;L). This month's <strong>New Admissions</strong> are deferred to next month's payout automatically on Carry Forward.</p>
+          <h2 class="section-title">Teacher Payouts (All Courses) — Separate PDF Slips</h2>
+          <p class="section-sub"><strong>1-Month Arrears Rule:</strong> All 5 course teachers appear here. Enter <strong>Fixed Salary (₹)</strong> for salaried teachers and/or <strong>Existing Students</strong> for % Basis teachers (excluded from P&amp;L). This month's <strong>New Admissions</strong> shift to next month automatically on Carry Forward.</p>
         </div>
         <button id="btn-all-teachers-pdf" type="button" class="btn btn-sm btn-pdf">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -2227,7 +2321,7 @@
             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
             <rect x="6" y="14" width="12" height="8"></rect>
           </svg>
-          All % Teachers Combined PDF
+          All Teachers Combined PDF
         </button>
       </div>
       <div id="teacher-payouts-grid" class="payout-grid"></div>
@@ -2262,8 +2356,6 @@
           <input id="restore-file-input" type="file" accept=".json,application/json" style="display:none;" />
           <span id="history-count-badge" class="kpi-badge tabular-nums">0 saved</span>
         </div>
-      </div>
-        <span id="history-count-badge" class="kpi-badge tabular-nums">0 saved</span>
       </div>
       <div class="table-scroll">
         <table class="history-table tabular-nums">
@@ -2346,10 +2438,11 @@
       const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
       const DEFAULT_COURSES = [
-        { id: 'guitar',  name: 'Guitar',  fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'percent',  defaultTeacherPct: 50 },
-        { id: 'piano',   name: 'Piano',   fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'salaried', defaultTeacherPct: 0 },
-        { id: 'singing', name: 'Singing', fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'salaried', defaultTeacherPct: 0 },
-        { id: 'dance',   name: 'Dance',   fullFee: 1400, basicFee: 1000, maintFee: 200, taxFee: 200, defaultEmp: 'percent',  defaultTeacherPct: 50 }
+        { id: 'guitar',           name: 'Guitar',           fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'percent',  defaultTeacherPct: 50 },
+        { id: 'beginners_guitar', name: 'Beginners Guitar', fullFee: 1200, basicFee: 1000, maintFee: 200, taxFee: 0,   defaultEmp: 'percent',  defaultTeacherPct: 50 },
+        { id: 'piano',            name: 'Piano',            fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'salaried', defaultTeacherPct: 0 },
+        { id: 'singing',          name: 'Singing',          fullFee: 1950, basicFee: 1500, maintFee: 200, taxFee: 250, defaultEmp: 'salaried', defaultTeacherPct: 0 },
+        { id: 'dance',            name: 'Dance',            fullFee: 1400, basicFee: 1000, maintFee: 200, taxFee: 200, defaultEmp: 'percent',  defaultTeacherPct: 50 }
       ];
 
       const GUITAR_VARIANTS = [
@@ -2448,6 +2541,17 @@
         return DEFAULT_COURSES.find(c => c.id === courseId) || DEFAULT_COURSES[0];
       }
 
+      function getCourseTeacherLabel(courseId) {
+        if (courseId === 'guitar') return 'Advance / Electric Guitar';
+        return getCourseDef(courseId).name;
+      }
+
+      function getTeacherDisplayName(courseId) {
+        const raw = state.teacherNames && state.teacherNames[courseId];
+        if (raw && String(raw).trim()) return String(raw).trim();
+        return `${getCourseTeacherLabel(courseId)} Teacher`;
+      }
+
       function getGuitarVariantLabel(subType) {
         return subType === 'electric' ? 'Electric Guitar' : 'Advance Guitar';
       }
@@ -2519,10 +2623,18 @@
           lastProfit: 0,
           recordingStudioIncome: 0,
           teacherNames: {
-            guitar: 'Guitar Teacher',
-            piano: 'Piano Teacher',
-            singing: 'Singing Teacher',
-            dance: 'Dance Teacher'
+            guitar: '',
+            beginners_guitar: '',
+            piano: '',
+            singing: '',
+            dance: ''
+          },
+          teacherSalaries: {
+            guitar: 0,
+            beginners_guitar: 0,
+            piano: 0,
+            singing: 0,
+            dance: 0
           },
           courseSettings,
           guitarVariantSettings,
@@ -2606,6 +2718,7 @@
               month: Number(parsed.month) || def.month,
               recordingStudioIncome: Math.max(0, Number(parsed.recordingStudioIncome) || 0),
               teacherNames: { ...def.teacherNames, ...(parsed.teacherNames || {}) },
+              teacherSalaries: { ...def.teacherSalaries, ...(parsed.teacherSalaries || {}) },
               courseSettings: { ...def.courseSettings, ...(parsed.courseSettings || {}) },
               guitarVariantSettings: {
                 electric: { ...def.guitarVariantSettings.electric, ...((parsed.guitarVariantSettings && parsed.guitarVariantSettings.electric) || {}) }
@@ -2816,6 +2929,7 @@
             monthLabel: formatMonthFull(targetYear, targetMonth),
             recordingStudioIncome: Math.max(0, Number(snap.recordingStudioIncome) || 0),
             teacherNames: { ...def.teacherNames, ...(snap.teacherNames || {}) },
+            teacherSalaries: { ...def.teacherSalaries, ...(snap.teacherSalaries || {}) },
             courseSettings: { ...def.courseSettings, ...(snap.courseSettings || {}) },
             guitarVariantSettings: {
               electric: { ...def.guitarVariantSettings.electric, ...((snap.guitarVariantSettings && snap.guitarVariantSettings.electric) || {}) }
@@ -2841,6 +2955,7 @@
           const preservedSettings = JSON.parse(JSON.stringify(state.courseSettings));
           const preservedGuitarVariants = JSON.parse(JSON.stringify(state.guitarVariantSettings || {}));
           const preservedTeachers = JSON.parse(JSON.stringify(state.teacherNames || {}));
+          const preservedSalaries = JSON.parse(JSON.stringify(state.teacherSalaries || {}));
           const preservedExisting = JSON.parse(JSON.stringify(state.existingStudents || makeEmptyCourseMap()));
           const preservedMode = state.mode;
           const baseProfit = prevSaved ? prevSaved.currentProfit : state.lastProfit;
@@ -2849,6 +2964,7 @@
           state.courseSettings = preservedSettings;
           state.guitarVariantSettings = { ...state.guitarVariantSettings, ...preservedGuitarVariants };
           state.teacherNames = { ...state.teacherNames, ...preservedTeachers };
+          state.teacherSalaries = { ...state.teacherSalaries, ...preservedSalaries };
           state.existingStudents = { ...makeEmptyCourseMap(), ...preservedExisting };
           state.mode = preservedMode;
           state.lastProfit = baseProfit;
@@ -2866,24 +2982,201 @@
       }
 
       // =========================================================
-      // RENDER SETTINGS, SECTIONS, DASHBOARD & HISTORY
+      // TEACHER PAYOUTS (ALL COURSES) DATA & UI PANEL
       // =========================================================
+      function getPercentTeacherData(courseId) {
+        const courseDef = getCourseDef(courseId);
+        const teacherName = getTeacherDisplayName(courseId);
+        const fixedSalary = round2(Math.max(0, Number(state.teacherSalaries && state.teacherSalaries[courseId]) || 0));
+
+        const existingList = (state.existingStudents && state.existingStudents[courseId] ? state.existingStudents[courseId] : [])
+          .map(stu => ({ stu, m: calcStudent(courseId, { ...stu, empType: 'percent' }) }));
+
+        const newList = (state.admissions[courseId] || [])
+          .filter(stu => stu.empType !== 'salaried')
+          .map(stu => ({ stu, m: calcStudent(courseId, stu) }));
+
+        const cancelList = (state.cancellations[courseId] || [])
+          .filter(stu => stu.empType !== 'salaried')
+          .map(stu => ({ stu, m: calcStudent(courseId, stu) }));
+
+        const existingPayout = round2(existingList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
+        const newPayout = round2(newList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
+        const cancelPayout = round2(cancelList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
+        // 1-Month Arrears Rule: Fixed Salary + Existing Students - Canceled Deductions (New Admissions deferred to next month)
+        const netPayout = round2(fixedSalary + existingPayout - cancelPayout);
+        const existingDiscHit = round2(existingList.reduce((acc, x) => acc + x.m.teacherHit, 0));
+        const newDiscHit = round2(newList.reduce((acc, x) => acc + x.m.teacherHit, 0));
+        const totalDiscHit = round2(existingDiscHit);
+        const grossBasic = round2(existingList.reduce((acc, x) => acc + x.m.basicFee, 0));
+        const netBasic = round2(existingList.reduce((acc, x) => acc + x.m.netBasic, 0));
+
+        return {
+          courseId,
+          courseName: courseDef.name,
+          teacherName,
+          fixedSalary,
+          existingList,
+          newList,
+          cancelList,
+          existingPayout,
+          newPayout,
+          cancelPayout,
+          netPayout,
+          existingDiscHit,
+          newDiscHit,
+          totalDiscHit,
+          grossBasic,
+          netBasic
+        };
+      }
+
+      function getActivePercentCourses() {
+        // Return all 5 courses so every teacher (including Piano & Singing / Salaried teachers) appears in Payouts & PDF Slips
+        return DEFAULT_COURSES;
+      }
+
+      function renderTeacherPayoutsSection() {
+        const grid = document.getElementById('teacher-payouts-grid');
+        if (!grid) return;
+        const courses = getActivePercentCourses();
+
+        grid.innerHTML = courses.map(c => {
+          const d = getPercentTeacherData(c.id);
+          const cfg = state.courseSettings[c.id] || getCourseDef(c.id);
+          const isOpen = Boolean(state.expandedExisting && state.expandedExisting[c.id]);
+          const netCls = d.netPayout > 0 ? 'text-gain' : d.netPayout < 0 ? 'text-loss' : '';
+
+          const existingRowsHtml = d.existingList.length === 0
+            ? `<div style="font-size:0.74rem; color:var(--muted); padding:6px 4px;">No existing continuing students added for ${c.name} yet. Click <strong>+ Add Existing</strong> above.</div>`
+            : d.existingList.map(({ stu, m }, idx) => {
+                const isCustomT = !TEACHER_PCT_PRESETS.includes(Number(stu.teacherPct));
+                const isCustomD = !DISCOUNT_PCT_PRESETS.includes(Number(stu.discPct));
+                return `
+                  <div class="existing-stu-card">
+                    <div class="existing-stu-top">
+                      <input type="text" class="text-input" placeholder="Existing Student #${idx + 1} Name" value="${escapeHtml(stu.name)}" data-ex-text="name" data-ex-course="${c.id}" data-ex-id="${stu.id}" />
+                      <div class="stu-phone-wrap">
+                        <input type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit Mobile" value="${escapeHtml(stu.phone || '')}" data-ex-phone="phone" data-ex-course="${c.id}" data-ex-id="${stu.id}" class="tabular-nums" />
+                        <span class="phone-count-pill tabular-nums ${(stu.phone || '').length === 10 ? 'valid' : ''}">${(stu.phone || '').length}/10</span>
+                      </div>
+                      <input type="text" class="text-input note" placeholder="Batch / Old Fee Note" value="${escapeHtml(stu.note)}" data-ex-text="note" data-ex-course="${c.id}" data-ex-id="${stu.id}" />
+                      <button type="button" class="remove-row-btn" title="Remove existing student" aria-label="Remove existing student" data-del-ex="${c.id}:${stu.id}">&times;</button>
+                    </div>
+                    <div class="existing-stu-bottom tabular-nums">
+                      <div class="ctrl-inline">
+                        ${c.id === 'guitar' ? `
+                          <select class="select-input tabular-nums" data-ex-field="subType" data-ex-course="${c.id}" data-ex-id="${stu.id}" aria-label="Guitar Category">
+                            ${buildGuitarTypeOptions(stu.subType)}
+                          </select>
+                        ` : ''}
+                        <span style="font-size:0.7rem; color:var(--muted); font-weight:700;">Teacher %:</span>
+                        <select class="select-input tabular-nums" data-ex-field="teacherPct" data-ex-course="${c.id}" data-ex-id="${stu.id}">
+                          ${buildTeacherPctOptions(stu.teacherPct)}
+                        </select>
+                        ${isCustomT ? `<span class="custom-pct-wrap"><input type="number" min="0" max="100" step="1" value="${stu.teacherPct}" data-ex-custom="teacherPct" data-ex-course="${c.id}" data-ex-id="${stu.id}" class="tabular-nums" /><span>%</span></span>` : ''}
+                        <span style="font-size:0.7rem; color:var(--muted); font-weight:700; margin-left:4px;">Disc %:</span>
+                        <select class="select-input tabular-nums" data-ex-field="discPct" data-ex-course="${c.id}" data-ex-id="${stu.id}">
+                          ${buildDiscPctOptions(stu.discPct)}
+                        </select>
+                        ${isCustomD ? `<span class="custom-pct-wrap"><input type="number" min="0" max="100" step="1" value="${stu.discPct}" data-ex-custom="discPct" data-ex-course="${c.id}" data-ex-id="${stu.id}" class="tabular-nums" /><span>%</span></span>` : ''}
+                      </div>
+                      <div style="text-align:right;">
+                        <span style="font-size:0.71rem; color:var(--muted);">Basic ${formatINR(m.netBasic)} × ${m.teacherPct}% = </span>
+                        <strong class="text-gain" style="font-size:0.88rem;">${formatINR(m.teacherPayout, true)}</strong>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('');
+
+          return `
+            <div class="payout-teacher-card" data-payout-card="${c.id}">
+              <div class="payout-card-top">
+                <div class="payout-name-row">
+                  <span class="kpi-badge" style="color:var(--text); font-weight:800;">${getCourseTeacherLabel(c.id)}</span>
+                  <input type="text" class="teacher-name-input" data-teacher-name="${c.id}" value="${escapeHtml((state.teacherNames && state.teacherNames[c.id]) || '')}" placeholder="${c.id === 'guitar' ? 'Type name (e.g. Sumit)' : 'Type teacher name...'}" aria-label="${c.name} Teacher Name" />
+                </div>
+                <button type="button" class="btn btn-sm btn-pdf" data-open-teacher-pdf="${c.id}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                  </svg>
+                  Print / PDF Slip
+                </button>
+              </div>
+
+              <!-- Fixed Salary Input (for Salaried teachers or hybrid payout) -->
+              <div class="existing-bar tabular-nums">
+                <div>
+                  <div style="font-size:0.76rem; font-weight:800; color:var(--text);">Fixed Salary (₹) <span class="kpi-badge" style="margin-left:4px; font-size:0.64rem;">${c.defaultEmp === 'salaried' ? 'Salaried' : 'Optional'}</span></div>
+                  <div style="font-size:0.65rem; color:var(--muted);">Monthly fixed salary (added to slip, excluded from P&amp;L)</div>
+                </div>
+                <div style="display:inline-flex; align-items:center; gap:5px; background:var(--bg-subtle); border:1px solid var(--border); border-radius:8px; padding:4px 9px;">
+                  <span style="font-size:0.8rem; font-weight:800; color:var(--muted);">₹</span>
+                  <input type="number" min="0" step="500" value="${d.fixedSalary}" data-teacher-salary="${c.id}" class="tabular-nums" style="width:92px; background:transparent; border:none; color:var(--text); font-family:inherit; font-size:0.84rem; font-weight:800; outline:none; text-align:right;" aria-label="${c.name} Teacher Fixed Salary" />
+                </div>
+              </div>
+
+              <!-- Existing Students Bar (Not Added to P&L) -->
+              <div class="existing-bar tabular-nums">
+                <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" data-toggle-ex="${c.id}">
+                  <span class="chevron-btn ${isOpen ? 'open' : ''}" style="width:22px; height:22px;">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </span>
+                  <div>
+                    <div style="font-size:0.78rem; font-weight:800; color:var(--text);">Existing Students (${d.existingList.length}) · <span class="text-gain">${formatINR(d.existingPayout, true)}</span></div>
+                    <div style="font-size:0.66rem; color:var(--muted);">Continuing from prev months · Basic ₹${cfg.basicFee} · Not in P&amp;L</div>
+                  </div>
+                </div>
+                <div class="stepper">
+                  <button type="button" class="step-btn" data-pop-ex="${c.id}" title="Remove last existing student">−</button>
+                  <span class="step-count">${d.existingList.length}</span>
+                  <button type="button" class="step-btn add-btn" data-add-ex="${c.id}">+ Add Existing</button>
+                </div>
+              </div>
+
+              <div class="existing-drawer ${isOpen ? 'open' : ''}">
+                ${existingRowsHtml}
+              </div>
+
+              <div class="payout-stats tabular-nums">
+                <div style="font-size:0.74rem; color:var(--muted); line-height:1.5;">
+                  ${d.fixedSalary > 0 || c.defaultEmp === 'salaried' ? `Fixed Salary: <strong class="text-gain" data-salary-summary="${c.id}">${formatINR(d.fixedSalary)}</strong> · ` : ''}Existing (Payable): <strong class="text-gain">${d.existingList.length} (${formatINR(d.existingPayout, true)})</strong> ·
+                  Canceled: <strong class="text-loss">−${d.cancelList.length} (${d.cancelPayout > 0 ? `−${formatINR(d.cancelPayout)}` : '₹0'})</strong><br/>
+                  Next Month (New Admissions — Excluded): <strong class="text-amber">${d.newList.length} (${formatINR(d.newPayout)} deferred)</strong>
+                  ${d.totalDiscHit > 0 ? ` · Teacher Disc: <strong class="text-amber">−${formatINR(d.totalDiscHit)}</strong>` : ''}
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:0.68rem; color:var(--muted); text-transform:uppercase; font-weight:700;">Payable This Month</div>
+                  <div class="${netCls}" data-payable-val="${c.id}" style="font-size:1.08rem; font-weight:800;">${formatINR(d.netPayout, true)}</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
       function renderSettingsPanel() {
         const grid = document.getElementById('settings-grid');
+        if (!grid) return;
+
         const items = [
-          { type: 'course', id: 'guitar', title: 'Advance Guitar', cfg: state.courseSettings.guitar },
-          { type: 'variant', id: 'electric', title: 'Electric Guitar (Sub-option)', cfg: state.guitarVariantSettings.electric },
-          { type: 'course', id: 'piano', title: 'Piano', cfg: state.courseSettings.piano },
-          { type: 'course', id: 'singing', title: 'Singing', cfg: state.courseSettings.singing },
-          { type: 'course', id: 'dance', title: 'Dance', cfg: state.courseSettings.dance }
+          { kind: 'course', id: 'guitar', title: 'Advance Guitar', cfg: state.courseSettings.guitar },
+          { kind: 'variant', id: 'electric', title: 'Electric Guitar', cfg: state.guitarVariantSettings.electric },
+          { kind: 'course', id: 'beginners_guitar', title: 'Beginners Guitar', cfg: state.courseSettings.beginners_guitar },
+          { kind: 'course', id: 'piano', title: 'Piano', cfg: state.courseSettings.piano },
+          { kind: 'course', id: 'singing', title: 'Singing', cfg: state.courseSettings.singing },
+          { kind: 'course', id: 'dance', title: 'Dance', cfg: state.courseSettings.dance }
         ];
 
         grid.innerHTML = items.map(item => {
-          const cfg = item.cfg;
+          const cfg = item.cfg || { fullFee: 0, basicFee: 0, maintFee: 0, taxFee: 0 };
           const sum = round2((Number(cfg.basicFee) || 0) + (Number(cfg.maintFee) || 0) + (Number(cfg.taxFee) || 0));
-          const full = round2(Number(cfg.fullFee) || 0);
-          const ok = Math.abs(sum - full) < 0.01;
-          const attr = item.type === 'variant' ? `data-set-variant="${item.id}"` : `data-set-course="${item.id}"`;
+          const ok = Math.abs(sum - round2(Number(cfg.fullFee) || 0)) < 0.01;
+          const attr = item.kind === 'variant' ? `data-set-variant="${item.id}"` : `data-set-course="${item.id}"`;
+
           return `
             <div class="setting-course-box">
               <div class="setting-course-head">
@@ -2893,24 +3186,67 @@
               <div class="setting-inputs">
                 <div class="setting-field">
                   <label>Full Fee (₹)</label>
-                  <input type="number" min="0" step="50" ${attr} data-set-field="fullFee" value="${cfg.fullFee}" class="tabular-nums" />
+                  <input type="number" min="0" step="50" value="${cfg.fullFee}" ${attr} data-set-field="fullFee" class="tabular-nums" />
                 </div>
                 <div class="setting-field">
                   <label>Basic Fee (₹)</label>
-                  <input type="number" min="0" step="50" ${attr} data-set-field="basicFee" value="${cfg.basicFee}" class="tabular-nums" />
+                  <input type="number" min="0" step="50" value="${cfg.basicFee}" ${attr} data-set-field="basicFee" class="tabular-nums" />
                 </div>
                 <div class="setting-field">
                   <label>Maint (₹)</label>
-                  <input type="number" min="0" step="50" ${attr} data-set-field="maintFee" value="${cfg.maintFee}" class="tabular-nums" />
+                  <input type="number" min="0" step="50" value="${cfg.maintFee}" ${attr} data-set-field="maintFee" class="tabular-nums" />
                 </div>
                 <div class="setting-field">
                   <label>Tax (₹)</label>
-                  <input type="number" min="0" step="50" ${attr} data-set-field="taxFee" value="${cfg.taxFee}" class="tabular-nums" />
+                  <input type="number" min="0" step="50" value="${cfg.taxFee}" ${attr} data-set-field="taxFee" class="tabular-nums" />
                 </div>
               </div>
             </div>
           `;
         }).join('');
+      }
+
+      function renderCourseTeachersBlock() {
+        const grid = document.getElementById('course-teachers-grid');
+        if (!grid) return;
+
+        grid.innerHTML = DEFAULT_COURSES.map(c => {
+          const rawName = (state.teacherNames && state.teacherNames[c.id]) || '';
+          const labelTitle = getCourseTeacherLabel(c.id);
+          const badge = c.defaultEmp === 'percent' ? '% Basis' : 'Salaried';
+          const ph = c.id === 'guitar' ? 'Type name (e.g. Sumit)' : 'Type teacher name...';
+          return `
+            <div class="teacher-dir-item">
+              <div class="teacher-dir-label">
+                <span>${labelTitle}</span>
+                <span class="teacher-dir-sub">${badge}</span>
+              </div>
+              <input
+                type="text"
+                class="teacher-dir-input"
+                data-dir-teacher="${c.id}"
+                value="${escapeHtml(rawName)}"
+                placeholder="${ph}"
+                aria-label="${labelTitle} Teacher Name"
+              />
+            </div>
+          `;
+        }).join('');
+      }
+
+      function syncTeacherNameUI(courseId, newName) {
+        const displayName = getTeacherDisplayName(courseId);
+        document.querySelectorAll(`[data-course-teacher-tag="${courseId}"]`).forEach(el => {
+          el.textContent = displayName;
+        });
+        const dirInp = document.querySelector(`input[data-dir-teacher="${courseId}"]`);
+        if (dirInp && dirInp !== document.activeElement) {
+          dirInp.value = newName;
+        }
+        const payoutInp = document.querySelector(`input[data-teacher-name="${courseId}"]`);
+        if (payoutInp && payoutInp !== document.activeElement) {
+          payoutInp.value = newName;
+        }
       }
 
       function buildTeacherPctOptions(selectedVal) {
@@ -3050,6 +3386,7 @@
           const metaPillText = c.id === 'guitar'
             ? `Adv ₹${cfg.fullFee} · Elec ₹${state.guitarVariantSettings.electric.fullFee}`
             : `Full ₹${cfg.fullFee} · Basic ₹${cfg.basicFee}`;
+          const tDisplayName = getTeacherDisplayName(c.id);
 
           return `
             <div class="course-block">
@@ -3059,6 +3396,7 @@
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                   </span>
                   <span class="course-name">${c.name}</span>
+                  <span class="course-teacher-pill" data-course-teacher-tag="${c.id}">${escapeHtml(tDisplayName)}</span>
                   <span class="course-meta-pill tabular-nums">${metaPillText}</span>
                 </div>
 
@@ -3078,171 +3416,6 @@
 
               <div class="student-drawer ${isOpen ? 'open' : ''}">
                 ${drawerInner}
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-
-      // =========================================================
-      // TEACHER PAYOUTS (% BASIS) DATA & UI PANEL
-      // =========================================================
-      function getPercentTeacherData(courseId) {
-        const courseDef = getCourseDef(courseId);
-        const teacherName = (state.teacherNames && state.teacherNames[courseId]) || `${courseDef.name} Teacher`;
-
-        const existingList = (state.existingStudents && state.existingStudents[courseId] ? state.existingStudents[courseId] : [])
-          .map(stu => ({ stu, m: calcStudent(courseId, { ...stu, empType: 'percent' }) }));
-
-        const newList = (state.admissions[courseId] || [])
-          .filter(stu => stu.empType !== 'salaried')
-          .map(stu => ({ stu, m: calcStudent(courseId, stu) }));
-
-        const cancelList = (state.cancellations[courseId] || [])
-          .filter(stu => stu.empType !== 'salaried')
-          .map(stu => ({ stu, m: calcStudent(courseId, stu) }));
-
-        const existingPayout = round2(existingList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
-        const newPayout = round2(newList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
-        const cancelPayout = round2(cancelList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
-        // 1-Month Arrears Rule: New Admissions are deferred to next month's payout
-        const netPayout = round2(existingPayout - cancelPayout);
-        const existingDiscHit = round2(existingList.reduce((acc, x) => acc + x.m.teacherHit, 0));
-        const newDiscHit = round2(newList.reduce((acc, x) => acc + x.m.teacherHit, 0));
-        const totalDiscHit = round2(existingDiscHit);
-        const grossBasic = round2(existingList.reduce((acc, x) => acc + x.m.basicFee, 0));
-        const netBasic = round2(existingList.reduce((acc, x) => acc + x.m.netBasic, 0));
-
-        return {
-          courseId,
-          courseName: courseDef.name,
-          teacherName,
-          existingList,
-          newList,
-          cancelList,
-          existingPayout,
-          newPayout,
-          cancelPayout,
-          netPayout,
-          existingDiscHit,
-          newDiscHit,
-          totalDiscHit,
-          grossBasic,
-          netBasic
-        };
-      }
-
-      function getActivePercentCourses() {
-        return DEFAULT_COURSES.filter(c => {
-          const data = getPercentTeacherData(c.id);
-          return c.defaultEmp === 'percent' || data.existingList.length > 0 || data.newList.length > 0 || data.cancelList.length > 0;
-        });
-      }
-
-      function renderTeacherPayoutsSection() {
-        const grid = document.getElementById('teacher-payouts-grid');
-        if (!grid) return;
-        const courses = getActivePercentCourses();
-
-        grid.innerHTML = courses.map(c => {
-          const d = getPercentTeacherData(c.id);
-          const cfg = state.courseSettings[c.id] || getCourseDef(c.id);
-          const isOpen = Boolean(state.expandedExisting && state.expandedExisting[c.id]);
-          const netCls = d.netPayout > 0 ? 'text-gain' : d.netPayout < 0 ? 'text-loss' : '';
-
-          const existingRowsHtml = d.existingList.length === 0
-            ? `<div style="font-size:0.74rem; color:var(--muted); padding:6px 4px;">No existing continuing students added for ${c.name} yet. Click <strong>+ Add Existing</strong> above.</div>`
-            : d.existingList.map(({ stu, m }, idx) => {
-                const isCustomT = !TEACHER_PCT_PRESETS.includes(Number(stu.teacherPct));
-                const isCustomD = !DISCOUNT_PCT_PRESETS.includes(Number(stu.discPct));
-                return `
-                  <div class="existing-stu-card">
-                    <div class="existing-stu-top">
-                      <input type="text" class="text-input" placeholder="Existing Student #${idx + 1} Name" value="${escapeHtml(stu.name)}" data-ex-text="name" data-ex-course="${c.id}" data-ex-id="${stu.id}" />
-                      <div class="stu-phone-wrap">
-                        <input type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit Mobile" value="${escapeHtml(stu.phone || '')}" data-ex-phone="phone" data-ex-course="${c.id}" data-ex-id="${stu.id}" class="tabular-nums" />
-                        <span class="phone-count-pill tabular-nums ${(stu.phone || '').length === 10 ? 'valid' : ''}">${(stu.phone || '').length}/10</span>
-                      </div>
-                      <input type="text" class="text-input note" placeholder="Batch / Old Fee Note" value="${escapeHtml(stu.note)}" data-ex-text="note" data-ex-course="${c.id}" data-ex-id="${stu.id}" />
-                      <button type="button" class="remove-row-btn" title="Remove existing student" aria-label="Remove existing student" data-del-ex="${c.id}:${stu.id}">&times;</button>
-                    </div>
-                    <div class="existing-stu-bottom tabular-nums">
-                      <div class="ctrl-inline">
-                        ${c.id === 'guitar' ? `
-                          <select class="select-input tabular-nums" data-ex-field="subType" data-ex-course="${c.id}" data-ex-id="${stu.id}" aria-label="Guitar Category">
-                            ${buildGuitarTypeOptions(stu.subType)}
-                          </select>
-                        ` : ''}
-                        <span style="font-size:0.7rem; color:var(--muted); font-weight:700;">Teacher %:</span>
-                        <select class="select-input tabular-nums" data-ex-field="teacherPct" data-ex-course="${c.id}" data-ex-id="${stu.id}">
-                          ${buildTeacherPctOptions(stu.teacherPct)}
-                        </select>
-                        ${isCustomT ? `<span class="custom-pct-wrap"><input type="number" min="0" max="100" step="1" value="${stu.teacherPct}" data-ex-custom="teacherPct" data-ex-course="${c.id}" data-ex-id="${stu.id}" class="tabular-nums" /><span>%</span></span>` : ''}
-                        <span style="font-size:0.7rem; color:var(--muted); font-weight:700; margin-left:4px;">Disc %:</span>
-                        <select class="select-input tabular-nums" data-ex-field="discPct" data-ex-course="${c.id}" data-ex-id="${stu.id}">
-                          ${buildDiscPctOptions(stu.discPct)}
-                        </select>
-                        ${isCustomD ? `<span class="custom-pct-wrap"><input type="number" min="0" max="100" step="1" value="${stu.discPct}" data-ex-custom="discPct" data-ex-course="${c.id}" data-ex-id="${stu.id}" class="tabular-nums" /><span>%</span></span>` : ''}
-                      </div>
-                      <div style="text-align:right;">
-                        <span style="font-size:0.71rem; color:var(--muted);">Basic ${formatINR(m.netBasic)} × ${m.teacherPct}% = </span>
-                        <strong class="text-gain" style="font-size:0.88rem;">${formatINR(m.teacherPayout, true)}</strong>
-                      </div>
-                    </div>
-                  </div>
-                `;
-              }).join('');
-
-          return `
-            <div class="payout-teacher-card">
-              <div class="payout-card-top">
-                <div class="payout-name-row">
-                  <span class="kpi-badge" style="color:var(--text); font-weight:800;">${c.name}</span>
-                  <input type="text" class="teacher-name-input" data-teacher-name="${c.id}" value="${escapeHtml(d.teacherName)}" placeholder="Teacher Name" aria-label="${c.name} Teacher Name" />
-                </div>
-                <button type="button" class="btn btn-sm btn-pdf" data-open-teacher-pdf="${c.id}">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                    <rect x="6" y="14" width="12" height="8"></rect>
-                  </svg>
-                  Print / PDF Slip
-                </button>
-              </div>
-
-              <!-- Existing Students Bar (Not Added to P&L) -->
-              <div class="existing-bar tabular-nums">
-                <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" data-toggle-ex="${c.id}">
-                  <span class="chevron-btn ${isOpen ? 'open' : ''}" style="width:22px; height:22px;">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                  </span>
-                  <div>
-                    <div style="font-size:0.78rem; font-weight:800; color:var(--text);">Existing Students (${d.existingList.length}) · <span class="text-gain">${formatINR(d.existingPayout, true)}</span></div>
-                    <div style="font-size:0.66rem; color:var(--muted);">Continuing from prev months · Basic ₹${cfg.basicFee} · Not in P&amp;L</div>
-                  </div>
-                </div>
-                <div class="stepper">
-                  <button type="button" class="step-btn" data-pop-ex="${c.id}" title="Remove last existing student">−</button>
-                  <span class="step-count">${d.existingList.length}</span>
-                  <button type="button" class="step-btn add-btn" data-add-ex="${c.id}">+ Add Existing</button>
-                </div>
-              </div>
-
-              <div class="existing-drawer ${isOpen ? 'open' : ''}">
-                ${existingRowsHtml}
-              </div>
-
-              <div class="payout-stats tabular-nums">
-                <div style="font-size:0.74rem; color:var(--muted); line-height:1.5;">
-                  Existing (Payable): <strong class="text-gain">${d.existingList.length} (${formatINR(d.existingPayout, true)})</strong> ·
-                  Canceled: <strong class="text-loss">−${d.cancelList.length} (${d.cancelPayout > 0 ? `−${formatINR(d.cancelPayout)}` : '₹0'})</strong><br/>
-                  Next Month (New Admissions — Excluded): <strong class="text-amber">${d.newList.length} (${formatINR(d.newPayout)} deferred)</strong>
-                  ${d.totalDiscHit > 0 ? ` · Teacher Disc: <strong class="text-amber">−${formatINR(d.totalDiscHit)}</strong>` : ''}
-                </div>
-                <div style="text-align:right;">
-                  <div style="font-size:0.68rem; color:var(--muted); text-transform:uppercase; font-weight:700;">Payable This Month</div>
-                  <div class="${netCls}" style="font-size:1.08rem; font-weight:800;">${formatINR(d.netPayout, true)}</div>
-                </div>
               </div>
             </div>
           `;
@@ -3359,6 +3532,7 @@
         if (shouldSave) saveState();
         renderCalendarUI();
         renderSettingsPanel();
+        renderCourseTeachersBlock();
         renderSection('admissions');
         renderSection('cancellations');
         renderDashboard();
@@ -3394,9 +3568,10 @@
           cGrandHs = round2(cGrandHs + netHs);
 
           const hsCls = netHs > 0 ? 'pr-gain' : netHs < 0 ? 'pr-loss' : '';
+          const tLabel = getTeacherDisplayName(c.id);
           return `
             <tr>
-              <td style="font-weight:700;">${c.name}</td>
+              <td><div style="font-weight:700;">${c.name}</div><div style="font-size:9px; color:#64748b;">${escapeHtml(tLabel)}</div></td>
               <td class="pr-num pr-gain">+${n.count}</td>
               <td class="pr-num pr-loss">−${x.count}</td>
               <td class="pr-num" style="font-weight:700;">${netStu > 0 ? `+${netStu}` : netStu < 0 ? `−${Math.abs(netStu)}` : '0'}</td>
@@ -3687,8 +3862,8 @@
           <div style="${isMulti ? 'page-break-after: always; break-after: page; margin-bottom: 24px;' : ''}">
             <div class="pr-header">
               <div>
-                <div class="pr-brand">HS MUSIC <span>— Teacher Payout Slip (% Basis)</span></div>
-                <div class="pr-sub">Preetam Nagar, Prayagraj · Student-Wise Commission Statement</div>
+                <div class="pr-brand">HS MUSIC <span>— Teacher Payout Slip</span></div>
+                <div class="pr-sub">Preetam Nagar, Prayagraj · Monthly Salary &amp; Student-Wise Commission Statement</div>
               </div>
               <div class="pr-meta">
                 <div class="pr-period">${escapeHtml(d.teacherName)} (${escapeHtml(d.courseName)})</div>
@@ -3699,7 +3874,14 @@
             </div>
 
             <div class="pr-section-title">1. Payout Summary — ${escapeHtml(d.teacherName)}</div>
-            <div class="pr-bridge-grid" style="grid-template-columns: repeat(4, 1fr);">
+            <div class="pr-bridge-grid" style="grid-template-columns: repeat(${d.fixedSalary > 0 ? 5 : 4}, 1fr);">
+              ${d.fixedSalary > 0 ? `
+                <div class="pr-bridge-card">
+                  <div class="pr-card-label">Fixed Salary</div>
+                  <div class="pr-card-val pr-gain">${formatINR(d.fixedSalary)}</div>
+                  <div class="pr-card-sub">Monthly base salary</div>
+                </div>
+              ` : ''}
               <div class="pr-bridge-card">
                 <div class="pr-card-label">Existing Students (Payable)</div>
                 <div class="pr-card-val pr-gain">${formatINR(d.existingPayout, true)}</div>
@@ -3718,7 +3900,7 @@
               <div class="pr-bridge-card highlight">
                 <div class="pr-card-label">Payable This Month</div>
                 <div class="pr-card-val">${formatINR(d.netPayout, true)}</div>
-                <div class="pr-card-sub">Existing − Canceled (${formatMonthShort(state.year, state.month)})</div>
+                <div class="pr-card-sub">${d.fixedSalary > 0 ? 'Salary + Existing − Canceled' : 'Existing − Canceled'} (${formatMonthShort(state.year, state.month)})</div>
               </div>
             </div>
 
@@ -3767,7 +3949,7 @@
         const activeCourses = getActivePercentCourses();
         let html = `
           <option value="pnl">Complete Monthly P&amp;L Report</option>
-          <option value="all-teachers">All % Basis Teachers (Combined Payout PDF)</option>
+          <option value="all-teachers">All Teachers (Combined Payout PDF)</option>
         `;
         activeCourses.forEach(c => {
           const d = getPercentTeacherData(c.id);
@@ -3787,7 +3969,7 @@
           if (titleEl) titleEl.textContent = `Complete A4 P&L Report — ${state.monthLabel}`;
           reportEl.innerHTML = buildPrintReportHTML();
         } else if (currentPrintReportKey === 'all-teachers') {
-          if (titleEl) titleEl.textContent = `All % Basis Teachers Payout Slips — ${state.monthLabel}`;
+          if (titleEl) titleEl.textContent = `All Teachers Payout Slips — ${state.monthLabel}`;
           reportEl.innerHTML = buildTeacherPayoutPDFHTML('all-teachers');
         } else if (currentPrintReportKey.startsWith('teacher:')) {
           const courseId = currentPrintReportKey.split(':')[1];
@@ -4006,8 +4188,9 @@
           cGrandTeacher = round2(cGrandTeacher + netTeacher);
           cGrandDisc = round2(cGrandDisc + n.discTotal);
           cGrandHs = round2(cGrandHs + netHs);
+          const tLabel = getTeacherDisplayName(c.id);
           return [
-            c.name,
+            `${c.name}\n(${tLabel})`,
             `+${n.count}`,
             `-${x.count}`,
             netStu > 0 ? `+${netStu}` : `${netStu}`,
@@ -4146,19 +4329,24 @@
 
           let y = drawPdfHeader(
             doc,
-            'Teacher Payout Slip (% Basis)',
+            'Teacher Payout Slip',
             `${d.teacherName} (${d.courseName})`,
             `Preetam Nagar, Prayagraj | ${state.monthLabel} (${getMonthDateRange(state.year, state.month)})`,
             `Basic: ${formatPdfINR(cfg.basicFee)} / Full: ${formatPdfINR(cfg.fullFee)} | Generated: ${nowStr}`
           );
 
           y = drawPdfSectionTitle(doc, y, `1. Payout Summary - ${d.teacherName}`);
-          y = drawPdfCardGrid(doc, y, [
+          const payoutCards = [];
+          if (d.fixedSalary > 0) {
+            payoutCards.push({ label: 'Fixed Salary', value: formatPdfINR(d.fixedSalary), sub: 'Monthly base salary', tone: 'gain' });
+          }
+          payoutCards.push(
             { label: 'Existing (Payable)', value: formatPdfINR(d.existingPayout, true), sub: `${d.existingList.length} continuing students`, tone: 'gain' },
             { label: 'Canceled Deductions', value: d.cancelPayout > 0 ? `-${formatPdfINR(d.cancelPayout)}` : 'Rs. 0', sub: `${d.cancelList.length} canceled`, tone: 'loss' },
             { label: 'New (Next Month)', value: formatPdfINR(d.newPayout), sub: `${d.newList.length} deferred (excluded)`, tone: 'amber' },
-            { label: 'Payable This Month', value: formatPdfINR(d.netPayout, true), sub: `Existing - Canceled (${formatMonthShort(state.year, state.month)})`, highlight: true }
-          ], isLand ? 4 : 2);
+            { label: 'Payable This Month', value: formatPdfINR(d.netPayout, true), sub: `${d.fixedSalary > 0 ? 'Salary + Existing - Canceled' : 'Existing - Canceled'} (${formatMonthShort(state.year, state.month)})`, highlight: true }
+          );
+          y = drawPdfCardGrid(doc, y, payoutCards, isLand ? payoutCards.length : (payoutCards.length > 4 ? 3 : 2));
 
           function addTeacherTable(list, isGain, title, emptyLabel) {
             y = drawPdfSectionTitle(doc, y, title);
@@ -4425,7 +4613,7 @@
           ['Net Profit Change', s.netDelta],
           ['Current Month Profit', s.currentProfit],
           [],
-          ['Section', 'Course', 'Student Name', 'Mobile (10-digit)', 'Details/Note', 'Teacher Type', 'Teacher %', 'Full Fee', 'Discount %', 'Net Fee', 'Teacher Share', 'Tax Reserve', 'HS Music Part']
+          ['Section', 'Course', 'Teacher Name', 'Student Name', 'Mobile (10-digit)', 'Details/Note', 'Teacher Type', 'Teacher %', 'Full Fee', 'Discount %', 'Net Fee', 'Teacher Share', 'Tax Reserve', 'HS Music Part']
         ];
 
         ['admissions', 'cancellations'].forEach(section => {
@@ -4437,6 +4625,7 @@
               rows.push([
                 label,
                 getStudentCourseLabel(c.id, stu),
+                getTeacherDisplayName(c.id),
                 stu.name || '(Unnamed)',
                 stu.phone || '',
                 stu.note || '',
@@ -4525,6 +4714,7 @@
                 month: Number(sObj.month) || def.month,
                 recordingStudioIncome: Math.max(0, Number(sObj.recordingStudioIncome) || 0),
                 teacherNames: { ...def.teacherNames, ...(sObj.teacherNames || {}) },
+                teacherSalaries: { ...def.teacherSalaries, ...(sObj.teacherSalaries || {}) },
                 courseSettings: { ...def.courseSettings, ...(sObj.courseSettings || {}) },
                 guitarVariantSettings: {
                   electric: { ...def.guitarVariantSettings.electric, ...((sObj.guitarVariantSettings && sObj.guitarVariantSettings.electric) || {}) }
@@ -4776,6 +4966,19 @@
         });
 
         // Teacher Payouts Panel Events (Name edit, Existing Students & Individual PDF button)
+        const dirGrid = document.getElementById('course-teachers-grid');
+        if (dirGrid) {
+          dirGrid.addEventListener('input', (e) => {
+            const inp = e.target.closest('input[data-dir-teacher]');
+            if (!inp) return;
+            const courseId = inp.dataset.dirTeacher;
+            if (!state.teacherNames) state.teacherNames = {};
+            state.teacherNames[courseId] = inp.value;
+            saveState();
+            syncTeacherNameUI(courseId, inp.value);
+          });
+        }
+
         const payoutGrid = document.getElementById('teacher-payouts-grid');
         payoutGrid.addEventListener('input', (e) => {
           const inp = e.target.closest('input[data-teacher-name]');
@@ -4784,21 +4987,42 @@
             if (!state.teacherNames) state.teacherNames = {};
             state.teacherNames[courseId] = inp.value;
             saveState();
+            syncTeacherNameUI(courseId, inp.value);
             return;
           }
 
-          const phoneInp = e.target.closest('input[data-ex-phone]');
-          if (phoneInp) {
-            const digitsOnly = phoneInp.value.replace(/\D/g, '').slice(0, 10);
-            if (phoneInp.value !== digitsOnly) phoneInp.value = digitsOnly;
-            const courseId = phoneInp.dataset.exCourse;
-            const stuId = phoneInp.dataset.exId;
+          const salInp = e.target.closest('input[data-teacher-salary]');
+          if (salInp) {
+            const courseId = salInp.dataset.teacherSalary;
+            if (!state.teacherSalaries) state.teacherSalaries = {};
+            state.teacherSalaries[courseId] = Math.max(0, Number(salInp.value) || 0);
+            saveState();
+            const d = getPercentTeacherData(courseId);
+            const card = payoutGrid.querySelector(`[data-payout-card="${courseId}"]`);
+            if (card) {
+              const salSum = card.querySelector(`[data-salary-summary="${courseId}"]`);
+              if (salSum) salSum.textContent = formatINR(d.fixedSalary);
+              const payEl = card.querySelector(`[data-payable-val="${courseId}"]`);
+              if (payEl) {
+                payEl.textContent = formatINR(d.netPayout, true);
+                payEl.className = d.netPayout > 0 ? 'text-gain' : d.netPayout < 0 ? 'text-loss' : '';
+              }
+            }
+            return;
+          }
+
+          const exPhone = e.target.closest('input[data-ex-phone]');
+          if (exPhone) {
+            const digitsOnly = exPhone.value.replace(/\D/g, '').slice(0, 10);
+            if (exPhone.value !== digitsOnly) exPhone.value = digitsOnly;
+            const courseId = exPhone.dataset.exCourse;
+            const stuId = exPhone.dataset.exId;
             const stu = (state.existingStudents[courseId] || []).find(s => s.id === stuId);
             if (stu) {
               stu.phone = digitsOnly;
               saveState();
             }
-            const pill = phoneInp.parentElement.querySelector('.phone-count-pill');
+            const pill = exPhone.parentElement.querySelector('.phone-count-pill');
             if (pill) {
               pill.textContent = `${digitsOnly.length}/10`;
               pill.classList.toggle('valid', digitsOnly.length === 10);
@@ -4992,11 +5216,15 @@
           state.lastProfit = 0;
           state.recordingStudioIncome = 15000;
           state.mode = 'cash';
+          state.teacherNames.guitar = 'Sumit';
 
           state.admissions.guitar = [
             { id: 'demo-g1', name: 'Rahul Verma', phone: '9876543210', note: 'Evening Batch (Full Fee)', subType: 'advance', empType: 'percent', teacherPct: 50, discPct: 0 },
             { id: 'demo-g2', name: 'Aman Singh', phone: '9123456789', note: '10% Referral Discount', subType: 'advance', empType: 'percent', teacherPct: 50, discPct: 10 },
             { id: 'demo-g3', name: 'Karan Yadav', phone: '9839556677', note: 'Lead Batch (Full Fee)', subType: 'electric', empType: 'percent', teacherPct: 50, discPct: 0 }
+          ];
+          state.admissions.beginners_guitar = [
+            { id: 'demo-bg1', name: 'Arjun Patel', phone: '9812345670', note: 'Beginner Batch (Full Fee)', subType: '', empType: 'percent', teacherPct: 50, discPct: 0 }
           ];
           state.admissions.piano = [
             { id: 'demo-p1', name: 'Sneha Gupta', phone: '9988776655', note: 'Morning Batch', subType: '', empType: 'salaried', teacherPct: 0, discPct: 0 }
@@ -5011,15 +5239,20 @@
             { id: 'demo-eg1', name: 'Vikram Tiwari', phone: '9839011223', note: 'Old Batch (Continuing)', subType: 'advance', empType: 'percent', teacherPct: 50, discPct: 0 },
             { id: 'demo-eg2', name: 'Ananya Mishra', phone: '9450112233', note: 'Old Batch (Electric)', subType: 'electric', empType: 'percent', teacherPct: 50, discPct: 0 }
           ];
+          state.existingStudents.beginners_guitar = [
+            { id: 'demo-ebg1', name: 'Devansh Pandey', phone: '9795112233', note: 'Beginner Continuing Batch', subType: '', empType: 'percent', teacherPct: 50, discPct: 0 }
+          ];
           state.existingStudents.dance = [
             { id: 'demo-ed1', name: 'Kavya Srivastava', phone: '9621009988', note: 'Evening Continuing Batch', subType: '', empType: 'percent', teacherPct: 50, discPct: 0 }
           ];
 
           state.expanded.admissions.guitar = true;
+          state.expanded.admissions.beginners_guitar = true;
           state.expanded.admissions.piano = true;
           state.expanded.admissions.dance = true;
           state.expanded.cancellations.guitar = true;
           state.expandedExisting.guitar = true;
+          state.expandedExisting.beginners_guitar = true;
           state.expandedExisting.dance = true;
 
           document.getElementById('last-profit-input').value = state.lastProfit;
@@ -5145,6 +5378,7 @@
                 monthLabel: formatMonthFull(targetY, targetM),
                 recordingStudioIncome: Math.max(0, Number(snap.recordingStudioIncome) || 0),
                 teacherNames: { ...def.teacherNames, ...(snap.teacherNames || {}) },
+                teacherSalaries: { ...def.teacherSalaries, ...(snap.teacherSalaries || {}) },
                 courseSettings: { ...def.courseSettings, ...(snap.courseSettings || {}) },
                 guitarVariantSettings: {
                   electric: { ...def.guitarVariantSettings.electric, ...((snap.guitarVariantSettings && snap.guitarVariantSettings.electric) || {}) }
