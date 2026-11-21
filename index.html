@@ -2239,9 +2239,30 @@
     <section class="section-card" aria-label="Saved Month History">
       <div class="section-header">
         <div>
-          <h2 class="section-title">Saved Month History</h2>
-          <p class="section-sub">Snapshots are saved locally in your browser and linked with the calendar picker</p>
+          <h2 class="section-title">Saved Month History &amp; Backup</h2>
+          <p class="section-sub">Snapshots save in your browser — download a Backup (.json) file to keep previous months 100% safe across devices</p>
         </div>
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+          <button id="btn-backup-json" type="button" class="btn btn-sm btn-emerald">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download Backup (.json)
+          </button>
+          <button id="btn-restore-json" type="button" class="btn btn-sm btn-sky">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            Restore Backup
+          </button>
+          <input id="restore-file-input" type="file" accept=".json,application/json" style="display:none;" />
+          <span id="history-count-badge" class="kpi-badge tabular-nums">0 saved</span>
+        </div>
+      </div>
         <span id="history-count-badge" class="kpi-badge tabular-nums">0 saved</span>
       </div>
       <div class="table-scroll">
@@ -4449,6 +4470,93 @@
       }
 
       // =========================================================
+      // FULL BACKUP & RESTORE (.JSON) — SAFE ACROSS DEVICES
+      // =========================================================
+      function exportFullBackupJSON() {
+        try {
+          const payload = {
+            app: 'HS-Music-Monthly-Profit-Bridge',
+            version: 6,
+            exportedAt: new Date().toISOString(),
+            state,
+            historyList
+          };
+          const jsonStr = JSON.stringify(payload, null, 2);
+          const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const todayTag = new Date().toISOString().slice(0, 10);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `HS-Music-Full-Backup-${todayTag}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
+          showToast(`Backup downloaded (${historyList.length} saved month${historyList.length === 1 ? '' : 's'} included)!`, 'success');
+        } catch (err) {
+          console.error('Backup export error:', err);
+          showToast('Could not create backup file.', 'warning');
+        }
+      }
+
+      function importFullBackupJSON(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const parsed = JSON.parse(String(ev.target.result || ''));
+            if (!parsed || (typeof parsed.state !== 'object' && !Array.isArray(parsed.historyList))) {
+              showToast('Invalid backup file. Please choose a valid HS Music .json backup.', 'warning');
+              return;
+            }
+
+            if (Array.isArray(parsed.historyList)) {
+              historyList = parsed.historyList;
+              saveHistory();
+            }
+
+            if (parsed.state && typeof parsed.state === 'object') {
+              const sObj = parsed.state;
+              const def = createDefaultState(sObj.year, sObj.month);
+              state = {
+                ...def,
+                ...sObj,
+                year: Number(sObj.year) || def.year,
+                month: Number(sObj.month) || def.month,
+                recordingStudioIncome: Math.max(0, Number(sObj.recordingStudioIncome) || 0),
+                teacherNames: { ...def.teacherNames, ...(sObj.teacherNames || {}) },
+                courseSettings: { ...def.courseSettings, ...(sObj.courseSettings || {}) },
+                guitarVariantSettings: {
+                  electric: { ...def.guitarVariantSettings.electric, ...((sObj.guitarVariantSettings && sObj.guitarVariantSettings.electric) || {}) }
+                },
+                admissions: { ...def.admissions, ...(sObj.admissions || {}) },
+                cancellations: { ...def.cancellations, ...(sObj.cancellations || {}) },
+                existingStudents: { ...def.existingStudents, ...(sObj.existingStudents || {}) },
+                expanded: {
+                  admissions: { ...def.expanded.admissions, ...((sObj.expanded && sObj.expanded.admissions) || {}) },
+                  cancellations: { ...def.expanded.cancellations, ...((sObj.expanded && sObj.expanded.cancellations) || {}) }
+                },
+                expandedExisting: { ...def.expandedExisting, ...(sObj.expandedExisting || {}) }
+              };
+              migrateLegacyElectricGuitar(state, sObj);
+              state.monthLabel = formatMonthFull(state.year, state.month);
+              popoverYear = state.year;
+              document.getElementById('last-profit-input').value = state.lastProfit;
+              document.getElementById('recording-studio-input').value = state.recordingStudioIncome;
+            }
+
+            renderHistory();
+            fullRender(true);
+            showToast(`Backup restored! ${historyList.length} saved month${historyList.length === 1 ? '' : 's'} loaded.`, 'success');
+          } catch (err) {
+            console.error('Backup restore error:', err);
+            showToast('Failed to read backup file. Make sure it is a valid .json file.', 'warning');
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      // =========================================================
       // EVENT LISTENERS
       // =========================================================
       function bindSectionEvents(section) {
@@ -5075,6 +5183,18 @@
 
         // Export CSV
         document.getElementById('btn-export-csv').addEventListener('click', exportCSV);
+
+        // Full Backup (.json) & Restore
+        document.getElementById('btn-backup-json').addEventListener('click', exportFullBackupJSON);
+        const restoreInput = document.getElementById('restore-file-input');
+        document.getElementById('btn-restore-json').addEventListener('click', () => {
+          restoreInput.value = '';
+          restoreInput.click();
+        });
+        restoreInput.addEventListener('change', (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (file) importFullBackupJSON(file);
+        });
       }
 
       window.addEventListener('DOMContentLoaded', () => {
