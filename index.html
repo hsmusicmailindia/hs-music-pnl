@@ -6,6 +6,7 @@
   <title>HS Music — Monthly Profit Bridge (Student-Wise, Calendar &amp; PDF)</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
   <style id="dynamic-page-orientation">
     @page { size: A4 portrait; margin: 10mm; }
   </style>
@@ -39,6 +40,115 @@
       --radius-lg: 16px;
       --radius-md: 12px;
       --radius-sm: 8px;
+    }
+
+    /* =========================================================
+       BRIGHT / LIGHT THEME OVERRIDES
+       ========================================================= */
+    html[data-theme="light"] {
+      --bg: #f1f5f9;
+      --bg-subtle: #f8fafc;
+      --card: #ffffff;
+      --card-hover: #f1f5f9;
+      --border: #cbd5e1;
+      --border-strong: #94a3b8;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #e11d48;
+      --accent-hover: #be123c;
+      --emerald: #047857;
+      --emerald-bg: rgba(4, 120, 87, 0.1);
+      --emerald-border: rgba(4, 120, 87, 0.32);
+      --rose: #be123c;
+      --rose-bg: rgba(190, 18, 60, 0.1);
+      --rose-border: rgba(190, 18, 60, 0.32);
+      --amber: #b45309;
+      --amber-bg: rgba(180, 83, 9, 0.1);
+      --amber-border: rgba(180, 83, 9, 0.32);
+      --sky: #0369a1;
+      --sky-bg: rgba(3, 105, 161, 0.1);
+      --sky-border: rgba(3, 105, 161, 0.32);
+    }
+
+    html[data-theme="light"] .app-header {
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    html[data-theme="light"] .hero-card {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    html[data-theme="light"] .btn-pdf {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border-color: #0f172a;
+      color: #ffffff;
+    }
+
+    html[data-theme="light"] .btn-pdf:hover {
+      background: #1e293b;
+      border-color: #1e293b;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18);
+    }
+
+    /* Theme Slider Switch */
+    .theme-switch-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 10px 4px 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .theme-switch-wrap:hover {
+      border-color: var(--border-strong);
+    }
+
+    .theme-slider-track {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: #1e293b;
+      border: 1px solid var(--border-strong);
+      transition: background 0.22s ease;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+    }
+
+    html[data-theme="light"] .theme-slider-track {
+      background: #fde68a;
+      border-color: #f59e0b;
+    }
+
+    .theme-slider-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #f8fafc;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+      transform: translateX(0);
+      transition: transform 0.22s ease, background 0.22s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    html[data-theme="light"] .theme-slider-thumb {
+      transform: translateX(18px);
+      background: #f59e0b;
+    }
+
+    .theme-switch-label {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
     }
 
     *, *::before, *::after {
@@ -1494,6 +1604,51 @@
       border-top: 1px solid rgba(38, 44, 61, 0.65);
     }
 
+    .deduction-row-card {
+      background: var(--bg);
+      border: 1px solid var(--rose-border);
+      border-radius: 9px;
+      padding: 8px 10px;
+      display: grid;
+      grid-template-columns: 115px 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    @media (max-width: 560px) {
+      .deduction-row-card {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .deduction-amt-wrap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--rose-bg);
+      border: 1px solid var(--rose-border);
+      border-radius: 8px;
+      padding: 5px 8px;
+    }
+
+    .deduction-amt-wrap span {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--rose);
+    }
+
+    .deduction-amt-wrap input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--rose);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 800;
+      outline: none;
+      text-align: right;
+    }
+
     .modal-report-select {
       background: var(--bg);
       border: 1px solid var(--border-strong);
@@ -2042,6 +2197,14 @@
       </div>
 
       <div class="header-right">
+        <!-- Dark / Bright Theme Slide Switch -->
+        <button id="btn-theme-toggle" type="button" class="theme-switch-wrap" role="switch" aria-checked="false" aria-label="Toggle Dark and Bright Mode" title="Slide to switch between Dark Mode and Bright Mode">
+          <span class="theme-slider-track" aria-hidden="true">
+            <span class="theme-slider-thumb"></span>
+          </span>
+          <span id="theme-switch-label" class="theme-switch-label">Dark Mode</span>
+        </button>
+
         <!-- Interactive Month & Year Calendar Picker -->
         <div class="cal-wrapper" id="cal-wrapper">
           <div class="cal-bar">
@@ -2189,13 +2352,13 @@
     </section>
 
     <!-- =========================================================
-         COURSE TEACHERS DIRECTORY (SEPARATE TEACHER NAME PER COURSE)
+         COURSE TEACHERS DIRECTORY (NAME + SALARY vs % BASIS CONFIG)
          ========================================================= -->
     <section class="section-card" aria-label="Course Teachers Directory">
       <div class="section-header">
         <div>
-          <h2 class="section-title">Course Teachers</h2>
-          <p class="section-sub">Type each course teacher's name manually (e.g., Sumit for Advance / Electric Guitar) — auto-updates in Courses, Payout Slips &amp; PDF Reports</p>
+          <h2 class="section-title">Course Teachers &amp; Compensation Type</h2>
+          <p class="section-sub">Confirm here who is on <strong>Salaried</strong> (e.g. Piano, Singing — 100% fee goes to HS Music, ₹0 variable share) vs <strong>% Basis (50%)</strong> — applies automatically to Admissions, Payouts &amp; CSV Imports</p>
         </div>
         <span class="kpi-badge">5 Courses</span>
       </div>
@@ -2316,6 +2479,27 @@
           <p class="section-sub"><strong>1-Month Arrears Rule:</strong> Select payout month independently below. Enter <strong>Fixed Salary (₹)</strong> and/or <strong>Existing Students</strong> (excluded from P&amp;L). Save each month's complete Teacher Payout separately.</p>
         </div>
         <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+          <!-- Import CSV / Excel into Teacher Payout Existing Students -->
+          <div style="display:inline-flex; flex-wrap:wrap; align-items:center; gap:6px; background:var(--bg); border:1px solid var(--border-strong); border-radius:10px; padding:4px 6px;">
+            <select id="import-payout-course-select" class="select-input" aria-label="Select Course Teacher for CSV/Excel Import" title="Choose which course teacher's Existing Students list will receive the imported file">
+              <option value="guitar:advance">Advance Guitar</option>
+              <option value="guitar:electric">Electric Guitar</option>
+              <option value="beginners_guitar">Beginners Guitar</option>
+              <option value="piano">Piano</option>
+              <option value="singing">Singing</option>
+              <option value="dance">Dance</option>
+            </select>
+            <button id="btn-import-payout-file" type="button" class="btn btn-sm btn-sky" title="Import Eskooly CSV or Excel (.xlsx/.xls) into selected course's Existing Students">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              Import CSV / Excel
+            </button>
+            <input id="import-payout-file-input" type="file" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" style="display:none;" />
+          </div>
+
           <!-- Independent Teacher Payout Month & Year Calendar -->
           <div class="cal-wrapper" id="payout-cal-wrapper">
             <div class="cal-bar">
@@ -2529,7 +2713,6 @@
         return `₹${absStr}`;
       }
 
-      // ASCII-safe INR formatter for vector jsPDF (standard PDF fonts don't support Unicode ₹ or −)
       function formatPdfINR(val, withSign = false) {
         const num = round2(val || 0);
         const absStr = inrFmt.format(Math.abs(num));
@@ -2636,16 +2819,33 @@
         }).join('');
       }
 
+      function getCoursePayMode(courseId) {
+        if (state && state.teacherPayModes && state.teacherPayModes[courseId]) {
+          return state.teacherPayModes[courseId];
+        }
+        return getCourseDef(courseId).defaultEmp || 'percent';
+      }
+
+      function getCourseDefaultTeacherPct(courseId) {
+        const mode = getCoursePayMode(courseId);
+        if (mode === 'salaried') return 0;
+        if (state && state.teacherDefaultPcts && state.teacherDefaultPcts[courseId] !== undefined) {
+          return clamp(state.teacherDefaultPcts[courseId], 0, 100);
+        }
+        return getCourseDef(courseId).defaultTeacherPct || 50;
+      }
+
       function createStudent(courseId) {
-        const def = getCourseDef(courseId);
+        const payMode = getCoursePayMode(courseId);
+        const pct = getCourseDefaultTeacherPct(courseId);
         return {
           id: `stu-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
           name: '',
           phone: '',
           note: '',
           subType: courseId === 'guitar' ? 'advance' : '',
-          empType: def.defaultEmp,
-          teacherPct: def.defaultTeacherPct,
+          empType: payMode,
+          teacherPct: payMode === 'salaried' ? 0 : pct,
           discPct: 0
         };
       }
@@ -2677,12 +2877,27 @@
           mode: 'cash',
           lastProfit: 0,
           recordingStudioIncome: 0,
+          theme: 'dark',
           teacherNames: {
             guitar: '',
             beginners_guitar: '',
             piano: '',
             singing: '',
             dance: ''
+          },
+          teacherPayModes: {
+            guitar: 'percent',
+            beginners_guitar: 'percent',
+            piano: 'salaried',
+            singing: 'salaried',
+            dance: 'percent'
+          },
+          teacherDefaultPcts: {
+            guitar: 50,
+            beginners_guitar: 50,
+            piano: 0,
+            singing: 0,
+            dance: 50
           },
           teacherSalaries: {
             guitar: 0,
@@ -2696,11 +2911,13 @@
           admissions: makeEmptyCourseMap(),
           cancellations: makeEmptyCourseMap(),
           existingStudents: makeEmptyCourseMap(),
+          teacherDeductions: makeEmptyCourseMap(),
           expanded: {
             admissions: makeExpandedMap(false),
             cancellations: makeExpandedMap(false)
           },
-          expandedExisting: makeExpandedMap(false)
+          expandedExisting: makeExpandedMap(false),
+          expandedDeductions: makeExpandedMap(false)
         };
       }
 
@@ -2761,7 +2978,6 @@
           if (targetState[bucket] && targetState[bucket].electric_guitar) {
             delete targetState[bucket].electric_guitar;
           }
-          // Normalize any legacy 'regular' or blank guitar subType to 'advance'
           if (targetState[bucket] && Array.isArray(targetState[bucket].guitar)) {
             targetState[bucket].guitar = targetState[bucket].guitar.map(stu => ({
               ...stu,
@@ -2785,7 +3001,10 @@
               payoutYear: Number(parsed.payoutYear) || Number(parsed.year) || def.year,
               payoutMonth: Number(parsed.payoutMonth) || Number(parsed.month) || def.month,
               recordingStudioIncome: Math.max(0, Number(parsed.recordingStudioIncome) || 0),
+              theme: parsed.theme === 'light' ? 'light' : 'dark',
               teacherNames: { ...def.teacherNames, ...(parsed.teacherNames || {}) },
+              teacherPayModes: { ...def.teacherPayModes, ...(parsed.teacherPayModes || {}) },
+              teacherDefaultPcts: { ...def.teacherDefaultPcts, ...(parsed.teacherDefaultPcts || {}) },
               teacherSalaries: { ...def.teacherSalaries, ...(parsed.teacherSalaries || {}) },
               courseSettings: { ...def.courseSettings, ...(parsed.courseSettings || {}) },
               guitarVariantSettings: {
@@ -2794,11 +3013,13 @@
               admissions: { ...def.admissions, ...(parsed.admissions || {}) },
               cancellations: { ...def.cancellations, ...(parsed.cancellations || {}) },
               existingStudents: { ...def.existingStudents, ...(parsed.existingStudents || {}) },
+              teacherDeductions: { ...def.teacherDeductions, ...(parsed.teacherDeductions || {}) },
               expanded: {
                 admissions: { ...def.expanded.admissions, ...((parsed.expanded && parsed.expanded.admissions) || {}) },
                 cancellations: { ...def.expanded.cancellations, ...((parsed.expanded && parsed.expanded.cancellations) || {}) }
               },
-              expandedExisting: { ...def.expandedExisting, ...(parsed.expandedExisting || {}) }
+              expandedExisting: { ...def.expandedExisting, ...(parsed.expandedExisting || {}) },
+              expandedDeductions: { ...def.expandedDeductions, ...(parsed.expandedDeductions || {}) }
             };
             migrateLegacyElectricGuitar(state, parsed);
             state.monthLabel = formatMonthFull(state.year, state.month);
@@ -3004,6 +3225,8 @@
             monthLabel: formatMonthFull(targetYear, targetMonth),
             recordingStudioIncome: Math.max(0, Number(snap.recordingStudioIncome) || 0),
             teacherNames: { ...def.teacherNames, ...(snap.teacherNames || {}) },
+            teacherPayModes: { ...def.teacherPayModes, ...(snap.teacherPayModes || {}) },
+            teacherDefaultPcts: { ...def.teacherDefaultPcts, ...(snap.teacherDefaultPcts || {}) },
             teacherSalaries: { ...def.teacherSalaries, ...(snap.teacherSalaries || {}) },
             courseSettings: { ...def.courseSettings, ...(snap.courseSettings || {}) },
             guitarVariantSettings: {
@@ -3012,11 +3235,13 @@
             admissions: { ...def.admissions, ...(snap.admissions || {}) },
             cancellations: { ...def.cancellations, ...(snap.cancellations || {}) },
             existingStudents: { ...def.existingStudents, ...(snap.existingStudents || {}) },
+            teacherDeductions: { ...def.teacherDeductions, ...(snap.teacherDeductions || {}) },
             expanded: {
               admissions: { ...def.expanded.admissions, ...((snap.expanded && snap.expanded.admissions) || {}) },
               cancellations: { ...def.expanded.cancellations, ...((snap.expanded && snap.expanded.cancellations) || {}) }
             },
-            expandedExisting: { ...def.expandedExisting, ...(snap.expandedExisting || {}) }
+            expandedExisting: { ...def.expandedExisting, ...(snap.expandedExisting || {}) },
+            expandedDeductions: { ...def.expandedDeductions, ...(snap.expandedDeductions || {}) }
           };
           migrateLegacyElectricGuitar(state, snap);
           document.getElementById('last-profit-input').value = state.lastProfit;
@@ -3030,18 +3255,26 @@
           const preservedSettings = JSON.parse(JSON.stringify(state.courseSettings));
           const preservedGuitarVariants = JSON.parse(JSON.stringify(state.guitarVariantSettings || {}));
           const preservedTeachers = JSON.parse(JSON.stringify(state.teacherNames || {}));
+          const preservedPayModes = JSON.parse(JSON.stringify(state.teacherPayModes || {}));
+          const preservedDefaultPcts = JSON.parse(JSON.stringify(state.teacherDefaultPcts || {}));
           const preservedSalaries = JSON.parse(JSON.stringify(state.teacherSalaries || {}));
           const preservedExisting = JSON.parse(JSON.stringify(state.existingStudents || makeEmptyCourseMap()));
+          const preservedDeductions = JSON.parse(JSON.stringify(state.teacherDeductions || makeEmptyCourseMap()));
           const preservedMode = state.mode;
+          const preservedTheme = state.theme;
           const baseProfit = prevSaved ? prevSaved.currentProfit : state.lastProfit;
 
           state = createDefaultState(targetYear, targetMonth);
           state.courseSettings = preservedSettings;
           state.guitarVariantSettings = { ...state.guitarVariantSettings, ...preservedGuitarVariants };
           state.teacherNames = { ...state.teacherNames, ...preservedTeachers };
+          state.teacherPayModes = { ...state.teacherPayModes, ...preservedPayModes };
+          state.teacherDefaultPcts = { ...state.teacherDefaultPcts, ...preservedDefaultPcts };
           state.teacherSalaries = { ...state.teacherSalaries, ...preservedSalaries };
           state.existingStudents = { ...makeEmptyCourseMap(), ...preservedExisting };
+          state.teacherDeductions = { ...makeEmptyCourseMap(), ...preservedDeductions };
           state.mode = preservedMode;
+          state.theme = preservedTheme;
           state.lastProfit = baseProfit;
           document.getElementById('last-profit-input').value = state.lastProfit;
           document.getElementById('recording-studio-input').value = state.recordingStudioIncome;
@@ -3112,6 +3345,7 @@
           state.teacherNames = { ...def.teacherNames, ...(pSnap.teacherNames || {}) };
           state.teacherSalaries = { ...def.teacherSalaries, ...(pSnap.teacherSalaries || {}) };
           state.existingStudents = { ...makeEmptyCourseMap(), ...(pSnap.existingStudents || {}) };
+          state.teacherDeductions = { ...makeEmptyCourseMap(), ...(pSnap.teacherDeductions || {}) };
           saveState();
           renderCourseTeachersBlock();
           renderPayoutCalendarUI();
@@ -3149,6 +3383,8 @@
             existingPayout: d.existingPayout,
             cancelCount: d.cancelList.length,
             cancelPayout: d.cancelPayout,
+            leaveDeductionCount: d.deductionsList.length,
+            leaveDeductionTotal: d.leaveDeductionTotal,
             deferredNewCount: d.newList.length,
             deferredNewPayout: d.newPayout,
             netPayout: d.netPayout
@@ -3174,7 +3410,8 @@
             payoutMonth: pm,
             teacherNames: JSON.parse(JSON.stringify(state.teacherNames || {})),
             teacherSalaries: JSON.parse(JSON.stringify(state.teacherSalaries || {})),
-            existingStudents: JSON.parse(JSON.stringify(state.existingStudents || makeEmptyCourseMap()))
+            existingStudents: JSON.parse(JSON.stringify(state.existingStudents || makeEmptyCourseMap())),
+            teacherDeductions: JSON.parse(JSON.stringify(state.teacherDeductions || makeEmptyCourseMap()))
           }
         };
 
@@ -3203,11 +3440,19 @@
           .filter(stu => stu.empType !== 'salaried')
           .map(stu => ({ stu, m: calcStudent(courseId, stu) }));
 
+        const deductionsList = (state.teacherDeductions && state.teacherDeductions[courseId] ? state.teacherDeductions[courseId] : [])
+          .map(ded => ({
+            id: ded.id,
+            amount: round2(Math.max(0, Number(ded.amount) || 0)),
+            reason: String(ded.reason || '')
+          }));
+
         const existingPayout = round2(existingList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
         const newPayout = round2(newList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
         const cancelPayout = round2(cancelList.reduce((acc, x) => acc + x.m.teacherPayout, 0));
+        const leaveDeductionTotal = round2(deductionsList.reduce((acc, x) => acc + x.amount, 0));
         const totalDiscHit = round2(existingList.reduce((acc, x) => acc + x.m.teacherHit, 0));
-        const netPayout = round2(fixedSalary + existingPayout - cancelPayout);
+        const netPayout = round2(fixedSalary + existingPayout - cancelPayout - leaveDeductionTotal);
 
         return {
           courseId,
@@ -3217,16 +3462,17 @@
           existingList,
           newList,
           cancelList,
+          deductionsList,
           existingPayout,
           newPayout,
           cancelPayout,
+          leaveDeductionTotal,
           totalDiscHit,
           netPayout
         };
       }
 
       function getActivePercentCourses() {
-        // Return all 5 courses so every teacher (including Piano & Singing / Salaried teachers) appears in Payouts & PDF Slips
         return DEFAULT_COURSES;
       }
 
@@ -3238,14 +3484,31 @@
         grid.innerHTML = courses.map(c => {
           const d = getPercentTeacherData(c.id);
           const cfg = state.courseSettings[c.id] || getCourseDef(c.id);
+          const coursePayMode = getCoursePayMode(c.id);
+          const isCourseSalaried = coursePayMode === 'salaried';
           const isOpen = Boolean(state.expandedExisting && state.expandedExisting[c.id]);
+          const isDedOpen = Boolean(state.expandedDeductions && state.expandedDeductions[c.id]);
           const netCls = d.netPayout > 0 ? 'text-gain' : d.netPayout < 0 ? 'text-loss' : '';
 
+          const deductionsRowsHtml = d.deductionsList.length === 0
+            ? `<div style="font-size:0.74rem; color:var(--muted); padding:6px 4px;">No leave or missed class deductions added for ${d.teacherName}. Click <strong>+ Add Deduction</strong> above to cut payment with reason.</div>`
+            : d.deductionsList.map((ded, idx) => `
+                <div class="deduction-row-card tabular-nums">
+                  <div class="deduction-amt-wrap">
+                    <span>−₹</span>
+                    <input type="number" min="0" step="50" value="${ded.amount}" placeholder="0" data-ded-amt="${c.id}:${ded.id}" aria-label="Deduction Amount" />
+                  </div>
+                  <input type="text" class="text-input" value="${escapeHtml(ded.reason)}" placeholder="Reason #${idx + 1} (e.g., 2 Days Leave / Missed Evening Class)" data-ded-reason="${c.id}:${ded.id}" aria-label="Deduction Reason" />
+                  <button type="button" class="remove-row-btn" title="Remove deduction" aria-label="Remove deduction" data-del-ded="${c.id}:${ded.id}">&times;</button>
+                </div>
+              `).join('');
+
           const existingRowsHtml = d.existingList.length === 0
-            ? `<div style="font-size:0.74rem; color:var(--muted); padding:6px 4px;">No existing continuing students added for ${c.name} yet. Click <strong>+ Add Existing</strong> above.</div>`
+            ? `<div style="font-size:0.74rem; color:var(--muted); padding:6px 4px;">No existing continuing students added for ${c.name} yet. Click <strong>+ Add Existing</strong> or use <strong>Import CSV / Excel</strong> above.</div>`
             : d.existingList.map(({ stu, m }, idx) => {
                 const isCustomT = !TEACHER_PCT_PRESETS.includes(Number(stu.teacherPct));
                 const isCustomD = !DISCOUNT_PCT_PRESETS.includes(Number(stu.discPct));
+                const stuSalaried = m.isSalaried;
                 return `
                   <div class="existing-stu-card">
                     <div class="existing-stu-top">
@@ -3264,20 +3527,31 @@
                             ${buildGuitarTypeOptions(stu.subType)}
                           </select>
                         ` : ''}
-                        <span style="font-size:0.7rem; color:var(--muted); font-weight:700;">Teacher %:</span>
-                        <select class="select-input tabular-nums" data-ex-field="teacherPct" data-ex-course="${c.id}" data-ex-id="${stu.id}">
-                          ${buildTeacherPctOptions(stu.teacherPct)}
+                        <select class="select-input emp-select ${stuSalaried ? 'salaried' : ''}" data-ex-field="empType" data-ex-course="${c.id}" data-ex-id="${stu.id}" aria-label="Teacher Compensation Mode">
+                          <option value="percent" ${!stuSalaried ? 'selected' : ''}>% Basis</option>
+                          <option value="salaried" ${stuSalaried ? 'selected' : ''}>Salaried</option>
                         </select>
-                        ${isCustomT ? `<span class="custom-pct-wrap"><input type="number" min="0" max="100" step="1" value="${stu.teacherPct}" data-ex-custom="teacherPct" data-ex-course="${c.id}" data-ex-id="${stu.id}" class="tabular-nums" /><span>%</span></span>` : ''}
+                        ${stuSalaried ? `
+                          <span class="salaried-pill" style="padding:3px 8px; font-size:0.68rem;">Salaried (₹0 variable · 100% HS Part)</span>
+                        ` : `
+                          <span style="font-size:0.7rem; color:var(--muted); font-weight:700;">Teacher %:</span>
+                          <select class="select-input tabular-nums" data-ex-field="teacherPct" data-ex-course="${c.id}" data-ex-id="${stu.id}">
+                            ${buildTeacherPctOptions(stu.teacherPct)}
+                          </select>
+                          ${isCustomT ? `<span class="custom-pct-wrap"><input type="number" min="0" max="100" step="1" value="${stu.teacherPct}" data-ex-custom="teacherPct" data-ex-course="${c.id}" data-ex-id="${stu.id}" class="tabular-nums" /><span>%</span></span>` : ''}
+                        `}
                         <span style="font-size:0.7rem; color:var(--muted); font-weight:700; margin-left:4px;">Disc %:</span>
                         <select class="select-input tabular-nums" data-ex-field="discPct" data-ex-course="${c.id}" data-ex-id="${stu.id}">
                           ${buildDiscPctOptions(stu.discPct)}
                         </select>
                         ${isCustomD ? `<span class="custom-pct-wrap"><input type="number" min="0" max="100" step="1" value="${stu.discPct}" data-ex-custom="discPct" data-ex-course="${c.id}" data-ex-id="${stu.id}" class="tabular-nums" /><span>%</span></span>` : ''}
+                        ${m.d > 0 ? `<span class="sync-badge tabular-nums">−${m.d}% (${formatINR(m.discAmtFull)} off)</span>` : ''}
                       </div>
                       <div style="text-align:right;">
-                        <span style="font-size:0.71rem; color:var(--muted);">Basic ${formatINR(m.netBasic)} × ${m.teacherPct}% = </span>
-                        <strong class="text-gain" style="font-size:0.88rem;">${formatINR(m.teacherPayout, true)}</strong>
+                        ${stuSalaried
+                          ? `<span style="font-size:0.71rem; color:var(--muted);">Net Fee ${formatINR(m.netFull)} → HS Part 100% · Teacher: </span><strong style="font-size:0.86rem; color:var(--sky);">₹0</strong>`
+                          : `<span style="font-size:0.71rem; color:var(--muted);">Basic ${formatINR(m.netBasic)} × ${m.teacherPct}% = </span><strong class="text-gain" style="font-size:0.88rem;">${formatINR(m.teacherPayout, true)}</strong>`
+                        }
                       </div>
                     </div>
                   </div>
@@ -3304,7 +3578,7 @@
               <!-- Fixed Salary Input (for Salaried teachers or hybrid payout) -->
               <div class="existing-bar tabular-nums">
                 <div>
-                  <div style="font-size:0.76rem; font-weight:800; color:var(--text);">Fixed Salary (₹) <span class="kpi-badge" style="margin-left:4px; font-size:0.64rem;">${c.defaultEmp === 'salaried' ? 'Salaried' : 'Optional'}</span></div>
+                  <div style="font-size:0.76rem; font-weight:800; color:var(--text);">Fixed Salary (₹) <span class="kpi-badge" style="margin-left:4px; font-size:0.64rem; ${isCourseSalaried ? 'background:var(--sky-bg); border-color:var(--sky-border); color:var(--sky);' : ''}">${isCourseSalaried ? 'Salaried Course' : 'Optional'}</span></div>
                   <div style="font-size:0.65rem; color:var(--muted);">Monthly fixed salary (added to slip, excluded from P&amp;L)</div>
                 </div>
                 <div style="display:inline-flex; align-items:center; gap:5px; background:var(--bg-subtle); border:1px solid var(--border); border-radius:8px; padding:4px 9px;">
@@ -3321,7 +3595,7 @@
                   </span>
                   <div>
                     <div style="font-size:0.78rem; font-weight:800; color:var(--text);">Existing Students (${d.existingList.length}) · <span class="text-gain">${formatINR(d.existingPayout, true)}</span></div>
-                    <div style="font-size:0.66rem; color:var(--muted);">Continuing from prev months · Basic ₹${cfg.basicFee} · Not in P&amp;L</div>
+                    <div style="font-size:0.66rem; color:var(--muted);">${isCourseSalaried ? 'Salaried course · ₹0 variable share · 100% HS Part' : `Continuing from prev months · Basic ₹${cfg.basicFee}`} · Not in P&amp;L</div>
                   </div>
                 </div>
                 <div class="stepper">
@@ -3335,10 +3609,29 @@
                 ${existingRowsHtml}
               </div>
 
+              <!-- Leave / Missed Class Deductions Bar (With Reason) -->
+              <div class="existing-bar tabular-nums" style="border-color:${d.leaveDeductionTotal > 0 ? 'var(--rose-border)' : 'var(--border)'};">
+                <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" data-toggle-ded="${c.id}">
+                  <span class="chevron-btn ${isDedOpen ? 'open' : ''}" style="width:22px; height:22px;">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </span>
+                  <div>
+                    <div style="font-size:0.78rem; font-weight:800; color:var(--text);">Leave / Missed Class Deductions (${d.deductionsList.length}) · <span class="text-loss" data-ded-summary="${c.id}">${d.leaveDeductionTotal > 0 ? `−${formatINR(d.leaveDeductionTotal)}` : '₹0'}</span></div>
+                    <div style="font-size:0.66rem; color:var(--muted);">Cut payment for leaves or missed classes with exact reason</div>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-danger-outline" data-add-ded="${c.id}">+ Add Deduction</button>
+              </div>
+
+              <div class="existing-drawer ${isDedOpen ? 'open' : ''}">
+                ${deductionsRowsHtml}
+              </div>
+
               <div class="payout-stats tabular-nums">
                 <div style="font-size:0.74rem; color:var(--muted); line-height:1.5;">
-                  ${d.fixedSalary > 0 || c.defaultEmp === 'salaried' ? `Fixed Salary: <strong class="text-gain" data-salary-summary="${c.id}">${formatINR(d.fixedSalary)}</strong> · ` : ''}Existing (Payable): <strong class="text-gain">${d.existingList.length} (${formatINR(d.existingPayout, true)})</strong> ·
-                  Canceled: <strong class="text-loss">−${d.cancelList.length} (${d.cancelPayout > 0 ? `−${formatINR(d.cancelPayout)}` : '₹0'})</strong><br/>
+                  ${d.fixedSalary > 0 || isCourseSalaried ? `Fixed Salary: <strong class="text-gain" data-salary-summary="${c.id}">${formatINR(d.fixedSalary)}</strong> · ` : ''}Existing (Payable): <strong class="text-gain">${d.existingList.length} (${formatINR(d.existingPayout, true)})</strong> ·
+                  Canceled: <strong class="text-loss">−${d.cancelList.length} (${d.cancelPayout > 0 ? `−${formatINR(d.cancelPayout)}` : '₹0'})</strong> ·
+                  Leaves / Cuts: <strong class="text-loss" data-ded-stat="${c.id}">${d.leaveDeductionTotal > 0 ? `−${formatINR(d.leaveDeductionTotal)}` : '₹0'}</strong><br/>
                   Next Month (New Admissions — Excluded): <strong class="text-amber">${d.newList.length} (${formatINR(d.newPayout)} deferred)</strong>
                   ${d.totalDiscHit > 0 ? ` · Teacher Disc: <strong class="text-amber">−${formatINR(d.totalDiscHit)}</strong>` : ''}
                 </div>
@@ -3400,6 +3693,15 @@
         }).join('');
       }
 
+      function applyThemeUI() {
+        const isLight = state.theme === 'light';
+        document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+        const btn = document.getElementById('btn-theme-toggle');
+        const lbl = document.getElementById('theme-switch-label');
+        if (btn) btn.setAttribute('aria-checked', String(isLight));
+        if (lbl) lbl.textContent = isLight ? 'Bright Mode' : 'Dark Mode';
+      }
+
       function renderCourseTeachersBlock() {
         const grid = document.getElementById('course-teachers-grid');
         if (!grid) return;
@@ -3407,13 +3709,15 @@
         grid.innerHTML = DEFAULT_COURSES.map(c => {
           const rawName = (state.teacherNames && state.teacherNames[c.id]) || '';
           const labelTitle = getCourseTeacherLabel(c.id);
-          const badge = c.defaultEmp === 'percent' ? '% Basis' : 'Salaried';
+          const payMode = getCoursePayMode(c.id);
+          const isSalaried = payMode === 'salaried';
+          const pct = getCourseDefaultTeacherPct(c.id);
           const ph = c.id === 'guitar' ? 'Type name (e.g. Sumit)' : 'Type teacher name...';
           return `
             <div class="teacher-dir-item">
               <div class="teacher-dir-label">
                 <span>${labelTitle}</span>
-                <span class="teacher-dir-sub">${badge}</span>
+                <span class="kpi-badge ${isSalaried ? '' : 'gain'}" style="font-size:0.63rem; padding:1px 7px; ${isSalaried ? 'background:var(--sky-bg); border-color:var(--sky-border); color:var(--sky);' : ''}">${isSalaried ? 'Salaried (₹0 %)' : `${pct}% Basis`}</span>
               </div>
               <input
                 type="text"
@@ -3423,6 +3727,18 @@
                 placeholder="${ph}"
                 aria-label="${labelTitle} Teacher Name"
               />
+              <div style="display:flex; align-items:center; gap:5px; margin-top:2px;">
+                <select class="select-input emp-select ${isSalaried ? 'salaried' : ''}" data-dir-paymode="${c.id}" style="flex:1; padding:4px 7px; font-size:0.72rem;" aria-label="${labelTitle} Compensation Type">
+                  <option value="percent" ${!isSalaried ? 'selected' : ''}>% Basis</option>
+                  <option value="salaried" ${isSalaried ? 'selected' : ''}>Salaried</option>
+                </select>
+                ${!isSalaried ? `
+                  <span class="custom-pct-wrap" style="padding:3px 6px; border-color:var(--border);">
+                    <input type="number" min="0" max="100" step="5" value="${pct}" data-dir-pct="${c.id}" class="tabular-nums" style="width:36px; font-size:0.72rem;" aria-label="${labelTitle} Teacher Percentage" />
+                    <span>%</span>
+                  </span>
+                ` : `<span style="font-size:0.66rem; color:var(--muted); font-weight:600; white-space:nowrap;">100% HS Part</span>`}
+              </div>
             </div>
           `;
         }).join('');
@@ -3620,13 +3936,11 @@
         const s = computeSummary();
         latestSummary = s;
 
-        // Mode segmented buttons & tax reminder
         document.querySelectorAll('.mode-btn').forEach(btn => {
           btn.classList.toggle('active', btn.dataset.mode === state.mode);
         });
         document.getElementById('tax-reminder-pill').classList.toggle('hidden', state.mode === 'real');
 
-        // Hero Bridge
         document.getElementById('last-profit-fmt').textContent = formatINR(s.lastProfit);
         document.getElementById('curr-profit-val').textContent = formatINR(s.currentProfit);
         document.getElementById('curr-mode-label').textContent = state.mode === 'cash' ? 'Cash Left (Incl. Tax)' : 'Real Net (Ex-Tax)';
@@ -3660,7 +3974,6 @@
           : `${s.pctChange > 0 ? '+' : s.pctChange < 0 ? '−' : ''}${Math.abs(s.pctChange).toFixed(2)}% change`;
         document.getElementById('net-delta-pct').textContent = pctText;
 
-        // Section Header & Footer Totals
         document.getElementById('admissions-head-badge').textContent = `${s.newStudents} student${s.newStudents === 1 ? '' : 's'} · ${formatINR(s.newHsTotal, true)}`;
         document.getElementById('admissions-footer-total').textContent = formatINR(s.newHsTotal, true);
 
@@ -3668,7 +3981,6 @@
         document.getElementById('cancellations-head-badge').textContent = `${s.cancelStudents} student${s.cancelStudents === 1 ? '' : 's'} · ${cancelDisplay}`;
         document.getElementById('cancellations-footer-total').textContent = cancelDisplay;
 
-        // 6-Metric Summary Strip & Studio Badge
         document.getElementById('studio-added-badge').textContent = `${formatINR(s.studioIncome, true)} added to profit`;
         document.getElementById('m-new-gain').textContent = formatINR(s.newHsTotal, true);
         document.getElementById('m-new-sub').textContent = `${s.newStudents} student${s.newStudents === 1 ? '' : 's'} added`;
@@ -3750,7 +4062,6 @@
           return;
         }
 
-        // Default: Complete Profit & Loss History View
         if (backupLbl) backupLbl.textContent = 'Download P&L Backup (.json)';
         if (badge) badge.textContent = `${historyList.length} P&L saved`;
         if (thead) {
@@ -3801,6 +4112,7 @@
 
       function fullRender(shouldSave = true) {
         if (shouldSave) saveState();
+        applyThemeUI();
         renderCalendarUI();
         renderPayoutCalendarUI();
         renderSettingsPanel();
@@ -4087,7 +4399,7 @@
               <tr>
                 <td class="pr-num">${idx + 1}</td>
                 <td class="pr-student-col"><div style="font-weight:700;">${nameLine}${typeTag}</div>${noteLine}</td>
-                <td>% Basis</td>
+                <td>${m.isSalaried ? 'Salaried' : '% Basis'}</td>
                 <td class="pr-num">${formatINR(m.fullFee)}</td>
                 <td class="pr-num">${formatINR(m.basicFee)}</td>
                 <td class="pr-num">${m.d}%</td>
@@ -4151,7 +4463,7 @@
             </div>
 
             <div class="pr-section-title">1. Payout Summary — ${escapeHtml(d.teacherName)}</div>
-            <div class="pr-bridge-grid" style="grid-template-columns: repeat(${d.fixedSalary > 0 ? 5 : 4}, 1fr);">
+            <div class="pr-bridge-grid" style="grid-template-columns: repeat(${(d.fixedSalary > 0 ? 1 : 0) + (d.leaveDeductionTotal > 0 ? 5 : 4)}, 1fr);">
               ${d.fixedSalary > 0 ? `
                 <div class="pr-bridge-card">
                   <div class="pr-card-label">Fixed Salary</div>
@@ -4169,6 +4481,13 @@
                 <div class="pr-card-val pr-loss">${d.cancelPayout > 0 ? `−${formatINR(d.cancelPayout)}` : '₹0'}</div>
                 <div class="pr-card-sub">${d.cancelList.length} canceled student${d.cancelList.length === 1 ? '' : 's'}</div>
               </div>
+              ${d.leaveDeductionTotal > 0 ? `
+                <div class="pr-bridge-card">
+                  <div class="pr-card-label">Leave / Class Cuts</div>
+                  <div class="pr-card-val pr-loss">−${formatINR(d.leaveDeductionTotal)}</div>
+                  <div class="pr-card-sub">${d.deductionsList.length} deduction${d.deductionsList.length === 1 ? '' : 's'}</div>
+                </div>
+              ` : ''}
               <div class="pr-bridge-card">
                 <div class="pr-card-label">New Admissions (Next Month)</div>
                 <div class="pr-card-val pr-amber">${formatINR(d.newPayout)}</div>
@@ -4177,7 +4496,7 @@
               <div class="pr-bridge-card highlight">
                 <div class="pr-card-label">Payable This Month</div>
                 <div class="pr-card-val">${formatINR(d.netPayout, true)}</div>
-                <div class="pr-card-sub">${d.fixedSalary > 0 ? 'Salary + Existing − Canceled' : 'Existing − Canceled'} (${payoutMonthShort})</div>
+                <div class="pr-card-sub">Net after cuts (${payoutMonthShort})</div>
               </div>
             </div>
 
@@ -4187,7 +4506,38 @@
             <div class="pr-section-title">2B. Canceled Enrollments — Payout Deduction</div>
             ${buildTeacherStudentTable(d.cancelList, false, 'canceled enrollments')}
 
-            <div class="pr-section-title">2C. New Admissions (Deferred to Next Month — Excluded from This Month's Payout)</div>
+            <div class="pr-section-title">2C. Leave / Missed Class Deductions (Payment Cut &amp; Reason)</div>
+            ${d.deductionsList.length === 0
+              ? `<div class="pr-empty">No leave or missed class deductions recorded for ${escapeHtml(d.teacherName)}.</div>`
+              : `
+                <table class="pr-table">
+                  <thead>
+                    <tr>
+                      <th class="pr-num" style="width:36px;">S.No</th>
+                      <th>Reason for Deduction / Leave / Missed Class</th>
+                      <th class="pr-num" style="width:130px;">Deducted Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${d.deductionsList.map((ded, idx) => `
+                      <tr>
+                        <td class="pr-num">${idx + 1}</td>
+                        <td>${escapeHtml(ded.reason || 'Leave / Missed Class Deduction')}</td>
+                        <td class="pr-num pr-loss" style="font-weight:800;">−${formatINR(ded.amount)}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="2">TOTAL LEAVE / MISSED CLASS DEDUCTIONS (${d.deductionsList.length})</td>
+                      <td class="pr-num pr-loss">−${formatINR(d.leaveDeductionTotal)}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              `
+            }
+
+            <div class="pr-section-title">2D. New Admissions (Deferred to Next Month — Excluded from This Month's Payout)</div>
             ${buildTeacherStudentTable(d.newList, true, 'new admissions')}
 
             <div class="pr-footer">
@@ -4434,7 +4784,6 @@
           `Mode: ${modeText} | Generated: ${nowStr}`
         );
 
-        // 1. Executive Profit Bridge
         y = drawPdfSectionTitle(doc, y, '1. Executive Profit Bridge Summary');
         y = drawPdfCardGrid(doc, y, [
           { label: `${formatMonthShort(prev.year, prev.month)} Profit`, value: formatPdfINR(s.lastProfit), sub: 'Opening Base' },
@@ -4445,7 +4794,6 @@
           { label: `${formatMonthShort(state.year, state.month)} Profit`, value: formatPdfINR(s.currentProfit), sub: 'Final Closing Profit', highlight: true }
         ], isLand ? 6 : 3);
 
-        // 2. 6-Metric Breakdown
         y = drawPdfSectionTitle(doc, y, '2. 6-Metric Financial Breakdown');
         y = drawPdfCardGrid(doc, y, [
           { label: 'New Admission Gain', value: formatPdfINR(s.newHsTotal, true), sub: `${s.newStudents} added`, tone: 'gain' },
@@ -4456,7 +4804,6 @@
           { label: 'Scaled Tax Change', value: formatPdfINR(s.netTaxChange, true), sub: 'Pass-through tax', tone: 'amber' }
         ], isLand ? 6 : 3);
 
-        // 3. Course-Wise Summary
         y = drawPdfSectionTitle(doc, y, '3. Course-Wise Summary');
         let cGrandNew = 0, cGrandCancel = 0, cGrandTeacher = 0, cGrandDisc = 0, cGrandHs = 0;
         const courseBody = DEFAULT_COURSES.map(c => {
@@ -4499,7 +4846,6 @@
         });
         y = doc.lastAutoTable.finalY + 6;
 
-        // 4A & 4B Detailed Student-Wise Tables
         function addStudentSection(section, title) {
           const isGain = section === 'admissions';
           y = drawPdfSectionTitle(doc, y, title);
@@ -4565,7 +4911,6 @@
         addStudentSection('admissions', '4A. Detailed Student-Wise — New Admissions (+ Profit)');
         addStudentSection('cancellations', '4B. Detailed Student-Wise — Canceled Enrollments (- Loss)');
 
-        // Footer & Signature
         if (y > pageH - 26) {
           doc.addPage();
           y = 18;
@@ -4629,9 +4974,14 @@
           }
           payoutCards.push(
             { label: 'Existing (Payable)', value: formatPdfINR(d.existingPayout, true), sub: `${d.existingList.length} continuing students`, tone: 'gain' },
-            { label: 'Canceled Deductions', value: d.cancelPayout > 0 ? `-${formatPdfINR(d.cancelPayout)}` : 'Rs. 0', sub: `${d.cancelList.length} canceled`, tone: 'loss' },
+            { label: 'Canceled Deductions', value: d.cancelPayout > 0 ? `-${formatPdfINR(d.cancelPayout)}` : 'Rs. 0', sub: `${d.cancelList.length} canceled`, tone: 'loss' }
+          );
+          if (d.leaveDeductionTotal > 0) {
+            payoutCards.push({ label: 'Leave / Class Cuts', value: `-${formatPdfINR(d.leaveDeductionTotal)}`, sub: `${d.deductionsList.length} deductions`, tone: 'loss' });
+          }
+          payoutCards.push(
             { label: 'New (Next Month)', value: formatPdfINR(d.newPayout), sub: `${d.newList.length} deferred (excluded)`, tone: 'amber' },
-            { label: 'Payable This Month', value: formatPdfINR(d.netPayout, true), sub: `${d.fixedSalary > 0 ? 'Salary + Existing - Canceled' : 'Existing - Canceled'} (${pMonthShort})`, highlight: true }
+            { label: 'Payable This Month', value: formatPdfINR(d.netPayout, true), sub: `Net after cuts (${pMonthShort})`, highlight: true }
           );
           y = drawPdfCardGrid(doc, y, payoutCards, isLand ? payoutCards.length : (payoutCards.length > 4 ? 3 : 2));
 
@@ -4660,7 +5010,7 @@
               return [
                 String(idx + 1),
                 details,
-                '% Basis',
+                m.isSalaried ? 'Salaried' : '% Basis',
                 formatPdfINR(m.fullFee),
                 formatPdfINR(m.basicFee),
                 `${m.d}%`,
@@ -4694,7 +5044,38 @@
 
           addTeacherTable(d.existingList, true, '2A. Existing Students (Continuing — Payable This Month)', 'existing continuing students');
           addTeacherTable(d.cancelList, false, '2B. Canceled Enrollments — Payout Deduction', 'canceled enrollments');
-          addTeacherTable(d.newList, true, '2C. New Admissions (Deferred to Next Month — Not in This Payout)', 'new admissions');
+
+          y = drawPdfSectionTitle(doc, y, '2C. Leave / Missed Class Deductions (Payment Cut & Reason)');
+          if (d.deductionsList.length === 0) {
+            doc.setFont('helvetica', 'italic');
+            doc.setFontSize(8.5);
+            doc.setTextColor(100, 116, 139);
+            doc.text(`No leave or missed class deductions recorded for ${d.teacherName}.`, margin, y + 2);
+            y += 8;
+          } else {
+            doc.autoTable({
+              startY: y,
+              margin: { left: margin, right: margin },
+              theme: 'grid',
+              styles: { fontSize: isLand ? 8 : 7.4, cellPadding: 2, textColor: [15, 23, 42], lineColor: [203, 213, 225], lineWidth: 0.2, overflow: 'linebreak' },
+              headStyles: { fillColor: [241, 245, 249], textColor: [30, 41, 59], fontStyle: 'bold' },
+              footStyles: { fillColor: [248, 250, 252], textColor: [15, 23, 42], fontStyle: 'bold' },
+              columnStyles: {
+                0: { halign: 'right', cellWidth: 10 },
+                2: { halign: 'right', fontStyle: 'bold', cellWidth: 36 }
+              },
+              head: [['#', 'Reason for Deduction / Leave / Missed Class', 'Deducted Amount']],
+              body: d.deductionsList.map((ded, idx) => [
+                String(idx + 1),
+                ded.reason || 'Leave / Missed Class Deduction',
+                `-${formatPdfINR(ded.amount)}`
+              ]),
+              foot: [[{ content: `TOTAL LEAVE / MISSED CLASS DEDUCTIONS (${d.deductionsList.length})`, colSpan: 2 }, `-${formatPdfINR(d.leaveDeductionTotal)}`]]
+            });
+            y = doc.lastAutoTable.finalY + 6;
+          }
+
+          addTeacherTable(d.newList, true, '2D. New Admissions (Deferred to Next Month — Not in This Payout)', 'new admissions');
 
           if (y > pageH - 28) {
             doc.addPage();
@@ -4841,7 +5222,6 @@
           }
         } catch (e) {}
 
-        // Fallback: hidden iframe print
         try {
           const iframe = document.createElement('iframe');
           iframe.style.position = 'fixed';
@@ -4908,7 +5288,8 @@
                 payoutMonth: state.payoutMonth || state.month,
                 teacherNames: state.teacherNames || {},
                 teacherSalaries: state.teacherSalaries || {},
-                existingStudents: state.existingStudents || makeEmptyCourseMap()
+                existingStudents: state.existingStudents || makeEmptyCourseMap(),
+                teacherDeductions: state.teacherDeductions || makeEmptyCourseMap()
               },
               payoutHistoryList
             };
@@ -4955,7 +5336,6 @@
               return;
             }
 
-            // Case 1: Dedicated Teacher Payout Backup
             if (parsed.backupType === 'payout') {
               if (Array.isArray(parsed.payoutHistoryList)) {
                 payoutHistoryList = parsed.payoutHistoryList;
@@ -4969,6 +5349,7 @@
                 state.teacherNames = { ...def.teacherNames, ...(ps.teacherNames || {}) };
                 state.teacherSalaries = { ...def.teacherSalaries, ...(ps.teacherSalaries || {}) };
                 state.existingStudents = { ...makeEmptyCourseMap(), ...(ps.existingStudents || {}) };
+                state.teacherDeductions = { ...makeEmptyCourseMap(), ...(ps.teacherDeductions || {}) };
                 payoutPopoverYear = state.payoutYear;
                 saveState();
               }
@@ -4979,7 +5360,6 @@
               return;
             }
 
-            // Case 2: P&L Backup or Legacy Full Backup
             if (typeof parsed.state !== 'object' && !Array.isArray(parsed.historyList) && !Array.isArray(parsed.payoutHistoryList)) {
               showToast('Invalid backup file. Please choose a valid HS Music .json backup.', 'warning');
               return;
@@ -5006,6 +5386,8 @@
                 payoutMonth: Number(sObj.payoutMonth) || state.payoutMonth || def.month,
                 recordingStudioIncome: Math.max(0, Number(sObj.recordingStudioIncome) || 0),
                 teacherNames: { ...def.teacherNames, ...(sObj.teacherNames || {}) },
+                teacherPayModes: { ...def.teacherPayModes, ...(sObj.teacherPayModes || {}) },
+                teacherDefaultPcts: { ...def.teacherDefaultPcts, ...(sObj.teacherDefaultPcts || {}) },
                 teacherSalaries: { ...def.teacherSalaries, ...(sObj.teacherSalaries || {}) },
                 courseSettings: { ...def.courseSettings, ...(sObj.courseSettings || {}) },
                 guitarVariantSettings: {
@@ -5014,11 +5396,13 @@
                 admissions: { ...def.admissions, ...(sObj.admissions || {}) },
                 cancellations: { ...def.cancellations, ...(sObj.cancellations || {}) },
                 existingStudents: { ...def.existingStudents, ...(sObj.existingStudents || {}) },
+                teacherDeductions: { ...def.teacherDeductions, ...(sObj.teacherDeductions || {}) },
                 expanded: {
                   admissions: { ...def.expanded.admissions, ...((sObj.expanded && sObj.expanded.admissions) || {}) },
                   cancellations: { ...def.expanded.cancellations, ...((sObj.expanded && sObj.expanded.cancellations) || {}) }
                 },
-                expandedExisting: { ...def.expandedExisting, ...(sObj.expandedExisting || {}) }
+                expandedExisting: { ...def.expandedExisting, ...(sObj.expandedExisting || {}) },
+                expandedDeductions: { ...def.expandedDeductions, ...(sObj.expandedDeductions || {}) }
               };
               migrateLegacyElectricGuitar(state, sObj);
               state.monthLabel = formatMonthFull(state.year, state.month);
@@ -5099,6 +5483,270 @@
         document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(url), 4000);
         showToast('Exported student-wise CSV!', 'success');
+      }
+
+      // =========================================================
+      // CSV / EXCEL IMPORT INTO TEACHER PAYOUT (EXISTING STUDENTS)
+      // =========================================================
+      function parseCSVRows(text) {
+        const rows = [];
+        let row = [];
+        let cell = '';
+        let inQuotes = false;
+        const cleanText = String(text || '').replace(/^\uFEFF/, '');
+
+        for (let i = 0; i < cleanText.length; i++) {
+          const ch = cleanText[i];
+          const next = cleanText[i + 1];
+          if (inQuotes) {
+            if (ch === '"' && next === '"') {
+              cell += '"';
+              i++;
+            } else if (ch === '"') {
+              inQuotes = false;
+            } else {
+              cell += ch;
+            }
+          } else {
+            if (ch === '"') {
+              inQuotes = true;
+            } else if (ch === ',') {
+              row.push(cell.trim());
+              cell = '';
+            } else if (ch === '\r' && next === '\n') {
+              row.push(cell.trim());
+              rows.push(row);
+              row = [];
+              cell = '';
+              i++;
+            } else if (ch === '\n' || ch === '\r') {
+              row.push(cell.trim());
+              rows.push(row);
+              row = [];
+              cell = '';
+            } else {
+              cell += ch;
+            }
+          }
+        }
+        if (cell.length > 0 || row.length > 0) {
+          row.push(cell.trim());
+          rows.push(row);
+        }
+        return rows.filter(r => r.some(c => c !== ''));
+      }
+
+      function rowsToObjects(rows) {
+        if (!Array.isArray(rows) || rows.length < 2) return [];
+        const headers = rows[0].map(h => String(h || '').trim());
+        const objs = [];
+        for (let i = 1; i < rows.length; i++) {
+          const r = rows[i];
+          if (!r || !r.some(v => String(v || '').trim() !== '')) continue;
+          const obj = {};
+          headers.forEach((h, idx) => {
+            if (h) obj[h] = r[idx] != null ? String(r[idx]).trim() : '';
+          });
+          objs.push(obj);
+        }
+        return objs;
+      }
+
+      function normalizeHeaderKey(k) {
+        return String(k || '').toLowerCase().replace(/[^a-z0-9%]+/g, ' ').replace(/\s+/g, ' ').trim();
+      }
+
+      function getRowField(rowObj, candidateKeys) {
+        const keys = Object.keys(rowObj);
+        for (const cand of candidateKeys) {
+          const found = keys.find(k => normalizeHeaderKey(k) === cand);
+          if (found && rowObj[found] !== undefined && String(rowObj[found]).trim() !== '') {
+            return String(rowObj[found]).trim();
+          }
+        }
+        for (const cand of candidateKeys) {
+          const found = keys.find(k => normalizeHeaderKey(k).includes(cand));
+          if (found && rowObj[found] !== undefined && String(rowObj[found]).trim() !== '') {
+            return String(rowObj[found]).trim();
+          }
+        }
+        return '';
+      }
+
+      function detectDiscountFromRow(rowObj, courseId, subType) {
+        const cfg = getEffectiveFeeConfig(courseId, { subType });
+        const fullFee = Number(cfg.fullFee) || 0;
+
+        // 1. Explicit discount / concession columns (handles "Discount in Fee", "Discount in Fees", "Discount %", "Discount", etc.)
+        const explicitCandidates = [
+          'discount in fee', 'discount in fees', 'fee discount', 'fees discount',
+          'discount %', 'discount percentage', 'disc %', 'disc', 'discount', 'concession'
+        ];
+        let rawDisc = getRowField(rowObj, explicitCandidates);
+
+        // Fallback: scan any column header containing 'disc' or 'concess'
+        if (!rawDisc) {
+          const anyDiscKey = Object.keys(rowObj).find(k => {
+            const nk = normalizeHeaderKey(k);
+            return (nk.includes('disc') || nk.includes('concess')) && String(rowObj[k] || '').trim() !== '';
+          });
+          if (anyDiscKey) rawDisc = String(rowObj[anyDiscKey]).trim();
+        }
+
+        if (rawDisc) {
+          const hasPercentSign = rawDisc.includes('%');
+          const numMatch = rawDisc.match(/-?\d+(\.\d+)?/);
+          if (numMatch) {
+            let val = parseFloat(numMatch[0]);
+            if (!isNaN(val) && val > 0) {
+              // Excel percentage cells often export as decimal fractions (e.g., 0.1 for 10%)
+              if (!hasPercentSign && val > 0 && val < 1) {
+                val = val * 100;
+              } else if (!hasPercentSign && val > 100 && fullFee > 0) {
+                // Flat rupee discount (e.g., 200 off on 1950) -> convert to proportional %
+                val = (val / fullFee) * 100;
+              }
+              return clamp(round2(val), 0, 100);
+            }
+          }
+        }
+
+        // 2. If no discount column is present or it's blank/0, check if a Paid Fee / Monthly Fee column shows a reduced fee
+        const paidCandidates = ['paid fee', 'monthly fee', 'tuition fee', 'net fee', 'fee amount', 'fees', 'fee'];
+        const rawPaid = getRowField(rowObj, paidCandidates);
+        if (rawPaid && fullFee > 0) {
+          const numMatch = rawPaid.match(/\d+(\.\d+)?/);
+          if (numMatch) {
+            const paidVal = parseFloat(numMatch[0]);
+            if (!isNaN(paidVal) && paidVal > 0 && paidVal < fullFee) {
+              const inferredPct = ((fullFee - paidVal) / fullFee) * 100;
+              return clamp(round2(inferredPct), 0, 100);
+            }
+          }
+        }
+
+        return 0;
+      }
+
+      function processImportedPayoutRecords(records, targetCourseSelection) {
+        if (!Array.isArray(records) || records.length === 0) {
+          showToast('No student rows found in the uploaded file.', 'warning');
+          return;
+        }
+
+        let courseId = targetCourseSelection;
+        let subType = '';
+        if (targetCourseSelection.startsWith('guitar:')) {
+          courseId = 'guitar';
+          subType = targetCourseSelection.split(':')[1] === 'electric' ? 'electric' : 'advance';
+        }
+
+        const def = getCourseDef(courseId);
+        const coursePayMode = getCoursePayMode(courseId);
+        const isCourseSalaried = coursePayMode === 'salaried';
+        const defaultPct = isCourseSalaried ? 0 : getCourseDefaultTeacherPct(courseId);
+
+        if (!state.existingStudents) state.existingStudents = makeEmptyCourseMap();
+        if (!state.expandedExisting) state.expandedExisting = makeExpandedMap(false);
+
+        let importedCount = 0;
+        let discountedCount = 0;
+        let skippedInactive = 0;
+
+        records.forEach((rec, idx) => {
+          const stuName = getRowField(rec, ['student name', 'name', 'student']);
+          if (!stuName) return;
+
+          const statusVal = getRowField(rec, ['status']).toLowerCase();
+          if (statusVal && ['inactive', 'canceled', 'cancelled', 'left', 'dropped'].includes(statusVal)) {
+            skippedInactive++;
+            return;
+          }
+
+          const discPct = detectDiscountFromRow(rec, courseId, subType);
+          if (discPct > 0) discountedCount++;
+
+          const rawPhone = getRowField(rec, ['mobile no', 'mobile', 'phone', 'contact no', 'contact']);
+          const phoneDigits = rawPhone.replace(/\D/g, '').slice(-10);
+
+          const stuIdCode = getRowField(rec, ['id', 'admission id', 'roll no', 'reg no']);
+          const admDate = getRowField(rec, ['admission date', 'adm date', 'date']);
+          const noteParts = [];
+          if (stuIdCode) noteParts.push(`ID: ${stuIdCode}`);
+          if (admDate) noteParts.push(`Adm: ${admDate}`);
+
+          const newStu = createStudent(courseId);
+          newStu.id = `imp-${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 6)}`;
+          newStu.name = stuName;
+          newStu.phone = phoneDigits.length === 10 ? phoneDigits : '';
+          newStu.note = noteParts.join(' · ');
+          newStu.subType = courseId === 'guitar' ? subType : '';
+          newStu.empType = coursePayMode;
+          newStu.teacherPct = defaultPct;
+          newStu.discPct = discPct;
+
+          state.existingStudents[courseId].push(newStu);
+          importedCount++;
+        });
+
+        if (importedCount === 0) {
+          showToast('No valid active student names found in the file.', 'warning');
+          return;
+        }
+
+        state.expandedExisting[courseId] = true;
+        saveState();
+        renderTeacherPayoutsSection();
+
+        const targetLabel = courseId === 'guitar'
+          ? getGuitarVariantLabel(subType)
+          : def.name;
+        const teacherName = getTeacherDisplayName(courseId);
+        const modeTag = isCourseSalaried ? 'Salaried · ₹0 variable' : `${defaultPct}% Basis`;
+        const discMsg = discountedCount > 0 ? ` · ${discountedCount} with discount applied` : '';
+        const skipMsg = skippedInactive > 0 ? ` · ${skippedInactive} inactive skipped` : '';
+        showToast(`Imported ${importedCount} student${importedCount === 1 ? '' : 's'} into ${targetLabel} (${teacherName} · ${modeTag})${discMsg}${skipMsg}!`, 'success');
+      }
+
+      function handlePayoutFileUpload(file, targetCourseSelection) {
+        if (!file) return;
+        const fileName = (file.name || '').toLowerCase();
+        const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
+
+        if (isExcel) {
+          if (!window.XLSX) {
+            showToast('Excel parser still loading — please wait 2 seconds or upload a .csv file.', 'warning');
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            try {
+              const data = new Uint8Array(ev.target.result);
+              const workbook = window.XLSX.read(data, { type: 'array' });
+              const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+              const rows = window.XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '', raw: false });
+              const records = rowsToObjects(rows);
+              processImportedPayoutRecords(records, targetCourseSelection);
+            } catch (err) {
+              console.error('Excel import error:', err);
+              showToast('Could not read Excel file. Please check the format.', 'warning');
+            }
+          };
+          reader.readAsArrayBuffer(file);
+        } else {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            try {
+              const rows = parseCSVRows(ev.target.result);
+              const records = rowsToObjects(rows);
+              processImportedPayoutRecords(records, targetCourseSelection);
+            } catch (err) {
+              console.error('CSV import error:', err);
+              showToast('Could not read CSV file. Please check the format.', 'warning');
+            }
+          };
+          reader.readAsText(file);
+        }
       }
 
       // =========================================================
@@ -5228,7 +5876,6 @@
       }
 
       function bindEvents() {
-        // Calendar Picker & Navigation
         const calWrapper = document.getElementById('cal-wrapper');
         const calTrigger = document.getElementById('btn-cal-trigger');
         const calPopover = document.getElementById('cal-popover');
@@ -5287,7 +5934,6 @@
           switchToMonth(today.year, today.month, true);
         });
 
-        // Independent Teacher Payout Calendar Picker & Save Snapshot
         const payoutCalWrapper = document.getElementById('payout-cal-wrapper');
         const payoutCalTrigger = document.getElementById('btn-payout-cal-trigger');
         const payoutCalPopover = document.getElementById('payout-cal-popover');
@@ -5350,13 +5996,28 @@
 
         document.getElementById('btn-save-payout-snapshot').addEventListener('click', saveCurrentPayoutSnapshot);
 
-        // History View Selector (Complete Profit & Loss vs Teacher Payout)
+        // Import CSV / Excel into Teacher Payout Existing Students
+        const importPayoutBtn = document.getElementById('btn-import-payout-file');
+        const importPayoutInput = document.getElementById('import-payout-file-input');
+        const importCourseSel = document.getElementById('import-payout-course-select');
+        if (importPayoutBtn && importPayoutInput && importCourseSel) {
+          importPayoutBtn.addEventListener('click', () => {
+            importPayoutInput.value = '';
+            importPayoutInput.click();
+          });
+          importPayoutInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (file) {
+              handlePayoutFileUpload(file, importCourseSel.value);
+            }
+          });
+        }
+
         document.getElementById('history-view-select').addEventListener('change', (e) => {
           activeHistoryView = e.target.value === 'payout' ? 'payout' : 'pnl';
           renderHistory();
         });
 
-        // PDF & Print Preview Modal Controls
         document.getElementById('btn-header-pdf').addEventListener('click', () => openPrintPreview('pnl'));
         document.getElementById('btn-action-pdf').addEventListener('click', () => openPrintPreview('pnl'));
         document.getElementById('btn-action-teacher-pdf').addEventListener('click', () => openPrintPreview('all-teachers'));
@@ -5382,17 +6043,89 @@
           }
         });
 
-        // Teacher Payouts Panel Events (Name edit, Existing Students & Individual PDF button)
+        // Dark / Bright Theme Slide Switch
+        const themeToggleBtn = document.getElementById('btn-theme-toggle');
+        if (themeToggleBtn) {
+          themeToggleBtn.addEventListener('click', () => {
+            state.theme = state.theme === 'light' ? 'dark' : 'light';
+            saveState();
+            applyThemeUI();
+            showToast(`Switched to ${state.theme === 'light' ? 'Bright Mode' : 'Dark Mode'}`, 'info');
+          });
+        }
+
+        // Teacher Payouts Panel Events (Name edit, Compensation Mode, Existing Students & Individual PDF button)
         const dirGrid = document.getElementById('course-teachers-grid');
         if (dirGrid) {
           dirGrid.addEventListener('input', (e) => {
             const inp = e.target.closest('input[data-dir-teacher]');
-            if (!inp) return;
-            const courseId = inp.dataset.dirTeacher;
-            if (!state.teacherNames) state.teacherNames = {};
-            state.teacherNames[courseId] = inp.value;
-            saveState();
-            syncTeacherNameUI(courseId, inp.value);
+            if (inp) {
+              const courseId = inp.dataset.dirTeacher;
+              if (!state.teacherNames) state.teacherNames = {};
+              state.teacherNames[courseId] = inp.value;
+              saveState();
+              syncTeacherNameUI(courseId, inp.value);
+              return;
+            }
+
+            const pctInp = e.target.closest('input[data-dir-pct]');
+            if (pctInp) {
+              const courseId = pctInp.dataset.dirPct;
+              const newPct = clamp(pctInp.value, 0, 100);
+              if (!state.teacherDefaultPcts) state.teacherDefaultPcts = {};
+              state.teacherDefaultPcts[courseId] = newPct;
+
+              ['admissions', 'cancellations', 'existingStudents'].forEach(bucket => {
+                (state[bucket][courseId] || []).forEach(stu => {
+                  if (stu.empType !== 'salaried') {
+                    stu.teacherPct = newPct;
+                  }
+                });
+              });
+
+              saveState();
+              renderSection('admissions');
+              renderSection('cancellations');
+              renderDashboard();
+              const refocus = dirGrid.querySelector(`input[data-dir-pct="${courseId}"]`);
+              if (refocus) {
+                refocus.focus();
+                refocus.setSelectionRange(refocus.value.length, refocus.value.length);
+              }
+            }
+          });
+
+          dirGrid.addEventListener('change', (e) => {
+            const modeSel = e.target.closest('select[data-dir-paymode]');
+            if (!modeSel) return;
+            const courseId = modeSel.dataset.dirPaymode;
+            const newMode = modeSel.value === 'salaried' ? 'salaried' : 'percent';
+            if (!state.teacherPayModes) state.teacherPayModes = {};
+            if (!state.teacherDefaultPcts) state.teacherDefaultPcts = {};
+
+            state.teacherPayModes[courseId] = newMode;
+            const pctForMode = newMode === 'salaried'
+              ? 0
+              : (state.teacherDefaultPcts[courseId] > 0 ? state.teacherDefaultPcts[courseId] : 50);
+            if (newMode === 'percent') {
+              state.teacherDefaultPcts[courseId] = pctForMode;
+            }
+
+            ['admissions', 'cancellations', 'existingStudents'].forEach(bucket => {
+              (state[bucket][courseId] || []).forEach(stu => {
+                stu.empType = newMode;
+                stu.teacherPct = pctForMode;
+              });
+            });
+
+            fullRender(true);
+            const labelTitle = getCourseTeacherLabel(courseId);
+            showToast(
+              newMode === 'salaried'
+                ? `${labelTitle} set to Salaried (₹0 variable payout · 100% fee to HS Music)`
+                : `${labelTitle} set to % Basis (${pctForMode}%)`,
+              'info'
+            );
           });
         }
 
@@ -5424,6 +6157,41 @@
                 payEl.textContent = formatINR(d.netPayout, true);
                 payEl.className = d.netPayout > 0 ? 'text-gain' : d.netPayout < 0 ? 'text-loss' : '';
               }
+            }
+            return;
+          }
+
+          const dedAmtInp = e.target.closest('input[data-ded-amt]');
+          if (dedAmtInp) {
+            const [courseId, dedId] = dedAmtInp.dataset.dedAmt.split(':');
+            const dedItem = (state.teacherDeductions && state.teacherDeductions[courseId] || []).find(x => x.id === dedId);
+            if (dedItem) {
+              dedItem.amount = Math.max(0, Number(dedAmtInp.value) || 0);
+              saveState();
+              const d = getPercentTeacherData(courseId);
+              const card = payoutGrid.querySelector(`[data-payout-card="${courseId}"]`);
+              if (card) {
+                const dedSum = card.querySelector(`[data-ded-summary="${courseId}"]`);
+                if (dedSum) dedSum.textContent = d.leaveDeductionTotal > 0 ? `−${formatINR(d.leaveDeductionTotal)}` : '₹0';
+                const dedStat = card.querySelector(`[data-ded-stat="${courseId}"]`);
+                if (dedStat) dedStat.textContent = d.leaveDeductionTotal > 0 ? `−${formatINR(d.leaveDeductionTotal)}` : '₹0';
+                const payEl = card.querySelector(`[data-payable-val="${courseId}"]`);
+                if (payEl) {
+                  payEl.textContent = formatINR(d.netPayout, true);
+                  payEl.className = d.netPayout > 0 ? 'text-gain' : d.netPayout < 0 ? 'text-loss' : '';
+                }
+              }
+            }
+            return;
+          }
+
+          const dedReasonInp = e.target.closest('input[data-ded-reason]');
+          if (dedReasonInp) {
+            const [courseId, dedId] = dedReasonInp.dataset.dedReason.split(':');
+            const dedItem = (state.teacherDeductions && state.teacherDeductions[courseId] || []).find(x => x.id === dedId);
+            if (dedItem) {
+              dedItem.reason = dedReasonInp.value;
+              saveState();
             }
             return;
           }
@@ -5488,6 +6256,13 @@
           const stu = (state.existingStudents[courseId] || []).find(s => s.id === stuId);
           if (field === 'subType') {
             stu.subType = sel.value;
+          } else if (field === 'empType') {
+            stu.empType = sel.value === 'salaried' ? 'salaried' : 'percent';
+            if (stu.empType === 'salaried') {
+              stu.teacherPct = 0;
+            } else if (!stu.teacherPct) {
+              stu.teacherPct = getCourseDefaultTeacherPct(courseId) || 50;
+            }
           } else if (field === 'teacherPct') {
             stu.teacherPct = sel.value === 'custom' ? 35 : clamp(sel.value, 0, 100);
           } else if (field === 'discPct') {
@@ -5504,8 +6279,6 @@
             if (!state.existingStudents) state.existingStudents = makeEmptyCourseMap();
             if (!state.expandedExisting) state.expandedExisting = makeExpandedMap(false);
             const newStu = createStudent(courseId);
-            newStu.empType = 'percent';
-            if (!newStu.teacherPct) newStu.teacherPct = getCourseDef(courseId).defaultTeacherPct || 50;
             state.existingStudents[courseId].push(newStu);
             state.expandedExisting[courseId] = true;
             saveState();
@@ -5547,6 +6320,46 @@
             return;
           }
 
+          const addDed = e.target.closest('button[data-add-ded]');
+          if (addDed) {
+            const courseId = addDed.dataset.addDed;
+            if (!state.teacherDeductions) state.teacherDeductions = makeEmptyCourseMap();
+            if (!state.expandedDeductions) state.expandedDeductions = makeExpandedMap(false);
+            const newDed = {
+              id: `ded-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+              amount: 0,
+              reason: ''
+            };
+            state.teacherDeductions[courseId].push(newDed);
+            state.expandedDeductions[courseId] = true;
+            saveState();
+            renderTeacherPayoutsSection();
+            const amtInput = payoutGrid.querySelector(`input[data-ded-amt="${courseId}:${newDed.id}"]`);
+            if (amtInput) amtInput.focus();
+            return;
+          }
+
+          const delDed = e.target.closest('button[data-del-ded]');
+          if (delDed) {
+            const [courseId, dedId] = delDed.dataset.delDed.split(':');
+            if (state.teacherDeductions && state.teacherDeductions[courseId]) {
+              state.teacherDeductions[courseId] = state.teacherDeductions[courseId].filter(x => x.id !== dedId);
+              saveState();
+              renderTeacherPayoutsSection();
+            }
+            return;
+          }
+
+          const toggleDed = e.target.closest('[data-toggle-ded]');
+          if (toggleDed) {
+            const courseId = toggleDed.dataset.toggleDed;
+            if (!state.expandedDeductions) state.expandedDeductions = makeExpandedMap(false);
+            state.expandedDeductions[courseId] = !state.expandedDeductions[courseId];
+            saveState();
+            renderTeacherPayoutsSection();
+            return;
+          }
+
           const btn = e.target.closest('button[data-open-teacher-pdf]');
           if (!btn) return;
           openPrintPreview(`teacher:${btn.dataset.openTeacherPdf}`);
@@ -5568,11 +6381,9 @@
           }
         });
 
-        // Admissions & Cancellations Section Events
         bindSectionEvents('admissions');
         bindSectionEvents('cancellations');
 
-        // Load Demo Button
         document.getElementById('btn-load-demo').addEventListener('click', () => {
           state = createDefaultState(state.year, state.month);
           state.lastProfit = 0;
@@ -5623,7 +6434,6 @@
           showToast('Loaded demo data (Base ₹0, Advance/Electric Guitar, 1-Month Arrears Payout).', 'success');
         });
 
-        // Reset All Button (Two-click confirmation, no alert/confirm)
         const resetBtn = document.getElementById('btn-reset-all');
         resetBtn.addEventListener('click', () => {
           if (!resetConfirmPending) {
@@ -5649,12 +6459,10 @@
           showToast('All student entries & settings reset.', 'warning');
         });
 
-        // Carry Forward -> Next Month
         document.getElementById('btn-carry-forward').addEventListener('click', () => {
           if (!latestSummary) return;
           const next = getNextYM(state.year, state.month);
 
-          // 1-Month Arrears: Move this month's % Basis New Admissions into Next Month's Existing Students
           let movedCount = 0;
           if (!state.existingStudents) state.existingStudents = makeEmptyCourseMap();
           DEFAULT_COURSES.forEach(c => {
@@ -5692,7 +6500,6 @@
           showToast(`Carried forward ${formatINR(state.lastProfit)} to ${state.monthLabel}${extraMsg}!`, 'success');
         });
 
-        // Mode Toggle (Cash Left vs Real Net)
         document.querySelectorAll('.mode-btn').forEach(btn => {
           btn.addEventListener('click', () => {
             state.mode = btn.dataset.mode === 'real' ? 'real' : 'cash';
@@ -5700,7 +6507,6 @@
           });
         });
 
-        // Last Profit & Recording Studio Inputs
         document.getElementById('last-profit-input').addEventListener('input', (e) => {
           state.lastProfit = Number(e.target.value) || 0;
           saveState();
@@ -5713,7 +6519,6 @@
           renderDashboard();
         });
 
-        // Course Fee Base Settings Toggle & Inputs
         const settingsToggle = document.getElementById('btn-settings-toggle');
         const settingsBody = document.getElementById('settings-body');
         const settingsChevron = document.getElementById('settings-chevron');
@@ -5745,7 +6550,6 @@
           renderDashboard();
         });
 
-        // Save Complete P&L Snapshot
         document.getElementById('btn-save-snapshot').addEventListener('click', () => {
           const s = computeSummary();
           const ymKey = makeYMKey(state.year, state.month);
@@ -5772,7 +6576,6 @@
           showToast(`Saved P&L snapshot for ${state.monthLabel} (${formatINR(s.currentProfit)})`, 'success');
         });
 
-        // History Load & Delete (Both P&L and Teacher Payout)
         document.getElementById('history-tbody').addEventListener('click', (e) => {
           const loadPayoutBtn = e.target.closest('button[data-load-payout-hist]');
           if (loadPayoutBtn) {
@@ -5825,6 +6628,8 @@
                 monthLabel: formatMonthFull(targetY, targetM),
                 recordingStudioIncome: Math.max(0, Number(snap.recordingStudioIncome) || 0),
                 teacherNames: { ...def.teacherNames, ...(snap.teacherNames || {}) },
+                teacherPayModes: { ...def.teacherPayModes, ...(snap.teacherPayModes || {}) },
+                teacherDefaultPcts: { ...def.teacherDefaultPcts, ...(snap.teacherDefaultPcts || {}) },
                 teacherSalaries: { ...def.teacherSalaries, ...(snap.teacherSalaries || {}) },
                 courseSettings: { ...def.courseSettings, ...(snap.courseSettings || {}) },
                 guitarVariantSettings: {
@@ -5862,10 +6667,8 @@
           }
         });
 
-        // Export CSV
         document.getElementById('btn-export-csv').addEventListener('click', exportCSV);
 
-        // Full Backup (.json) & Restore
         document.getElementById('btn-backup-json').addEventListener('click', exportFullBackupJSON);
         const restoreInput = document.getElementById('restore-file-input');
         document.getElementById('btn-restore-json').addEventListener('click', () => {
